@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText pass;
     private TextInputLayout inputLayoutUser;
     private TextInputLayout inputLayoutPass;
-    private Button buttonSign;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         inputLayoutPass = (TextInputLayout) findViewById(R.id.input_pass);
         user = (EditText) findViewById(R.id.edit_user);
         pass = (EditText) findViewById(R.id.edit_pass);
-        buttonSign = (Button) findViewById(R.id.btn_signup);
+        Button buttonSign = (Button) findViewById(R.id.btn_signup);
         buttonSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
