@@ -23,9 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean isSend;
     private boolean isRate;
 
-    private TextView textDownload;
-    private TextView textSend;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,9 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        textDownload = (TextView) findViewById(R.id.label_is_download);
-        textSend = (TextView) findViewById(R.id.label_is_send);
     }
 
     public void startReading(View view) {
@@ -58,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 view.setEnabled(false);
-                textDownload.setVisibility(View.VISIBLE);
                 isDownload = true;
             }
         });
@@ -84,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 view.setEnabled(false);
-                textSend.setVisibility(View.VISIBLE);
                 isSend = true;
             }
         });
