@@ -38,11 +38,93 @@ public class DBHelper extends SQLiteOpenHelper {
                 "1, " +
                 "'ende', " +
                 "'" + endeapp + "')");
+        sqLiteDatabase.execSQL("CREATE TABLE data_table (" +
+                "id INTEGER PRIMARY KEY, " +
+                "TlxRem integer, " +
+                "TlxAre integer, " +
+                "TlxRut integer, " +
+                "TlxRut integer, " +
+                "TlxAno integer, " +
+                "TlxMes integer, " +
+                "TlxCli numeric, " +
+                "TlxOrdTpl integer, " +
+                "TlxNom text, " +
+                "TlxDir text, " +
+                "TlxCtaAnt text, " +
+                "TlxCtg text, " +
+                "TlxNroMed text, " +
+                "TlxNroDig integer, " +
+                "TlxFacMul real, " +
+                "TlxFecAnt numeric, " +
+                "TlxFecLec numeric, " +
+                "TlxHorLec text, " +
+                "TlxUltInd integer, " +
+                "TlxConPro integer, " +
+                "TlxNvaLec integer, " +
+                "TlxTipLec integer, " +
+                "TlxSgl text, " +
+                "TlxOrdSeq integer, " +
+                "TlxImpFac integer, " +
+                "TlxImpTap real, " +
+                "TlxImpAse real, " +
+                "TlxCarFij real, " +
+                "TlxImpEn real, " +
+                "TlxImpPot real, " +
+                "TlxDesTdi real, " +
+                "TlxLey1886 real, " +
+                "TlxLeePot integer, " +
+                "TlxCotaseo integer, " +
+                "TlxTap numeric, " +
+                "TlxPotCon integer, " +
+                "TlxPotFac integer, " +
+                "TlxCliNit numeric, " +
+                "TlxFecCor numeric, " +
+                "TlxFecVto numeric, " +
+                "TlxFecproEmi numeric, " +
+                "TlxFecproMed numeric, " +
+                "TlxTope real, " +
+                "TlxLeyTag integer, " +
+                "TlxTpoTap integer, " +
+                "TlxImpTot real, " +
+                "TlxKwhAdi integer, " +
+                "TlxImpAvi integer, " +
+                "TlxCarFac integer, " +
+                "TlxDeuEneC integer, " +
+                "TlxDeuEneI real, " +
+                "TlxDeuAseC integer, " +
+                "TlxDeuAseI real, " +
+                "TlxFecEmi numeric, " +
+                "TlxUltPag numeric, " +
+                "TlxEstado integer, " +
+                "TlxUltObs text, " +
+                "TlxActivi text, " +
+                "TlxCiudad text, " +
+                "TlxFacNro numeric, " +
+                "TlxNroAut numeric, " +
+                "TlxCodCon text, " +
+                "TlxFecLim numeric, " +
+                "TlxKwhDev integer, " +
+                "TlxUltTipL integer, " +
+                "TlxCliNew integer, " +
+                "TlxEntEne integer, " +
+                "TlxEntPot integer, " +
+                "TlxPotFacM integer, " +
+                "TlxPerCo3 numeric, " +
+                "TlxPerHr3 numeric, " +
+                "TlxPerCo2 numeric, " +
+                "TlxPerHr2 numeric, " +
+                "TlxPerCo1 numeric, " +
+                "TlxPerHr1 numeric, " +
+                "TlxConsumo numeric, " +
+                "TlxPerdidas numeric, " +
+                "TlxConsFacturado numeric, " +
+                "TlxDebAuto text)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS User");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS user_table");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS data_table");
 
         onCreate(sqLiteDatabase);
     }

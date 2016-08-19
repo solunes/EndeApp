@@ -44,6 +44,16 @@ public class DBAdapter {
         return cursor.getCount() > 0;
     }
 
+
+    public DBAdapter open() throws SQLException {
+        db = dbHelper.getWritableDatabase();
+        return this;
+    }
+
+    public void close() {
+        dbHelper.close();
+    }
+
     public static String SHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.update(text.getBytes("iso-8859-1"), 0, text.length());
@@ -62,14 +72,5 @@ public class DBAdapter {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
-    }
-
-    public DBAdapter open() throws SQLException {
-        db = dbHelper.getWritableDatabase();
-        return this;
-    }
-
-    public void close() {
-        dbHelper.close();
     }
 }
