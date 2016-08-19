@@ -1,9 +1,11 @@
 package com.solunes.endeapp.activities;
 
+import android.graphics.Color;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -51,6 +53,9 @@ public class ReadingActivity extends AppCompatActivity {
         adapter = new PagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        TabLayout.Tab tabAt = tabLayout.getTabAt(2);
+        tabAt.setCustomView(R.layout.custom_tab);
+//        tabAt.getCustomView().setBackgroundColor(getResources().getColor(R.color.colorAccent));
 
 //        labelEnergiaFacturada = (TextView) findViewById(R.id.label_energia_facturada);
 //        labelSubtotal = (TextView) findViewById(R.id.label_subtotal);

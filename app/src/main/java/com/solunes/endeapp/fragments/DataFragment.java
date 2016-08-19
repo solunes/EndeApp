@@ -20,7 +20,6 @@ public class DataFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        onFragmentListener = (OnFragmentListener) context;
     }
 
     public static DataFragment newInstance() {
@@ -29,7 +28,6 @@ public class DataFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG, "onCreate: data fragment");
         super.onCreate(savedInstanceState);
     }
 

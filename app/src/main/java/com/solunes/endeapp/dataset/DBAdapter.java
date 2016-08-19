@@ -19,6 +19,7 @@ public class DBAdapter {
 
     private static final String TAG = "DBAdapter";
     private static final String TABLE_USER = "user_table";
+    private static final String TABLE_DATA = "data_table";
 
     private DBHelper dbHelper;
     private Context context;

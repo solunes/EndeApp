@@ -19,19 +19,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public int getItemPosition(Object object) {
-        return POSITION_NONE;
-    }
-
-    @Override
     public Fragment getItem(int position) {
-        Log.e(TAG, "getItem pager");
         return DataFragment.newInstance();
     }
 
     @Override
     public int getCount() {
-        return 10;
+        return 20;
     }
 
     @Override

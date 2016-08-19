@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:visibility="gone"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
+        android:elevation="4dp"
+        app:tabGravity="center"
+        app:tabMode="scrollable"
         app:tabSelectedTextColor="@android:color/white"
         app:tabTextColor="#80ffffff" />
 
@@ -22,7 +22,6 @@
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:visibility="gone" />
+        android:background="@android:color/white" />
 
 </LinearLayout>
