@@ -13,14 +13,16 @@ import com.solunes.endeapp.fragments.DataFragment;
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
     private static final String TAG = "PagerAdapter";
+    private DataFragment.OnFragmentListener listener;
 
-    public PagerAdapter(FragmentManager fm) {
+    public PagerAdapter(FragmentManager fm, DataFragment.OnFragmentListener listener) {
         super(fm);
+        this.listener = listener;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return DataFragment.newInstance();
+        return DataFragment.newInstance(listener);
     }
 
     @Override

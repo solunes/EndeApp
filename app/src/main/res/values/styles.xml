@@ -24,4 +24,10 @@
         <item name="colorControlHighlight">#90CAF9</item>
         <item name="colorButtonNormal">#2979FF</item>
     </style>
+
+    <style name="PrintButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlHighlight">#69f0ae</item>
+        <item name="colorButtonNormal">#00e676</item>
+    </style>
+
 </resources>
