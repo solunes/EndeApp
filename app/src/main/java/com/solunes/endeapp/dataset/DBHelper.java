@@ -42,8 +42,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY, " +
                 "TlxRem integer, " +
                 "TlxAre integer, " +
-                "TlxRut integer, " +
-                "TlxRut integer, " +
+                "TlxRutO integer, " +
+                "TlxRutA integer, " +
                 "TlxAno integer, " +
                 "TlxMes integer, " +
                 "TlxCli numeric, " +

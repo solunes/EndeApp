@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/activity_horizontal_margin"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="@dimen/activity_horizontal_margin"
+    android:layout_marginTop="@dimen/activity_horizontal_margin_half"
     android:orientation="vertical">
 
     <LinearLayout
@@ -20,7 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="@dimen/activity_horizontal_margin_half">
+                android:paddingRight="@dimen/activity_horizontal_margin_half"
+                android:paddingLeft="@dimen/activity_horizontal_margin_half">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -60,7 +64,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="@dimen/activity_horizontal_margin_half">
+                android:paddingRight="@dimen/activity_horizontal_margin_half"
+                android:paddingLeft="@dimen/activity_horizontal_margin_half">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -106,7 +111,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="@dimen/activity_horizontal_margin_half">
+                android:paddingRight="@dimen/activity_horizontal_margin_half"
+                android:paddingLeft="@dimen/activity_horizontal_margin_half">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -146,7 +152,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="@dimen/activity_horizontal_margin_half">
+                android:paddingRight="@dimen/activity_horizontal_margin_half"
+                android:paddingLeft="@dimen/activity_horizontal_margin_half">
 
                 <ImageView
                     android:layout_width="wrap_content"

@@ -36,22 +36,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         adapter = new PagerAdapter(getSupportFragmentManager(), this);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-//        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-//                Log.e(TAG, "onTabSelected: " + tab.getCustomView());
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//                Log.e(TAG, "onTabUnselected: " + tab.getCustomView());
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//                Log.e(TAG, "onTabReselected: " + tab.getCustomView());
-//            }
-//        });
         for (int i = 0; i < adapter.getCount(); i++) {
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
             tabAt.setCustomView(R.layout.custom_tab);

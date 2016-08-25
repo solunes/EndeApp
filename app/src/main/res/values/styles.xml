@@ -25,6 +25,10 @@
         <item name="colorButtonNormal">#2979FF</item>
     </style>
 
+    <style name="MyAction" parent="Theme.AppCompat.Light">
+        <item name="android:colorControlNormal">#FFEBEE</item>
+    </style>
+
     <style name="PrintButton" parent="Theme.AppCompat.Light">
         <item name="colorControlHighlight">#69f0ae</item>
         <item name="colorButtonNormal">#00e676</item>

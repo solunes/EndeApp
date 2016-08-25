@@ -13,10 +13,12 @@ import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.utils.UserPreferences;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
+    private static final String KEY_LOGIN = "login";
 
     private EditText user;
     private EditText pass;
@@ -27,6 +29,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        if (UserPreferences.getBoolean(this, KEY_LOGIN)){
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
@@ -56,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                     DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
                     if (dbAdapter.checkUser(user.getText().toString(), pass.getText().toString())) {
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        UserPreferences.putBoolean(LoginActivity.this, KEY_LOGIN, true);
                         finish();
                     } else {
                         Toast.makeText(LoginActivity.this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
@@ -64,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
 
 //        QRGEncoder qrgEncoder = new QRGEncoder("something", null, QRGContents.Type.TEXT, 1000);
 //        try {
