@@ -3,9 +3,11 @@ package com.solunes.endeapp.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import com.solunes.endeapp.fragments.DataFragment;
+import com.solunes.endeapp.models.DataModel;
+
+import java.util.ArrayList;
 
 /**
  * Created by jhonlimaster on 19-11-15.
@@ -13,25 +15,25 @@ import com.solunes.endeapp.fragments.DataFragment;
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
     private static final String TAG = "PagerAdapter";
-    private DataFragment.OnFragmentListener listener;
+    private int size;
 
-    public PagerAdapter(FragmentManager fm, DataFragment.OnFragmentListener listener) {
+    public PagerAdapter(FragmentManager fm, int sizeTable) {
         super(fm);
-        this.listener = listener;
+        this.size = sizeTable;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return DataFragment.newInstance(listener);
+        return DataFragment.newInstance(position+1);
     }
 
     @Override
     public int getCount() {
-        return 20;
+        return size;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "50";
+        return (position + 1) + "";
     }
 }

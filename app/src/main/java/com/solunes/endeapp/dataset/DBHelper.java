@@ -39,7 +39,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "'ende', " +
                 "'" + endeapp + "')");
         sqLiteDatabase.execSQL("CREATE TABLE data_table (" +
-                "id INTEGER PRIMARY KEY, " +
+                "_id INTEGER PRIMARY KEY, " +
                 "TlxRem integer, " +
                 "TlxAre integer, " +
                 "TlxRutO integer, " +
@@ -54,7 +54,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxCtg text, " +
                 "TlxNroMed text, " +
                 "TlxNroDig integer, " +
-                "TlxFacMul real, " +
+                "TlxFacMul decimal(15, 2), " +
                 "TlxFecAnt numeric, " +
                 "TlxFecLec numeric, " +
                 "TlxHorLec text, " +
@@ -65,13 +65,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxSgl text, " +
                 "TlxOrdSeq integer, " +
                 "TlxImpFac integer, " +
-                "TlxImpTap real, " +
-                "TlxImpAse real, " +
-                "TlxCarFij real, " +
-                "TlxImpEn real, " +
-                "TlxImpPot real, " +
-                "TlxDesTdi real, " +
-                "TlxLey1886 real, " +
+                "TlxImpTap decimal(15, 2), " +
+                "TlxImpAse decimal(15, 2), " +
+                "TlxCarFij decimal(15, 2), " +
+                "TlxImpEn decimal(15, 2), " +
+                "TlxImpPot decimal(15, 2), " +
+                "TlxDesTdi decimal(15, 2), " +
+                "TlxLey1886 decimal(15, 2), " +
                 "TlxLeePot integer, " +
                 "TlxCotaseo integer, " +
                 "TlxTap numeric, " +
@@ -82,17 +82,17 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxFecVto numeric, " +
                 "TlxFecproEmi numeric, " +
                 "TlxFecproMed numeric, " +
-                "TlxTope real, " +
+                "TlxTope decimal(15, 2), " +
                 "TlxLeyTag integer, " +
                 "TlxTpoTap integer, " +
-                "TlxImpTot real, " +
+                "TlxImpTot decimal(15, 2), " +
                 "TlxKwhAdi integer, " +
                 "TlxImpAvi integer, " +
                 "TlxCarFac integer, " +
                 "TlxDeuEneC integer, " +
-                "TlxDeuEneI real, " +
+                "TlxDeuEneI decimal(15, 2), " +
                 "TlxDeuAseC integer, " +
-                "TlxDeuAseI real, " +
+                "TlxDeuAseI decimal(15, 2), " +
                 "TlxFecEmi numeric, " +
                 "TlxUltPag numeric, " +
                 "TlxEstado integer, " +

@@ -6,11 +6,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.adapters.PagerAdapter;
+import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.fragments.DataFragment;
 
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener {
@@ -33,13 +35,18 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
-        adapter = new PagerAdapter(getSupportFragmentManager(), this);
+        DBAdapter dbAdapter = new DBAdapter(this);
+        adapter = new PagerAdapter(getSupportFragmentManager(), dbAdapter.getSizeData());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         for (int i = 0; i < adapter.getCount(); i++) {
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
-            tabAt.setCustomView(R.layout.custom_tab);
+            View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+            TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
+            tabText.setText(String.valueOf(i+1));
+            tabAt.setCustomView(inflate);
         }
+        dbAdapter.close();
     }
 
     @Override

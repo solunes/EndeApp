@@ -1,16 +1,20 @@
 package com.solunes.endeapp.dataset;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
+import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.User;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -38,7 +42,7 @@ public class DBAdapter {
             e.printStackTrace();
         }
         Cursor cursor = db.query(true, TABLE_USER, null,
-                User.Columns.username.name() + " = '" + username + "' AND " + User.Columns.password.name() + " = '" + password+"'",
+                User.Columns.username.name() + " = '" + username + "' AND " + User.Columns.password.name() + " = '" + password + "'",
                 null, null, null, null, null);
         cursor.moveToFirst();
 
@@ -49,6 +53,41 @@ public class DBAdapter {
     public DBAdapter open() throws SQLException {
         db = dbHelper.getWritableDatabase();
         return this;
+    }
+
+    public void saveDataObject(ContentValues values) {
+        open();
+        long insert = db.insert(TABLE_DATA, null, values);
+        Log.e(TAG, "saveDataObject: " + insert);
+    }
+
+    public ArrayList<DataModel> getAllData() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(TABLE_DATA, null, null, null, null, null, null);
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
+    public DataModel getData(int id) {
+        open();
+        Cursor query = db.query(TABLE_DATA, null, DataModel.Columns._id.name() + " = " + id, null, null, null, null);
+        query.moveToNext();
+        DataModel dataModel = DataModel.fromCursor(query);
+        query.close();
+        return dataModel;
+    }
+
+    public int getSizeData() {
+        open();
+        Cursor query = db.rawQuery("select count(*) from " + TABLE_DATA, null);
+        query.moveToNext();
+        int size = query.getInt(0);
+        query.close();
+        return size;
     }
 
     public void close() {

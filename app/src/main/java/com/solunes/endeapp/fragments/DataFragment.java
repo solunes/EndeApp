@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
+import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.utils.GenLecturas;
 
 /**
@@ -18,6 +20,7 @@ import com.solunes.endeapp.utils.GenLecturas;
  */
 public class DataFragment extends Fragment {
     private static final String TAG = "PostFragment";
+    private static final String KEY_POSITION = "position";
     private OnFragmentListener onFragmentListener;
 
     private EditText inputReading;
@@ -33,6 +36,9 @@ public class DataFragment extends Fragment {
     private TextView labelTotalFacturar;
     private Button save;
 
+    private TextView nameData;
+    private TextView clientData;
+
     public DataFragment() {
     }
 
@@ -42,8 +48,12 @@ public class DataFragment extends Fragment {
         onFragmentListener = (OnFragmentListener) context;
     }
 
-    public static DataFragment newInstance(DataFragment.OnFragmentListener listener) {
-        return new DataFragment();
+    public static DataFragment newInstance(int position) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(KEY_POSITION, position);
+        DataFragment dataFragment = new DataFragment();
+        dataFragment.setArguments(bundle);
+        return dataFragment;
     }
 
     @Override
@@ -54,11 +64,19 @@ public class DataFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_data, container, false);
-        setupUI(view);
+        Bundle arguments = getArguments();
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+        DataModel data = dbAdapter.getData(arguments.getInt(KEY_POSITION));
+        setupUI(view, data);
         return view;
     }
 
-    public void setupUI(View view) {
+    public void setupUI(View view, DataModel data) {
+        nameData = (TextView) view.findViewById(R.id.data_name);
+        nameData.setText(data.getTlxNom());
+        clientData = (TextView) view.findViewById(R.id.data_client);
+        clientData.setText(String.valueOf(data.getTlxCli()));
+
         labelEnergiaFacturada = (TextView) view.findViewById(R.id.label_energia_facturada);
         labelSubtotal = (TextView) view.findViewById(R.id.label_subtotal);
         labelImporteConsumo = (TextView) view.findViewById(R.id.label_importe_consumo);
