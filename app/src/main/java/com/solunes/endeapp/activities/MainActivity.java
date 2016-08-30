@@ -2,10 +2,10 @@ package com.solunes.endeapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +17,7 @@ import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
+import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.UserPreferences;
 
@@ -24,9 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Hashtable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView textSend;
     private TextView textTarifa;
 
+    private CardView cardRate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,20 +58,29 @@ public class MainActivity extends AppCompatActivity {
         textSend = (TextView) findViewById(R.id.text_date_send);
         textTarifa = (TextView) findViewById(R.id.text_date_tarifa);
 
-        String dateDownload = UserPreferences.getString(this, KEY_DOWNLOAD);
-        if (dateDownload != null) {
-            textDownload.setText(dateDownload);
+        Calendar calendar = Calendar.getInstance();
+        long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
+        if (dateDownload > 0) {
+            calendar.setTimeInMillis(dateDownload);
+            textDownload.setText(StringUtils.getHumanDate(calendar.getTime()));
             isDownload = true;
         }
-        String dateSend = UserPreferences.getString(this, KEY_SEND);
-        if (dateSend != null) {
-            textSend.setText(dateSend);
+        long dateSend = UserPreferences.getLong(this, KEY_SEND);
+        if (dateSend > 0) {
+            calendar.setTimeInMillis(dateSend);
+            textSend.setText(StringUtils.getHumanDate(calendar.getTime()));
+            isSend = true;
         }
-        String dateRate = UserPreferences.getString(this, KEY_RATE);
-        if (dateRate != null) {
-            textTarifa.setText(dateRate);
+        long dateRate = UserPreferences.getLong(this, KEY_RATE);
+        if (dateRate > 0) {
+            calendar.setTimeInMillis(dateRate);
+            textTarifa.setText(StringUtils.getHumanDate(calendar.getTime()));
             isRate = true;
         }
+
+        cardRate = (CardView) findViewById(R.id.card_rate);
+
+        validDay();
     }
 
     public void startReading(View view) {
@@ -87,13 +99,6 @@ public class MainActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                view.setEnabled(false);
-                isDownload = true;
-            }
-        });
         new GetRequest("http://ende.solunes.com/api/descarga/25/12345", new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
@@ -104,9 +109,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "onSuccess: ", e);
                 }
                 progressDialog.dismiss();
+                view.setEnabled(false);
+                isDownload = true;
+
                 String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
                 textDownload.setText(humanDate);
-                UserPreferences.putString(MainActivity.this, KEY_DOWNLOAD, humanDate);
+                UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
             }
 
             @Override
@@ -115,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).execute();
         progressDialog.show();
-
-
     }
 
     public void sendReading(final View view) {
@@ -124,38 +130,47 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "No se han descargado las rutas", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (isSend) {
+            return;
+        }
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Enviando....");
         progressDialog.setCancelable(false);
-        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        progressDialog.show();
+
+        Hashtable<String, String> params = prepareDataToPost();
+        new PostRequest(params, null, "http://ende.solunes.com/api/subida?TlxCli=602887&TlxAre=1320&TlxRutO=12345", new CallbackAPI() {
             @Override
-            public void onDismiss(DialogInterface dialogInterface) {
+            public void onSuccess(String result, int statusCode) {
+                Log.e(TAG, "onSuccess: " + result);
+                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                textSend.setText(humanDate);
+                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                progressDialog.dismiss();
                 view.setEnabled(false);
                 isSend = true;
             }
-        });
-        progressDialog.show();
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+
             @Override
-            public void run() {
+            public void onFailed(String reason, int statusCode) {
+                Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
             }
-        }, 500);
-
-        String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-        textSend.setText(humanDate);
-        UserPreferences.putString(this, KEY_SEND, humanDate);
+        }).execute();
     }
 
     public void updateRate(View view) {
-        isRate = true;
+        if (isRate) {
+            return;
+        }
         Toast.makeText(MainActivity.this, "Se ha actualizado la estructura tarifaria", Toast.LENGTH_SHORT).show();
         String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
         textTarifa.setText(humanDate);
-        UserPreferences.putString(this, KEY_RATE, humanDate);
+        UserPreferences.putLong(this, KEY_RATE, Calendar.getInstance().getTimeInMillis());
         int month = Calendar.getInstance().get(Calendar.MONTH);
         UserPreferences.putInt(this, KEY_RATE_MONTH, month);
+        isRate = true;
+        cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
     }
 
     private void processResponse(String result) throws JSONException {
@@ -248,5 +263,41 @@ public class MainActivity extends AppCompatActivity {
             dbAdapter.saveDataObject(values);
         }
         dbAdapter.close();
+    }
+
+    private Hashtable<String, String> prepareDataToPost() {
+        Hashtable<String, String> params = new Hashtable<>();
+
+        DBAdapter dbAdapter = new DBAdapter(this);
+        ArrayList<DataModel> allData = dbAdapter.getAllData();
+        for (DataModel dataModel : allData) {
+            String json = dataModel.getJsonToSend(dataModel);
+            params.put("" + dataModel.getTlxCli(), json);
+        }
+        return params;
+    }
+
+    public void validDay() {
+        Calendar calendar = Calendar.getInstance();
+        int monthRate = UserPreferences.getInt(getApplicationContext(), KEY_RATE_MONTH);
+        int currentMonth = calendar.get(Calendar.MONTH);
+        if (monthRate < currentMonth) {
+            isRate = false;
+            cardRate.setBackgroundTintList(getResources().getColorStateList(R.color.color_tint));
+        } else if (currentMonth == 0) {
+            isRate = false;
+            cardRate.setBackgroundTintList(getResources().getColorStateList(R.color.color_tint));
+        }
+
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        long dateDownload = UserPreferences.getLong(getApplicationContext(), KEY_DOWNLOAD);
+        calendar.setTimeInMillis(dateDownload);
+        if (calendar.get(Calendar.DAY_OF_MONTH) < currentDay) {
+            isDownload = false;
+            isSend = false;
+        } else if (!isRate) {
+            isDownload = false;
+            isSend = false;
+        }
     }
 }

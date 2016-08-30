@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 public class PostRequest extends AsyncTask<String, Void, String> {
@@ -17,7 +19,6 @@ public class PostRequest extends AsyncTask<String, Void, String> {
     private Hashtable<String, String> headers;
     private String urlEndpoint;
     private int statusCode;
-    private String token = null;
     private static final String TAG = "PostRequest";
     private CallbackAPI callbackAPI;
 
@@ -32,17 +33,12 @@ public class PostRequest extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... urls) {
         HttpURLConnection urlConnection = null;
         try {
-//            String paramString = ConnectionUtils.getStringParams(params);
-//            Log.e(TAG, "Params: " + paramString);
+            String paramString = getStringParams(params);
+            Log.e(TAG, "Params: " + paramString);
 
             urlConnection = (HttpURLConnection) new URL(urlEndpoint).openConnection();
             urlConnection.setRequestMethod("POST");
             Log.e(TAG, "endpoint: " + urlEndpoint);
-
-            if (this.token != null) {
-                Log.e(TAG, "Token: " + this.token);
-                urlConnection.setRequestProperty("Authorization", "Token " + this.token);
-            }
 
             if (headers != null && headers.size() > 0)
                 for (String key : headers.keySet())
@@ -82,10 +78,6 @@ public class PostRequest extends AsyncTask<String, Void, String> {
         return statusCode;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public void putHeader(String key, String value) {
         if (headers == null) {
             headers = new Hashtable<String, String>();
@@ -122,5 +114,20 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
     public boolean isSuccessStatusCode() {
         return (getStatusCode() >= 200 && getStatusCode() <= 250);
+    }
+
+    private static String getStringParams(Hashtable<String, String> params) {
+        if (params.size() == 0)
+            return "";
+
+        StringBuffer buf = new StringBuffer();
+        Enumeration<String> keys = params.keys();
+        while (keys.hasMoreElements()) {
+            buf.append(buf.length() == 0 ? "" : "&");
+            String key = keys.nextElement();
+            buf.append(key).append("=").append(params.get(key));
+        }
+        return buf.toString();
+
     }
 }

@@ -28,6 +28,12 @@ public class UserPreferences {
         editor.commit();
     }
 
+    public static void putLong(Context context, String tag, long value) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putLong(tag, value);
+        editor.commit();
+    }
+
     public static void putBoolean(Context context, String key, boolean value) {
         SharedPreferences.Editor editor = getEditor(context);
         editor.putBoolean(key, value);
@@ -48,6 +54,11 @@ public class UserPreferences {
     public static int getInt(Context context, String key) {
         SharedPreferences sharedPreferences = getPreferences(context);
         return sharedPreferences.getInt(key, 0);
+    }
+
+    public static long getLong(Context context, String key) {
+        SharedPreferences sharedPreferences = getPreferences(context);
+        return sharedPreferences.getLong(key, 0);
     }
 
     public static boolean getBoolean(Context context, String key) {
