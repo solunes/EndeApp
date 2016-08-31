@@ -48,7 +48,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
             urlConnection.setDoOutput(true);
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-//            out.write(paramString.getBytes());
+            out.write(paramString.getBytes());
             out.flush();
             out.close();
 

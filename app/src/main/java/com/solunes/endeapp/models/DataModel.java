@@ -20,7 +20,7 @@ public class DataModel {
     private int TlxRutA;
     private int TlxAno;
     private int TlxMes;
-    private double TlxCli;
+    private int TlxCli;
     private int TlxOrdTpl;
     private String TlxNom;
     private String TlxDir;
@@ -93,6 +93,7 @@ public class DataModel {
     private double TlxPerdidas;
     private double TlxConsFacturado;
     private String TlxDebAuto;
+    private boolean saveState;
 
     public enum Columns {
         _id,
@@ -174,7 +175,8 @@ public class DataModel {
         TlxConsumo,
         TlxPerdidas,
         TlxConsFacturado,
-        TlxDebAuto
+        TlxDebAuto,
+        save_state
     }
 
     public int get_id() {
@@ -233,11 +235,11 @@ public class DataModel {
         TlxMes = tlxMes;
     }
 
-    public double getTlxCli() {
+    public int getTlxCli() {
         return TlxCli;
     }
 
-    public void setTlxCli(double tlxCli) {
+    public void setTlxCli(int tlxCli) {
         TlxCli = tlxCli;
     }
 
@@ -817,6 +819,14 @@ public class DataModel {
         TlxDebAuto = tlxDebAuto;
     }
 
+    public boolean isSaveState() {
+        return saveState;
+    }
+
+    public void setSaveState(boolean saveState) {
+        this.saveState = saveState;
+    }
+
     public static DataModel fromCursor(Cursor cursor) {
         DataModel dataModel = new DataModel();
         dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
@@ -899,6 +909,7 @@ public class DataModel {
         dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
         dataModel.setTlxConsFacturado(cursor.getDouble(Columns.TlxConsFacturado.ordinal()));
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
+        dataModel.setSaveState(cursor.getInt(Columns.save_state.ordinal()) == 1);
         return dataModel;
     }
 
@@ -907,6 +918,7 @@ public class DataModel {
         try {
             jsonObject.put(Columns.TlxFecLec.name(), dataModel.getTlxFecLec());
             jsonObject.put(DataModel.Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
+            jsonObject.put(DataModel.Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
             jsonObject.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(DataModel.Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
             jsonObject.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());

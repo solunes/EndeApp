@@ -1,5 +1,6 @@
 package com.solunes.endeapp.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ public class DataFragment extends Fragment {
 
     private EditText inputReading;
     private Button buttonCalc;
+    private Button buttonPromedio;
     private TextView labelEnergiaFacturada;
     private TextView labelSubtotal;
     private TextView labelImporteConsumo;
@@ -38,6 +40,8 @@ public class DataFragment extends Fragment {
 
     private TextView nameData;
     private TextView clientData;
+
+    private DataModel dataModel;
 
     public DataFragment() {
     }
@@ -66,12 +70,13 @@ public class DataFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_data, container, false);
         Bundle arguments = getArguments();
         DBAdapter dbAdapter = new DBAdapter(getContext());
-        DataModel data = dbAdapter.getData(arguments.getInt(KEY_POSITION));
-        setupUI(view, data);
+        dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
+        dbAdapter.close();
+        setupUI(view, dataModel);
         return view;
     }
 
-    public void setupUI(View view, DataModel data) {
+    public void setupUI(View view, final DataModel data) {
         nameData = (TextView) view.findViewById(R.id.data_name);
         nameData.setText(data.getTlxNom());
         clientData = (TextView) view.findViewById(R.id.data_client);
@@ -92,36 +97,31 @@ public class DataFragment extends Fragment {
         buttonCalc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int lectura = GenLecturas.lecturaNormal(200, Integer.parseInt(inputReading.getText().toString()));
-                labelEnergiaFacturada.setText("Energia facturada: " + lectura);
-                labelSubtotal.setText("Subtotal: " + GenLecturas.subTotal(lectura));
-
-                double importeConsumo = GenLecturas.importeConsumo(lectura);
-                labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
-
-                double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
-                labelTarifaDignidad.setText("tarifa dignidad: " + tarifaDignidad);
-
-                double ley1886 = GenLecturas.ley1886(lectura);
-                labelLey1886.setText("Ley 1886: " + ley1886);
-
-                double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
-                labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
-
-                double totalSuministro = GenLecturas.totalSuministro(totalConsumo);
-                labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
-
-                double totalSuministroTap = GenLecturas.totalSuministroTap(totalSuministro, lectura);
-                labelTotalSuministroTap.setText("Total suministro mas TAP: " + totalSuministroTap);
-
-                double totalFacturar = GenLecturas.totalFacturar(totalSuministroTap);
-                labelTotalFacturar.setText("Importe total a facturar: " + totalFacturar);
+                String input = inputReading.getText().toString();
+                if (input.isEmpty()){
+                    return;
+                }
+                int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), Integer.parseInt(input));
+                calculo(lectura);
+            }
+        });
+        buttonPromedio = (Button) view.findViewById(R.id.button_promedio);
+        buttonPromedio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                calculo(dataModel.getTlxConPro());
+                buttonCalc.setEnabled(false);
             }
         });
         save = (Button) view.findViewById(R.id.save_button);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DBAdapter dbAdapter = new DBAdapter(getContext());
+                ContentValues cv = new ContentValues();
+                cv.put(DataModel.Columns.save_state.name(), 1);
+                dbAdapter.updateData(dataModel.getTlxCli(), cv);
+                dbAdapter.close();
                 onFragmentListener.onTabListener();
             }
         });
@@ -129,5 +129,31 @@ public class DataFragment extends Fragment {
 
     public interface OnFragmentListener {
         void onTabListener();
+    }
+
+    private void calculo(int lectura){
+        labelEnergiaFacturada.setText("Energia facturada: " + lectura);
+        labelSubtotal.setText("Subtotal: " + GenLecturas.subTotal(lectura));
+
+        double importeConsumo = GenLecturas.importeConsumo(lectura);
+        labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
+
+        double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
+        labelTarifaDignidad.setText("tarifa dignidad: " + tarifaDignidad);
+
+        double ley1886 = GenLecturas.ley1886(lectura);
+        labelLey1886.setText("Ley 1886: " + ley1886);
+
+        double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
+        labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
+
+        double totalSuministro = GenLecturas.totalSuministro(totalConsumo);
+        labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
+
+        double totalSuministroTap = GenLecturas.totalSuministroTap(totalSuministro, lectura);
+        labelTotalSuministroTap.setText("Total suministro mas TAP: " + totalSuministroTap);
+
+        double totalFacturar = GenLecturas.totalFacturar(totalSuministroTap);
+        labelTotalFacturar.setText("Importe total a facturar: " + totalFacturar);
     }
 }

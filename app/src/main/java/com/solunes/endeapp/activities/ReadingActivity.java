@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,6 +15,9 @@ import com.solunes.endeapp.R;
 import com.solunes.endeapp.adapters.PagerAdapter;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.fragments.DataFragment;
+import com.solunes.endeapp.models.DataModel;
+
+import java.util.ArrayList;
 
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener {
 
@@ -30,6 +34,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
@@ -39,11 +44,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         adapter = new PagerAdapter(getSupportFragmentManager(), dbAdapter.getSizeData());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        ArrayList<DataModel> allData = dbAdapter.getAllData();
         for (int i = 0; i < adapter.getCount(); i++) {
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
-            tabText.setText(String.valueOf(i+1));
+            tabText.setText(String.valueOf(i + 1));
+            if (allData.get(i).isSaveState()) {
+                tabText.setTextColor(getResources().getColor(android.R.color.white));
+            }
             tabAt.setCustomView(inflate);
         }
         dbAdapter.close();
@@ -55,5 +64,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         View customView = tabLayout.getTabAt(viewPager.getCurrentItem()).getCustomView();
         TextView textTab = (TextView) customView.findViewById(R.id.textview_custom_tab);
         textTab.setTextColor(getResources().getColor(android.R.color.white));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return false;
     }
 }

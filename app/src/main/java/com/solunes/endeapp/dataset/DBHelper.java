@@ -46,7 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxRutA integer, " +
                 "TlxAno integer, " +
                 "TlxMes integer, " +
-                "TlxCli numeric, " +
+                "TlxCli integer, " +
                 "TlxOrdTpl integer, " +
                 "TlxNom text, " +
                 "TlxDir text, " +
@@ -118,7 +118,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxConsumo numeric, " +
                 "TlxPerdidas numeric, " +
                 "TlxConsFacturado numeric, " +
-                "TlxDebAuto text)");
+                "TlxDebAuto text, " +
+                "save_state integer)");
     }
 
     @Override

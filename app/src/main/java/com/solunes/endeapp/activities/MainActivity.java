@@ -44,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView textSend;
     private TextView textTarifa;
 
+    private TextView stateTotal;
+    private TextView statePerformed;
+    private TextView stateMissing;
+    private TextView stateAverage;
+
     private CardView cardRate;
 
     @Override
@@ -58,12 +63,23 @@ public class MainActivity extends AppCompatActivity {
         textSend = (TextView) findViewById(R.id.text_date_send);
         textTarifa = (TextView) findViewById(R.id.text_date_tarifa);
 
+        stateAverage = (TextView) findViewById(R.id.state_average);
+        stateMissing = (TextView) findViewById(R.id.state_missing);
+        statePerformed = (TextView) findViewById(R.id.state_performed);
+        stateTotal = (TextView) findViewById(R.id.state_total);
+
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
         if (dateDownload > 0) {
             calendar.setTimeInMillis(dateDownload);
             textDownload.setText(StringUtils.getHumanDate(calendar.getTime()));
             isDownload = true;
+            DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+            stateTotal.setText(String.valueOf(dbAdapter.getSizeData()));
+            dbAdapter.close();
+            statePerformed.setText("0");
+            stateAverage.setText("0");
+            stateMissing.setText("0");
         }
         long dateSend = UserPreferences.getLong(this, KEY_SEND);
         if (dateSend > 0) {
@@ -81,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         cardRate = (CardView) findViewById(R.id.card_rate);
 
         validDay();
+        if (isDownload){
+            updateStates();
+        }
     }
 
     public void startReading(View view) {
@@ -96,10 +115,15 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "No hay estructura tarifaria", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (isDownload){
+            return;
+        }
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        new GetRequest("http://ende.solunes.com/api/descarga/25/12345", new CallbackAPI() {
+        Calendar calendar = Calendar.getInstance();
+        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
+        new GetRequest(url, new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
                 Log.e(TAG, "onSuccess: " + result.length());
@@ -108,6 +132,12 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     Log.e(TAG, "onSuccess: ", e);
                 }
+                DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+                stateTotal.setText(String.valueOf(dbAdapter.getSizeData()));
+                dbAdapter.close();
+                statePerformed.setText("0");
+                stateAverage.setText("0");
+                stateMissing.setText("0");
                 progressDialog.dismiss();
                 view.setEnabled(false);
                 isDownload = true;
@@ -139,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
 
         Hashtable<String, String> params = prepareDataToPost();
-        new PostRequest(params, null, "http://ende.solunes.com/api/subida?TlxCli=602887&TlxAre=1320&TlxRutO=12345", new CallbackAPI() {
+        new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
                 Log.e(TAG, "onSuccess: " + result);
@@ -270,9 +300,13 @@ public class MainActivity extends AppCompatActivity {
 
         DBAdapter dbAdapter = new DBAdapter(this);
         ArrayList<DataModel> allData = dbAdapter.getAllData();
+
+        params.put("TlxRem", String.valueOf(allData.get(0).getTlxRem()));
+        params.put("TlxAre", String.valueOf(allData.get(0).getTlxAre()));
+        params.put("TlxRutO", String.valueOf(allData.get(0).getTlxRutO()));
         for (DataModel dataModel : allData) {
             String json = dataModel.getJsonToSend(dataModel);
-            params.put("" + dataModel.getTlxCli(), json);
+            params.put("" + ((int) dataModel.getTlxCli()), json);
         }
         return params;
     }
@@ -299,5 +333,22 @@ public class MainActivity extends AppCompatActivity {
             isDownload = false;
             isSend = false;
         }
+    }
+
+    private void updateStates(){
+        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+        int sizeData = dbAdapter.getSizeData();
+        stateTotal.setText(String.valueOf(sizeData));
+        int countSave = dbAdapter.getCountSave();
+        dbAdapter.close();
+        statePerformed.setText(String.valueOf(countSave));
+        stateMissing.setText(String.valueOf(sizeData-countSave));
+        stateAverage.setText("0");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateStates();
     }
 }

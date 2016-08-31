@@ -45,9 +45,10 @@
                         android:text="Totales" />
 
                     <TextView
+                        android:id="@+id/state_total"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1235"
+                        android:text="--"
                         android:textAppearance="?android:textAppearanceLarge" />
 
                 </LinearLayout>
@@ -88,7 +89,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1596"
+                        android:id="@+id/state_performed"
+                        android:text="--"
                         android:textAppearance="?android:textAppearanceLarge" />
 
                 </LinearLayout>
@@ -135,7 +137,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="6541"
+                        android:id="@+id/state_missing"
+                        android:text="--"
                         android:textAppearance="?android:textAppearanceLarge" />
 
                 </LinearLayout>
@@ -176,7 +179,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1520"
+                        android:text="--"
+                        android:id="@+id/state_average"
                         android:textAppearance="?android:textAppearanceLarge" />
 
                 </LinearLayout>

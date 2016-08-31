@@ -61,6 +61,12 @@ public class DBAdapter {
         Log.e(TAG, "saveDataObject: " + insert);
     }
 
+    public void updateData(int client, ContentValues contentValues){
+        open();
+        int update = db.update(TABLE_DATA, contentValues, "TlxCli = " + client, null);
+        Log.e(TAG, "updateData: " + update);
+    }
+
     public ArrayList<DataModel> getAllData() {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
@@ -88,6 +94,15 @@ public class DBAdapter {
         int size = query.getInt(0);
         query.close();
         return size;
+    }
+
+    public int getCountSave(){
+        open();
+        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where save_state = 1", null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+        return count;
     }
 
     public void close() {
