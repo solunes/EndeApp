@@ -93,7 +93,6 @@ public class DataModel {
     private double TlxPerdidas;
     private double TlxConsFacturado;
     private String TlxDebAuto;
-    private boolean saveState;
 
     public enum Columns {
         _id,
@@ -175,8 +174,7 @@ public class DataModel {
         TlxConsumo,
         TlxPerdidas,
         TlxConsFacturado,
-        TlxDebAuto,
-        save_state
+        TlxDebAuto
     }
 
     public int get_id() {
@@ -819,14 +817,6 @@ public class DataModel {
         TlxDebAuto = tlxDebAuto;
     }
 
-    public boolean isSaveState() {
-        return saveState;
-    }
-
-    public void setSaveState(boolean saveState) {
-        this.saveState = saveState;
-    }
-
     public static DataModel fromCursor(Cursor cursor) {
         DataModel dataModel = new DataModel();
         dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
@@ -909,7 +899,6 @@ public class DataModel {
         dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
         dataModel.setTlxConsFacturado(cursor.getDouble(Columns.TlxConsFacturado.ordinal()));
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
-        dataModel.setSaveState(cursor.getInt(Columns.save_state.ordinal()) == 1);
         return dataModel;
     }
 
@@ -917,25 +906,27 @@ public class DataModel {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.TlxFecLec.name(), dataModel.getTlxFecLec());
-            jsonObject.put(DataModel.Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
-            jsonObject.put(DataModel.Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
-            jsonObject.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
-            jsonObject.put(DataModel.Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
-            jsonObject.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
-            jsonObject.put(DataModel.Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
-            jsonObject.put(DataModel.Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
-            jsonObject.put(DataModel.Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
-            jsonObject.put(DataModel.Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
-            jsonObject.put(DataModel.Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
-            jsonObject.put(DataModel.Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
+            jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
+            jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
+            jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
+            jsonObject.put(Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
+            jsonObject.put(Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
+            jsonObject.put(Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
+            jsonObject.put(Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
+            jsonObject.put(Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
+            jsonObject.put(Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
+            jsonObject.put(Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
+            jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
+            jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
+            jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
+            jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+            jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
+            jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+
             jsonObject.put(DataModel.Columns.TlxFecCor.name(), dataModel.getTlxFecCor());
             jsonObject.put(DataModel.Columns.TlxFecVto.name(), dataModel.getTlxFecVto());
             jsonObject.put(DataModel.Columns.TlxFecproEmi.name(), dataModel.getTlxFecproEmi());
             jsonObject.put(DataModel.Columns.TlxFecproMed.name(), dataModel.getTlxFecproMed());
-            jsonObject.put(DataModel.Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
-            jsonObject.put(DataModel.Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
-            jsonObject.put(DataModel.Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
-            jsonObject.put(DataModel.Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }

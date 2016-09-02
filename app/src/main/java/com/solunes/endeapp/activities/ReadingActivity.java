@@ -50,7 +50,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
             tabText.setText(String.valueOf(i + 1));
-            if (allData.get(i).isSaveState()) {
+            if (allData.get(i).getTlxNvaLec() > 0) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
             tabAt.setCustomView(inflate);

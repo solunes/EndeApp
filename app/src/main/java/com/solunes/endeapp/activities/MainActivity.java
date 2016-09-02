@@ -2,8 +2,10 @@ package com.solunes.endeapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -35,11 +37,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_RATE = "update_rate";
     private static final String KEY_RATE_MONTH = "update_rate_month";
     private static final String KEY_DOWNLOAD = "download";
+    private static final String KEY_WAS_UPLOAD = "was_upload";
     private static final String KEY_SEND = "send";
 
-    private boolean isDownload;
-    private boolean isSend;
     private boolean isRate;
+    private boolean wasDownload;
+    private boolean wasUpload;
+
     private TextView textDownload;
     private TextView textSend;
     private TextView textTarifa;
@@ -73,19 +77,11 @@ public class MainActivity extends AppCompatActivity {
         if (dateDownload > 0) {
             calendar.setTimeInMillis(dateDownload);
             textDownload.setText(StringUtils.getHumanDate(calendar.getTime()));
-            isDownload = true;
-            DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-            stateTotal.setText(String.valueOf(dbAdapter.getSizeData()));
-            dbAdapter.close();
-            statePerformed.setText("0");
-            stateAverage.setText("0");
-            stateMissing.setText("0");
         }
         long dateSend = UserPreferences.getLong(this, KEY_SEND);
         if (dateSend > 0) {
             calendar.setTimeInMillis(dateSend);
             textSend.setText(StringUtils.getHumanDate(calendar.getTime()));
-            isSend = true;
         }
         long dateRate = UserPreferences.getLong(this, KEY_RATE);
         if (dateRate > 0) {
@@ -93,74 +89,81 @@ public class MainActivity extends AppCompatActivity {
             textTarifa.setText(StringUtils.getHumanDate(calendar.getTime()));
             isRate = true;
         }
+        wasDownload = UserPreferences.getBoolean(getApplicationContext(), KEY_WAS_UPLOAD);
 
         cardRate = (CardView) findViewById(R.id.card_rate);
 
         validDay();
-        if (isDownload){
-            updateStates();
-        }
+        updateStates();
     }
 
     public void startReading(View view) {
-        if (!isDownload) {
-            Toast.makeText(MainActivity.this, "No se han descargado las rutas", Toast.LENGTH_SHORT).show();
+        if (!wasDownload || !isRate) {
+            Toast.makeText(MainActivity.this, "No se han descargado las rutas o tarifas", Toast.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class));
     }
 
     public void downloadRoutes(final View view) {
-        if (!isRate) {
-            Toast.makeText(MainActivity.this, "No hay estructura tarifaria", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (isDownload){
-            return;
+        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+        if (dbAdapter.getSizeData() > 0) {
+            if (!UserPreferences.getBoolean(this, KEY_WAS_UPLOAD)) {
+                Toast.makeText(MainActivity.this, "No se han subido los datos", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        Calendar calendar = Calendar.getInstance();
-        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
+        final Calendar calendar = Calendar.getInstance();
+//        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
+        String url = "http://ende.solunes.com/api/descarga/31/12345";
         new GetRequest(url, new CallbackAPI() {
             @Override
-            public void onSuccess(String result, int statusCode) {
+            public void onSuccess(final String result, int statusCode) {
                 Log.e(TAG, "onSuccess: " + result.length());
-                try {
-                    processResponse(result);
-                } catch (JSONException e) {
-                    Log.e(TAG, "onSuccess: ", e);
-                }
-                DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-                stateTotal.setText(String.valueOf(dbAdapter.getSizeData()));
-                dbAdapter.close();
-                statePerformed.setText("0");
-                stateAverage.setText("0");
-                stateMissing.setText("0");
-                progressDialog.dismiss();
-                view.setEnabled(false);
-                isDownload = true;
+                Runnable runSaveData = new Runnable() {
 
-                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                textDownload.setText(humanDate);
-                UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
+                    @Override
+                    public void run() {
+                        try {
+                            processResponse(result);
+                        } catch (JSONException e) {
+                            Log.e(TAG, "onSuccess: ", e);
+                        }
+                        progressDialog.dismiss();
+                        wasDownload = true;
+                        UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
+
+                        UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
+                    }
+                };
+                new Thread(runSaveData).start();
             }
 
             @Override
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
+                progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Error al descargar los datos", Toast.LENGTH_SHORT).show();
             }
         }).execute();
         progressDialog.show();
+        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                updateStates();
+                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                textDownload.setText(humanDate);
+                Toast.makeText(MainActivity.this, "Datos descargados", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void sendReading(final View view) {
-        if (!isDownload) {
+        if (!wasDownload) {
             Toast.makeText(MainActivity.this, "No se han descargado las rutas", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (isSend) {
             return;
         }
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -175,32 +178,50 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onSuccess: " + result);
                 String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
                 textSend.setText(humanDate);
-                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
                 progressDialog.dismiss();
-                view.setEnabled(false);
-                isSend = true;
+
+                Toast.makeText(MainActivity.this, "Datos enviados", Toast.LENGTH_SHORT).show();
+                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
             }
 
             @Override
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Error al enviar datos", Toast.LENGTH_SHORT).show();
             }
         }).execute();
     }
 
     public void updateRate(View view) {
-        if (isRate) {
-            return;
-        }
-        Toast.makeText(MainActivity.this, "Se ha actualizado la estructura tarifaria", Toast.LENGTH_SHORT).show();
-        String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-        textTarifa.setText(humanDate);
-        UserPreferences.putLong(this, KEY_RATE, Calendar.getInstance().getTimeInMillis());
-        int month = Calendar.getInstance().get(Calendar.MONTH);
-        UserPreferences.putInt(this, KEY_RATE_MONTH, month);
-        isRate = true;
-        cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Descargando....");
+        progressDialog.setCancelable(false);
+        String url = "http://ende.solunes.com/api/tarifas";
+        new GetRequest(url, new CallbackAPI() {
+            @Override
+            public void onSuccess(String result, int statusCode) {
+                Log.e(TAG, "onSuccess: " + result.length());
+                progressDialog.dismiss();
+                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                textTarifa.setText(humanDate);
+                UserPreferences.putLong(getApplicationContext(), KEY_RATE, Calendar.getInstance().getTimeInMillis());
+                int month = Calendar.getInstance().get(Calendar.MONTH);
+                UserPreferences.putInt(getApplicationContext(), KEY_RATE_MONTH, month);
+                cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
+                Toast.makeText(MainActivity.this, "Se ha actualizado la estructura tarifaria", Toast.LENGTH_SHORT).show();
+                isRate = true;
+            }
+
+            @Override
+            public void onFailed(String reason, int statusCode) {
+                Log.e(TAG, "onFailed: " + reason);
+                progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Error al descargar los parametros", Toast.LENGTH_SHORT).show();
+            }
+        }).execute();
+        progressDialog.show();
     }
 
     private void processResponse(String result) throws JSONException {
@@ -306,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         params.put("TlxRutO", String.valueOf(allData.get(0).getTlxRutO()));
         for (DataModel dataModel : allData) {
             String json = dataModel.getJsonToSend(dataModel);
-            params.put("" + ((int) dataModel.getTlxCli()), json);
+            params.put("" + (dataModel.getTlxCli()), json);
         }
         return params;
     }
@@ -322,27 +343,16 @@ public class MainActivity extends AppCompatActivity {
             isRate = false;
             cardRate.setBackgroundTintList(getResources().getColorStateList(R.color.color_tint));
         }
-
-        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        long dateDownload = UserPreferences.getLong(getApplicationContext(), KEY_DOWNLOAD);
-        calendar.setTimeInMillis(dateDownload);
-        if (calendar.get(Calendar.DAY_OF_MONTH) < currentDay) {
-            isDownload = false;
-            isSend = false;
-        } else if (!isRate) {
-            isDownload = false;
-            isSend = false;
-        }
     }
 
-    private void updateStates(){
+    private void updateStates() {
         DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         int sizeData = dbAdapter.getSizeData();
         stateTotal.setText(String.valueOf(sizeData));
         int countSave = dbAdapter.getCountSave();
         dbAdapter.close();
         statePerformed.setText(String.valueOf(countSave));
-        stateMissing.setText(String.valueOf(sizeData-countSave));
+        stateMissing.setText(String.valueOf(sizeData - countSave));
         stateAverage.setText("0");
     }
 
