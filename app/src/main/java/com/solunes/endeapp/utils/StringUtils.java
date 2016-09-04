@@ -10,9 +10,9 @@ import java.util.Date;
 public class StringUtils {
     private static final String TAG = "StringUtils";
 
-    public static String DB_DATE_FORMAT = "yyyy-MM-dd";
+    public static String DATE_FORMAT = "yyyy-MM-dd";
     public static String HUMAN_DATE_FORMAT = "dd, MMM yyyy";
-//    public static String DATE_TIME = "yyyy-MM-dd HH:mm:ss";
+    public static String HUMAN_HOUR_FORMAT = "HH:mm";
 
     public static String formateDateFromstring(String outputFormat, Date inputDate) {
         String outputDate = "";
@@ -23,5 +23,9 @@ public class StringUtils {
 
     public static String getHumanDate(Date inputDate) {
         return formateDateFromstring(HUMAN_DATE_FORMAT, inputDate);
+    }
+
+    public static String getHumanHour(Date inputDate) {
+        return formateDateFromstring(HUMAN_HOUR_FORMAT, inputDate);
     }
 }

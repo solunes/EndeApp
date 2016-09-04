@@ -16,12 +16,15 @@ import com.solunes.endeapp.adapters.PagerAdapter;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.utils.UserPreferences;
 
 import java.util.ArrayList;
 
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener {
 
     private static final String TAG = "ReadingActivity";
+
+    public static final String KEY_LAST_PAGER_PSOTION = "last_pager_position";
 
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -56,6 +59,10 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             tabAt.setCustomView(inflate);
         }
         dbAdapter.close();
+
+        int pagerPosition = UserPreferences.getInt(getApplicationContext(), KEY_LAST_PAGER_PSOTION);
+        Log.e(TAG, "onCreate: " + pagerPosition);
+        viewPager.setCurrentItem(pagerPosition);
     }
 
     @Override
@@ -68,11 +75,18 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e(TAG, "onPause: "+ viewPager.getCurrentItem());
+        UserPreferences.putInt(this, KEY_LAST_PAGER_PSOTION, viewPager.getCurrentItem());
     }
 }

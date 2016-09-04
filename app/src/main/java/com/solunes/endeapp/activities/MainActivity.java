@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isRate;
     private boolean wasDownload;
-    private boolean wasUpload;
 
     private TextView textDownload;
     private TextView textSend;
@@ -77,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         if (dateDownload > 0) {
             calendar.setTimeInMillis(dateDownload);
             textDownload.setText(StringUtils.getHumanDate(calendar.getTime()));
+            wasDownload = true;
         }
         long dateSend = UserPreferences.getLong(this, KEY_SEND);
         if (dateSend > 0) {
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
             textTarifa.setText(StringUtils.getHumanDate(calendar.getTime()));
             isRate = true;
         }
-        wasDownload = UserPreferences.getBoolean(getApplicationContext(), KEY_WAS_UPLOAD);
 
         cardRate = (CardView) findViewById(R.id.card_rate);
 
@@ -113,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+        dbAdapter.deleteAllData();
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         wasDownload = true;
                         UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
-
+                        UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
                         UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
                     }
                 };
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
+                progressDialog.setOnDismissListener(null);
                 progressDialog.dismiss();
                 Toast.makeText(MainActivity.this, "Error al descargar los datos", Toast.LENGTH_SHORT).show();
             }

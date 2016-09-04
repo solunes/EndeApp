@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:background="#ECEFF1"
     android:orientation="vertical"
+    android:id="@+id/data_layout"
     tools:context="com.solunes.endeapp.activities.ReadingActivity">
 
     <ScrollView
@@ -112,25 +113,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
-                        android:id="@+id/label_subtotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black" />
-
-                    <TextView
                         android:id="@+id/label_importe_consumo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black" />
-
-                    <TextView
-                        android:id="@+id/label_tarifa_dignidad"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black" />
-
-                    <TextView
-                        android:id="@+id/label_ley_1886"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/black" />
@@ -143,12 +126,6 @@
 
                     <TextView
                         android:id="@+id/label_total_suministro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black" />
-
-                    <TextView
-                        android:id="@+id/label_total_suministro_tap"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/black" />

@@ -78,6 +78,12 @@ public class DBAdapter {
         return dataModels;
     }
 
+    public int deleteAllData() {
+        open();
+        int delete = db.delete(TABLE_DATA, null, null);
+        return delete;
+    }
+
     public DataModel getData(int id) {
         open();
         Cursor query = db.query(TABLE_DATA, null, DataModel.Columns._id.name() + " = " + id, null, null, null, null);
@@ -98,7 +104,7 @@ public class DBAdapter {
 
     public int getCountSave(){
         open();
-        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where save_state = 1", null);
+        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where not "+DataModel.Columns.TlxNvaLec.name()+" = 0", null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();

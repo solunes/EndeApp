@@ -3,18 +3,22 @@ package com.solunes.endeapp.fragments;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.utils.GenLecturas;
+import com.solunes.endeapp.utils.StringUtils;
 
 import java.util.Calendar;
 
@@ -29,13 +33,9 @@ public class DataFragment extends Fragment {
     private EditText inputReading;
     private Button buttonConfirm;
     private TextView labelEnergiaFacturada;
-    private TextView labelSubtotal;
     private TextView labelImporteConsumo;
-    private TextView labelTarifaDignidad;
-    private TextView labelLey1886;
     private TextView labelTotalConsumo;
     private TextView labelTotalSuministro;
-    private TextView labelTotalSuministroTap;
     private TextView labelTotalFacturar;
 
     private TextView nameData;
@@ -71,8 +71,10 @@ public class DataFragment extends Fragment {
         Bundle arguments = getArguments();
         DBAdapter dbAdapter = new DBAdapter(getContext());
         dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
+        Log.e(TAG, "onCreateView: tipo de lectura " + dataModel.getTlxTipLec() + " ---- ultimo tipo " + dataModel.getTlxUltTipL());
         dbAdapter.close();
         setupUI(view, dataModel);
+        validSaved();
         return view;
     }
 
@@ -83,13 +85,9 @@ public class DataFragment extends Fragment {
         clientData.setText(String.valueOf(data.getTlxCli()));
 
         labelEnergiaFacturada = (TextView) view.findViewById(R.id.label_energia_facturada);
-        labelSubtotal = (TextView) view.findViewById(R.id.label_subtotal);
         labelImporteConsumo = (TextView) view.findViewById(R.id.label_importe_consumo);
-        labelTarifaDignidad = (TextView) view.findViewById(R.id.label_tarifa_dignidad);
-        labelLey1886 = (TextView) view.findViewById(R.id.label_ley_1886);
         labelTotalConsumo = (TextView) view.findViewById(R.id.label_total_consumo);
         labelTotalSuministro = (TextView) view.findViewById(R.id.label_total_suministro);
-        labelTotalSuministroTap = (TextView) view.findViewById(R.id.label_total_suministro_tap);
         labelTotalFacturar = (TextView) view.findViewById(R.id.label_total_facturar);
         inputReading = (EditText) view.findViewById(R.id.input_reading);
         inputReading.setSelected(false);
@@ -105,8 +103,10 @@ public class DataFragment extends Fragment {
                 dataModel.setTlxNvaLec(nuevaLectura);
 
                 // TODO: 02-09-16 validar los tipos de lecturas y si es nuevo cliente
+
                 int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
                 calculo(lectura);
+                saveLectura(view);
             }
         });
     }
@@ -115,31 +115,35 @@ public class DataFragment extends Fragment {
         void onTabListener();
     }
 
-    private void saveLectura() {
+    private void saveLectura(View view) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         ContentValues cv = new ContentValues();
         Calendar calendar = Calendar.getInstance();
-        cv.put(DataModel.Columns.TlxHorLec.name(), calendar.get(Calendar.HOUR) + ":" + calendar.get(Calendar.MINUTE));
+        Log.e(TAG, "saveLectura: "+StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT,calendar.getTime()) );
+        cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
+        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT,calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
         dbAdapter.close();
         onFragmentListener.onTabListener();
+        if (dataModel.getTlxTipLec() == 4){
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private void calculo(int lectura) {
         labelEnergiaFacturada.setText("Energia facturada: " + lectura);
-        labelSubtotal.setText("Subtotal: " + GenLecturas.subTotal(lectura));
 
         double importeConsumo = GenLecturas.importeConsumo(lectura);
         labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
 
         double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
-        labelTarifaDignidad.setText("tarifa dignidad: " + tarifaDignidad);
         dataModel.setTlxDesTdi(tarifaDignidad);
 
         double ley1886 = GenLecturas.ley1886(lectura);
-        labelLey1886.setText("Ley 1886: " + ley1886);
         dataModel.setTlxLey1886(ley1886);
 
         double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
@@ -149,10 +153,17 @@ public class DataFragment extends Fragment {
         labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
 
         double totalSuministroTap = GenLecturas.totalSuministroTap(totalSuministro, lectura);
-        labelTotalSuministroTap.setText("Total suministro mas TAP: " + totalSuministroTap);
 
         double totalFacturar = GenLecturas.totalFacturar(totalSuministroTap);
         labelTotalFacturar.setText("Importe total a facturar: " + totalFacturar);
+    }
 
+    private void validSaved(){
+        if (dataModel.getTlxNvaLec() > 0){
+            inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
+            int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec());
+            labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);
+            buttonConfirm.setEnabled(false);
+        }
     }
 }
