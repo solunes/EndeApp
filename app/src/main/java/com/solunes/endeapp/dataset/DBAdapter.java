@@ -22,49 +22,51 @@ import java.util.ArrayList;
 public class DBAdapter {
 
     private static final String TAG = "DBAdapter";
-    private static final String TABLE_USER = "user_table";
-    private static final String TABLE_DATA = "data_table";
+    public static final String TABLE_USER = "user_table";
+    public static final String TABLE_DATA = "data_table";
+    public static final String TABLE_TARIFA = "tarifa_table";
+    public static final String TABLE_OBS = "obs_table";
 
     private DBHelper dbHelper;
-    private Context context;
     private SQLiteDatabase db;
 
     public DBAdapter(Context context) {
         dbHelper = new DBHelper(context);
-        this.context = context;
     }
 
-    public boolean checkUser(String username, String password) {
+    public Cursor checkUser(String username, String password) {
         open();
-        try {
-            password = SHA1(password);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        Cursor cursor = db.query(true, TABLE_USER, null,
-                User.Columns.username.name() + " = '" + username + "' AND " + User.Columns.password.name() + " = '" + password + "'",
+        Cursor cursor = db.query(TABLE_USER, null,
+                User.Columns.LecCod.name() + " = '" + username + "' AND " + User.Columns.LecPas.name() + " = '" + password + "'",
                 null, null, null, null, null);
         cursor.moveToFirst();
 
-        return cursor.getCount() > 0;
+        return cursor;
     }
 
+    public User getUser(int id) {
+        open();
+        Cursor query = db.query(TABLE_USER, null, User.Columns.id.name() + " = " + id, null, null, null, null);
+        query.moveToFirst();
+        User user = User.fromCursor(query);
+        query.close();
+        return user;
+    }
 
     public DBAdapter open() throws SQLException {
         db = dbHelper.getWritableDatabase();
         return this;
     }
 
-    public void saveDataObject(ContentValues values) {
+    public void saveObject(String table,ContentValues values) {
         open();
-        long insert = db.insert(TABLE_DATA, null, values);
-        Log.e(TAG, "saveDataObject: " + insert);
+        db.insert(table, null, values);
     }
 
-    public void updateData(int client, ContentValues contentValues){
+
+    public void updateData(int client, ContentValues contentValues) {
         open();
-        int update = db.update(TABLE_DATA, contentValues, "TlxCli = " + client, null);
-        Log.e(TAG, "updateData: " + update);
+        db.update(TABLE_DATA, contentValues, "TlxCli = " + client, null);
     }
 
     public ArrayList<DataModel> getAllData() {
@@ -102,9 +104,9 @@ public class DBAdapter {
         return size;
     }
 
-    public int getCountSave(){
+    public int getCountSave() {
         open();
-        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where not "+DataModel.Columns.TlxNvaLec.name()+" = 0", null);
+        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where not " + DataModel.Columns.TlxNvaLec.name() + " = 0", null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();

@@ -905,7 +905,7 @@ public class DataModel {
     public String getJsonToSend(DataModel dataModel) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(Columns.TlxFecLec.name(), dataModel.getTlxFecLec());
+//            jsonObject.put(Columns.TlxFecLec.name(), dataModel.getTlxFecLec());
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
             jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
@@ -919,14 +919,15 @@ public class DataModel {
             jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
             jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
             jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
+            jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
 
-            jsonObject.put(DataModel.Columns.TlxFecCor.name(), dataModel.getTlxFecCor());
-            jsonObject.put(DataModel.Columns.TlxFecVto.name(), dataModel.getTlxFecVto());
-            jsonObject.put(DataModel.Columns.TlxFecproEmi.name(), dataModel.getTlxFecproEmi());
-            jsonObject.put(DataModel.Columns.TlxFecproMed.name(), dataModel.getTlxFecproMed());
+//            jsonObject.put(DataModel.Columns.TlxFecCor.name(), dataModel.getTlxFecCor());
+//            jsonObject.put(DataModel.Columns.TlxFecVto.name(), dataModel.getTlxFecVto());
+//            jsonObject.put(DataModel.Columns.TlxFecproEmi.name(), dataModel.getTlxFecproEmi());
+//            jsonObject.put(DataModel.Columns.TlxFecproMed.name(), dataModel.getTlxFecproMed());
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }

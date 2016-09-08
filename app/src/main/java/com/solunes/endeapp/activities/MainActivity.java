@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,6 +98,24 @@ public class MainActivity extends AppCompatActivity {
         updateStates();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);
+                finish();
+                startActivity(new Intent(this, LoginActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void startReading(View view) {
         if (!wasDownload || !isRate) {
             Toast.makeText(MainActivity.this, "No se han descargado las rutas o tarifas", Toast.LENGTH_SHORT).show();
@@ -117,12 +137,11 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
         final Calendar calendar = Calendar.getInstance();
-//        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
-        String url = "http://ende.solunes.com/api/descarga/31/12345";
+        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
+//        String url = "http://ende.solunes.com/api/descarga/06/12345";
         new GetRequest(url, new CallbackAPI() {
             @Override
             public void onSuccess(final String result, int statusCode) {
-                Log.e(TAG, "onSuccess: " + result.length());
                 Runnable runSaveData = new Runnable() {
 
                     @Override
@@ -312,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 //            values.put(DataModel.Columns.TlxConsFacturado.name(), object.getDouble(DataModel.Columns.TlxConsFacturado.name()));
             values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
 
-            dbAdapter.saveDataObject(values);
+            dbAdapter.saveObject(DBAdapter.TABLE_DATA,values);
         }
         dbAdapter.close();
     }
@@ -325,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
         params.put("TlxRem", String.valueOf(allData.get(0).getTlxRem()));
         params.put("TlxAre", String.valueOf(allData.get(0).getTlxAre()));
-        params.put("TlxRutO", String.valueOf(allData.get(0).getTlxRutO()));
+        params.put("TlxRutA", String.valueOf(allData.get(0).getTlxRutA()));
         for (DataModel dataModel : allData) {
             String json = dataModel.getJsonToSend(dataModel);
             params.put("" + (dataModel.getTlxCli()), json);

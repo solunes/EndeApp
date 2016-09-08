@@ -27,17 +27,32 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE user_table (id INTEGER PRIMARY KEY, username TEXT, password TEXT)");
-        String endeapp = null;
-        try {
-            endeapp = DBAdapter.SHA1("endeapp");
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            Log.e(TAG, "onCreate: SHA1", e);
-        }
-        sqLiteDatabase.execSQL("INSERT INTO user_table VALUES(" +
-                "1, " +
-                "'ende', " +
-                "'" + endeapp + "')");
+        sqLiteDatabase.execSQL("CREATE TABLE user_table (" +
+                "id integer, " +
+                "lecNro integer, " +
+                "lecNom text, " +
+                "lecCod text, " +
+                "lecPas text, " +
+                "lecNiv integer, " +
+                "lecAsi integer, " +
+                "lecAct integer, " +
+                "areaCod integer)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE tarifa_table (" +
+                "id integer, " +
+                "categoria_tarifa_id integer, " +
+                "item_facturacion_id integer, " +
+                "kwh_desde integer, " +
+                "kwh_hasta integer, " +
+                "importe numeric)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE obs_table (" +
+                "ObsCod integer, " +
+                "ObsDes text, " +
+                "ObsTip integer, " +
+                "ObsLec integer, " +
+                "ObsFac integer)");
+
         sqLiteDatabase.execSQL("CREATE TABLE data_table (" +
                 "_id INTEGER PRIMARY KEY, " +
                 "TlxRem integer, " +
@@ -120,14 +135,32 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxConsFacturado numeric, " +
                 "TlxDebAuto text, " +
                 "save_state integer)");
+
+
+
+        // inserts
+        sqLiteDatabase.execSQL("INSERT INTO user_table VALUES(" +
+                "1, " +
+                "null, " +
+                "'Administrador', " +
+                "'admin', " +
+                "'1234', " +
+                "1, " +
+                "null, " +
+                "null, " +
+                "null)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS user_table");
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS data_table");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS tarifa_table");
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS obs_table");
 
         onCreate(sqLiteDatabase);
     }
+
+
 }
 

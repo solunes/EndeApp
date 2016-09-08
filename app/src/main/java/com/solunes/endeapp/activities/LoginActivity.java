@@ -1,6 +1,7 @@
 package com.solunes.endeapp.activities;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,12 +14,13 @@ import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.UserPreferences;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
-    private static final String KEY_LOGIN = "login";
+    public static final String KEY_LOGIN = "login";
 
     private EditText user;
     private EditText pass;
@@ -29,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        if (UserPreferences.getBoolean(this, KEY_LOGIN)){
+        if (UserPreferences.getBoolean(this, KEY_LOGIN)) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
@@ -60,13 +62,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (valid) {
                     DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-                    if (dbAdapter.checkUser(user.getText().toString(), pass.getText().toString())) {
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        UserPreferences.putBoolean(LoginActivity.this, KEY_LOGIN, true);
+                    Cursor cursor = dbAdapter.checkUser(user.getText().toString(), pass.getText().toString());
+                    if (cursor.getCount() > 0) {
+                        User user = User.fromCursor(cursor);
+                        if (user.getLecNiv() == 1){
+                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                            intent.putExtra("id_user", user.getId());
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("id_user", user.getId());
+                            startActivity(intent);
+                            UserPreferences.putBoolean(LoginActivity.this, KEY_LOGIN, true);
+                        }
                         finish();
                     } else {
                         Toast.makeText(LoginActivity.this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
                     }
+                    cursor.close();
                     dbAdapter.close();
                 }
             }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">EndeApp</string>
+    <string name="action_logout">Salir</string>
+    <string name="admin_activity">Administrador</string>
 </resources>
