@@ -2,9 +2,12 @@ package com.solunes.endeapp.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import android.widget.Toast;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.StringUtils;
 
@@ -32,6 +36,7 @@ public class DataFragment extends Fragment {
 
     private EditText inputReading;
     private Button buttonConfirm;
+    private Button buttonObs;
     private TextView labelEnergiaFacturada;
     private TextView labelImporteConsumo;
     private TextView labelTotalConsumo;
@@ -107,6 +112,29 @@ public class DataFragment extends Fragment {
                 int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
                 calculo(lectura);
                 saveLectura(view);
+            }
+        });
+        buttonObs = (Button) view.findViewById(R.id.button_obs);
+        buttonObs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                alertDialog.setTitle("Selecionar una observacion");
+                DBAdapter dbAdapter = new DBAdapter(getContext());
+                Cursor obs = dbAdapter.getObs();
+                String[] stringObs = new String[obs.getCount()];
+                for (int i = 0; i < obs.getCount(); i++) {
+                    obs.moveToNext();
+                    stringObs[i] = Obs.fromCursor(obs).getObsDes();
+                }
+                alertDialog.setSingleChoiceItems(stringObs, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int position) {
+                        Log.e(TAG, "onClick: " + position);
+                        dialogInterface.dismiss();
+                    }
+                });
+                alertDialog.show();
             }
         });
     }

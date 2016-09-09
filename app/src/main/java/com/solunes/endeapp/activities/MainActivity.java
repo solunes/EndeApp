@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -137,8 +136,11 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
         final Calendar calendar = Calendar.getInstance();
-        String url = "http://ende.solunes.com/api/descarga/" + calendar.get(Calendar.DAY_OF_MONTH) + "/12345";
-//        String url = "http://ende.solunes.com/api/descarga/06/12345";
+        String remesa = calendar.get(Calendar.DAY_OF_MONTH) + "";
+        if (remesa.length() == 1) {
+            remesa = "0" + remesa;
+        }
+        String url = "http://ende.solunes.com/api/descarga/" + remesa + "/12345";
         new GetRequest(url, new CallbackAPI() {
             @Override
             public void onSuccess(final String result, int statusCode) {
@@ -218,11 +220,15 @@ public class MainActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        String url = "http://ende.solunes.com/api/tarifas";
+        String url = "http://ende.solunes.com/api/parametros-fijos";
         new GetRequest(url, new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
-                Log.e(TAG, "onSuccess: " + result.length());
+                try {
+                    AdminActivity.processResultFixParams(getApplicationContext(), result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 progressDialog.dismiss();
                 String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
                 textTarifa.setText(humanDate);
@@ -331,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
 //            values.put(DataModel.Columns.TlxConsFacturado.name(), object.getDouble(DataModel.Columns.TlxConsFacturado.name()));
             values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
 
-            dbAdapter.saveObject(DBAdapter.TABLE_DATA,values);
+            dbAdapter.saveObject(DBAdapter.TABLE_DATA, values);
         }
         dbAdapter.close();
     }

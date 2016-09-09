@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/data_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ECEFF1"
     android:orientation="vertical"
-    android:id="@+id/data_layout"
     tools:context="com.solunes.endeapp.activities.ReadingActivity">
 
     <ScrollView
@@ -99,12 +99,23 @@
                         android:hint="Lectura"
                         android:inputType="number" />
 
-                    <Button
-                        android:id="@+id/button_confirm"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/colorAccent"
-                        android:text="Confirmar" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/button_confirm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/colorAccent"
+                            android:text="Confirmar" />
+                        <Button
+                            android:id="@+id/button_obs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/Base.Widget.AppCompat.Button.Borderless"
+                            android:text="Observaciones" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/label_energia_facturada"

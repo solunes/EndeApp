@@ -58,11 +58,17 @@ public class DBAdapter {
         return this;
     }
 
-    public void saveObject(String table,ContentValues values) {
+    public void clearTables() {
+        open();
+        db.delete(TABLE_OBS, null, null);
+        db.delete(TABLE_USER, null, null);
+        db.delete(TABLE_TARIFA, null, null);
+    }
+
+    public void saveObject(String table, ContentValues values) {
         open();
         db.insert(table, null, values);
     }
-
 
     public void updateData(int client, ContentValues contentValues) {
         open();
@@ -135,5 +141,11 @@ public class DBAdapter {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
+    }
+
+    public Cursor getObs() {
+        open();
+        Cursor query = db.query(TABLE_OBS, null, null, null, null, null, null);
+        return query;
     }
 }

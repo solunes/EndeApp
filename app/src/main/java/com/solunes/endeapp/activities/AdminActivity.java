@@ -2,6 +2,7 @@ package com.solunes.endeapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -35,12 +36,6 @@ public class AdminActivity extends AppCompatActivity {
     public static final String KEY_TPL = "key_tpl";
 
     private EditText editTpl;
-    private TextView textUsername;
-    private TextView syncParams;
-    private TextView syncUser;
-    private TextView syncObs;
-    private Button btnSaveTpl;
-    private Button btnFixParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +49,9 @@ public class AdminActivity extends AppCompatActivity {
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
         editTpl = (EditText) findViewById(R.id.edit_tpl);
-        textUsername = (TextView) findViewById(R.id.text_username);
-        syncParams = (TextView) findViewById(R.id.sync_params);
-        syncUser = (TextView) findViewById(R.id.sync_user);
-        syncObs = (TextView) findViewById(R.id.sync_obs);
-        btnSaveTpl = (Button) findViewById(R.id.btn_save_tpl);
-        btnFixParams = (Button) findViewById(R.id.btn_fix_params);
+        TextView textUsername = (TextView) findViewById(R.id.text_username);
+        Button btnSaveTpl = (Button) findViewById(R.id.btn_save_tpl);
+        Button btnFixParams = (Button) findViewById(R.id.btn_fix_params);
 
         int id_user = getIntent().getExtras().getInt("id_user");
         DBAdapter dbAdapter = new DBAdapter(this);
@@ -84,7 +76,7 @@ public class AdminActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(String result, int statusCode) {
                         try {
-                            processResult(result);
+                            processResultFixParams(getApplicationContext(),result);
                             progressDialog.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -119,10 +111,11 @@ public class AdminActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void processResult(String result) throws JSONException {
+    public static void processResultFixParams(Context context, String result) throws JSONException {
         JSONObject jsonObject = new JSONObject(result);
         JSONArray tarifas = jsonObject.getJSONArray("tarifas");
-        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+        DBAdapter dbAdapter = new DBAdapter(context);
+        dbAdapter.clearTables();
         for (int i = 0; i < tarifas.length(); i++) {
             JSONObject object = tarifas.getJSONObject(i);
             ContentValues values = new ContentValues();
@@ -139,7 +132,6 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBAdapter.TABLE_TARIFA, values);
         }
-        syncParams.setText("tarifas guardadas");
 
         JSONArray usuarios = jsonObject.getJSONArray("usuarios");
         for (int i = 0; i < usuarios.length(); i++) {
@@ -157,7 +149,6 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBAdapter.TABLE_USER, values);
         }
-        syncUser.setText("usuarios guardados");
 
         JSONArray observaciones = jsonObject.getJSONArray("observaciones");
         for (int i = 0; i < observaciones.length(); i++) {
@@ -171,6 +162,5 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBAdapter.TABLE_OBS, values);
         }
-        syncObs.setText("Observaciones guardadas");
-    }
+     }
 }
