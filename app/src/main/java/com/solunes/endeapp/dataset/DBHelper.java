@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -79,7 +79,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxTipLec integer, " +
                 "TlxSgl text, " +
                 "TlxOrdSeq integer, " +
-                "TlxImpFac integer, " +
+                "TlxImpFac decimal(15, 2), " +
                 "TlxImpTap decimal(15, 2), " +
                 "TlxImpAse decimal(15, 2), " +
                 "TlxCarFij decimal(15, 2), " +

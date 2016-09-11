@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -69,7 +70,10 @@ public class AdminActivity extends AppCompatActivity {
         btnFixParams.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
                 final ProgressDialog progressDialog = new ProgressDialog(AdminActivity.this);
+                builder.setTitle("Administrador");
+                builder.setPositiveButton("Aceptar", null);
                 progressDialog.setMessage("Descargando....");
                 progressDialog.setCancelable(false);
                 new GetRequest("http://ende.solunes.com/api/parametros-fijos", new CallbackAPI() {
@@ -78,6 +82,8 @@ public class AdminActivity extends AppCompatActivity {
                         try {
                             processResultFixParams(getApplicationContext(),result);
                             progressDialog.dismiss();
+                            builder.setMessage("Los datos de tarifas, observaciones y usuarios han sido descargados");
+                            builder.show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -85,7 +91,8 @@ public class AdminActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailed(String reason, int statusCode) {
-                        Snackbar.make(view, "Error en descarga", Snackbar.LENGTH_SHORT).show();
+                        builder.setMessage("Error en descarga");
+                        builder.show();
                         progressDialog.dismiss();
                     }
                 }).execute();

@@ -29,8 +29,8 @@ public class DataModel {
     private String TlxNroMed;
     private int TlxNroDig;
     private double TlxFacMul;
-    private double TlxFecAnt;
-    private double TlxFecLec;
+    private String TlxFecAnt;
+    private String TlxFecLec;
     private String TlxHorLec;
     private int TlxUltInd;
     private int TlxConPro;
@@ -38,7 +38,7 @@ public class DataModel {
     private int TlxTipLec;
     private String TlxSgl;
     private int TlxOrdSeq;
-    private int TlxImpFac;
+    private double TlxImpFac;
     private double TlxImpTap;
     private double TlxImpAse;
     private double TlxCarFij;
@@ -52,10 +52,10 @@ public class DataModel {
     private int TlxPotCon;
     private int TlxPotFac;
     private double TlxCliNit;
-    private double TlxFecCor;
-    private double TlxFecVto;
-    private double TlxFecproEmi;
-    private double TlxFecproMed;
+    private String TlxFecCor;
+    private String TlxFecVto;
+    private String TlxFecproEmi;
+    private String TlxFecproMed;
     private double TlxTope;
     private int TlxLeyTag;
     private int TlxTpoTap;
@@ -67,8 +67,8 @@ public class DataModel {
     private double TlxDeuEneI;
     private int TlxDeuAseC;
     private double TlxDeuAseI;
-    private double TlxFecEmi;
-    private double TlxUltPag;
+    private String TlxFecEmi;
+    private String TlxUltPag;
     private int TlxEstado;
     private String TlxUltObs;
     private String TlxActivi;
@@ -76,7 +76,7 @@ public class DataModel {
     private double TlxFacNro;
     private double TlxNroAut;
     private String TlxCodCon;
-    private double TlxFecLim;
+    private String TlxFecLim;
     private int TlxKwhDev;
     private int TlxUltTipL;
     private int TlxCliNew;
@@ -305,19 +305,19 @@ public class DataModel {
         TlxFacMul = tlxFacMul;
     }
 
-    public double getTlxFecAnt() {
+    public String getTlxFecAnt() {
         return TlxFecAnt;
     }
 
-    public void setTlxFecAnt(double tlxFecAnt) {
+    public void setTlxFecAnt(String tlxFecAnt) {
         TlxFecAnt = tlxFecAnt;
     }
 
-    public double getTlxFecLec() {
+    public String getTlxFecLec() {
         return TlxFecLec;
     }
 
-    public void setTlxFecLec(double tlxFecLec) {
+    public void setTlxFecLec(String tlxFecLec) {
         TlxFecLec = tlxFecLec;
     }
 
@@ -377,11 +377,11 @@ public class DataModel {
         TlxOrdSeq = tlxOrdSeq;
     }
 
-    public int getTlxImpFac() {
+    public double getTlxImpFac() {
         return TlxImpFac;
     }
 
-    public void setTlxImpFac(int tlxImpFac) {
+    public void setTlxImpFac(double tlxImpFac) {
         TlxImpFac = tlxImpFac;
     }
 
@@ -489,35 +489,35 @@ public class DataModel {
         TlxCliNit = tlxCliNit;
     }
 
-    public double getTlxFecCor() {
+    public String getTlxFecCor() {
         return TlxFecCor;
     }
 
-    public void setTlxFecCor(double tlxFecCor) {
+    public void setTlxFecCor(String tlxFecCor) {
         TlxFecCor = tlxFecCor;
     }
 
-    public double getTlxFecVto() {
+    public String getTlxFecVto() {
         return TlxFecVto;
     }
 
-    public void setTlxFecVto(double tlxFecVto) {
+    public void setTlxFecVto(String tlxFecVto) {
         TlxFecVto = tlxFecVto;
     }
 
-    public double getTlxFecproEmi() {
+    public String getTlxFecproEmi() {
         return TlxFecproEmi;
     }
 
-    public void setTlxFecproEmi(double tlxFecproEmi) {
+    public void setTlxFecproEmi(String tlxFecproEmi) {
         TlxFecproEmi = tlxFecproEmi;
     }
 
-    public double getTlxFecproMed() {
+    public String getTlxFecproMed() {
         return TlxFecproMed;
     }
 
-    public void setTlxFecproMed(double tlxFecproMed) {
+    public void setTlxFecproMed(String tlxFecproMed) {
         TlxFecproMed = tlxFecproMed;
     }
 
@@ -609,19 +609,19 @@ public class DataModel {
         TlxDeuAseI = tlxDeuAseI;
     }
 
-    public double getTlxFecEmi() {
+    public String getTlxFecEmi() {
         return TlxFecEmi;
     }
 
-    public void setTlxFecEmi(double tlxFecEmi) {
+    public void setTlxFecEmi(String tlxFecEmi) {
         TlxFecEmi = tlxFecEmi;
     }
 
-    public double getTlxUltPag() {
+    public String getTlxUltPag() {
         return TlxUltPag;
     }
 
-    public void setTlxUltPag(double tlxUltPag) {
+    public void setTlxUltPag(String tlxUltPag) {
         TlxUltPag = tlxUltPag;
     }
 
@@ -681,11 +681,11 @@ public class DataModel {
         TlxCodCon = tlxCodCon;
     }
 
-    public double getTlxFecLim() {
+    public String getTlxFecLim() {
         return TlxFecLim;
     }
 
-    public void setTlxFecLim(double tlxFecLim) {
+    public void setTlxFecLim(String tlxFecLim) {
         TlxFecLim = tlxFecLim;
     }
 
@@ -835,8 +835,8 @@ public class DataModel {
         dataModel.setTlxNroMed(cursor.getString(Columns.TlxNroMed.ordinal()));
         dataModel.setTlxNroDig(cursor.getInt(Columns.TlxNroDig.ordinal()));
         dataModel.setTlxFacMul(cursor.getDouble(Columns.TlxFacMul.ordinal()));
-        dataModel.setTlxFecAnt(cursor.getDouble(Columns.TlxFecAnt.ordinal()));
-        dataModel.setTlxFecLec(cursor.getDouble(Columns.TlxFecLec.ordinal()));
+        dataModel.setTlxFecAnt(cursor.getString(Columns.TlxFecAnt.ordinal()));
+        dataModel.setTlxFecLec(cursor.getString(Columns.TlxFecLec.ordinal()));
         dataModel.setTlxHorLec(cursor.getString(Columns.TlxHorLec.ordinal()));
         dataModel.setTlxUltInd(cursor.getInt(Columns.TlxUltInd.ordinal()));
         dataModel.setTlxConPro(cursor.getInt(Columns.TlxConPro.ordinal()));
@@ -844,7 +844,7 @@ public class DataModel {
         dataModel.setTlxTipLec(cursor.getInt(Columns.TlxTipLec.ordinal()));
         dataModel.setTlxSgl(cursor.getString(Columns.TlxSgl.ordinal()));
         dataModel.setTlxOrdSeq(cursor.getInt(Columns.TlxOrdSeq.ordinal()));
-        dataModel.setTlxImpFac(cursor.getInt(Columns.TlxImpFac.ordinal()));
+        dataModel.setTlxImpFac(cursor.getDouble(Columns.TlxImpFac.ordinal()));
         dataModel.setTlxImpTap(cursor.getDouble(Columns.TlxImpTap.ordinal()));
         dataModel.setTlxImpAse(cursor.getDouble(Columns.TlxImpAse.ordinal()));
         dataModel.setTlxCarFij(cursor.getDouble(Columns.TlxCarFij.ordinal()));
@@ -858,10 +858,10 @@ public class DataModel {
         dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
         dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
         dataModel.setTlxCliNit(cursor.getDouble(Columns.TlxCliNit.ordinal()));
-        dataModel.setTlxFecCor(cursor.getDouble(Columns.TlxFecCor.ordinal()));
-        dataModel.setTlxFecVto(cursor.getDouble(Columns.TlxFecVto.ordinal()));
-        dataModel.setTlxFecproEmi(cursor.getDouble(Columns.TlxFecproEmi.ordinal()));
-        dataModel.setTlxFecproMed(cursor.getDouble(Columns.TlxFecproMed.ordinal()));
+        dataModel.setTlxFecCor(cursor.getString(Columns.TlxFecCor.ordinal()));
+        dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
+        dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
+        dataModel.setTlxFecproMed(cursor.getString(Columns.TlxFecproMed.ordinal()));
         dataModel.setTlxTope(cursor.getDouble(Columns.TlxTope.ordinal()));
         dataModel.setTlxLeyTag(cursor.getInt(Columns.TlxLeyTag.ordinal()));
         dataModel.setTlxTpoTap(cursor.getInt(Columns.TlxTpoTap.ordinal()));
@@ -873,8 +873,8 @@ public class DataModel {
         dataModel.setTlxDeuEneI(cursor.getDouble(Columns.TlxDeuEneI.ordinal()));
         dataModel.setTlxDeuAseC(cursor.getInt(Columns.TlxDeuAseC.ordinal()));
         dataModel.setTlxDeuAseI(cursor.getDouble(Columns.TlxDeuAseI.ordinal()));
-        dataModel.setTlxFecEmi(cursor.getDouble(Columns.TlxFecEmi.ordinal()));
-        dataModel.setTlxUltPag(cursor.getDouble(Columns.TlxUltPag.ordinal()));
+        dataModel.setTlxFecEmi(cursor.getString(Columns.TlxFecEmi.ordinal()));
+        dataModel.setTlxUltPag(cursor.getString(Columns.TlxUltPag.ordinal()));
         dataModel.setTlxEstado(cursor.getInt(Columns.TlxEstado.ordinal()));
         dataModel.setTlxUltObs(cursor.getString(Columns.TlxUltObs.ordinal()));
         dataModel.setTlxActivi(cursor.getString(Columns.TlxActivi.ordinal()));
@@ -882,7 +882,7 @@ public class DataModel {
         dataModel.setTlxFacNro(cursor.getDouble(Columns.TlxFacNro.ordinal()));
         dataModel.setTlxNroAut(cursor.getDouble(Columns.TlxNroAut.ordinal()));
         dataModel.setTlxCodCon(cursor.getString(Columns.TlxCodCon.ordinal()));
-        dataModel.setTlxFecLim(cursor.getDouble(Columns.TlxFecLim.ordinal()));
+        dataModel.setTlxFecLim(cursor.getString(Columns.TlxFecLim.ordinal()));
         dataModel.setTlxKwhDev(cursor.getInt(Columns.TlxKwhDev.ordinal()));
         dataModel.setTlxUltTipL(cursor.getInt(Columns.TlxUltTipL.ordinal()));
         dataModel.setTlxCliNew(cursor.getInt(Columns.TlxCliNew.ordinal()));

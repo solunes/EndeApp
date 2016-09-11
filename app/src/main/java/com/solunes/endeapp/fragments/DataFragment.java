@@ -110,6 +110,16 @@ public class DataFragment extends Fragment {
                 // TODO: 02-09-16 validar los tipos de lecturas y si es nuevo cliente
 
                 int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
+                // lectura ajustada
+                if (dataModel.getTlxTipLec() == 6) {
+                    lectura = lectura - dataModel.getTlxUltInd();
+                    if (lectura > 0) {
+                        dataModel.setTlxKwhDev(0);
+                    } else {
+                        dataModel.setTlxKwhDev(lectura);
+                        lectura = 0;
+                    }
+                }
                 calculo(lectura);
                 saveLectura(view);
             }
@@ -147,15 +157,15 @@ public class DataFragment extends Fragment {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         ContentValues cv = new ContentValues();
         Calendar calendar = Calendar.getInstance();
-        Log.e(TAG, "saveLectura: "+StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT,calendar.getTime()) );
+        Log.e(TAG, "saveLectura: " + StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
-        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT,calendar.getTime()));
+        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
         dbAdapter.close();
         onFragmentListener.onTabListener();
-        if (dataModel.getTlxTipLec() == 4){
+        if (dataModel.getTlxTipLec() == 4) {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
         } else {
             Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
@@ -167,6 +177,7 @@ public class DataFragment extends Fragment {
 
         double importeConsumo = GenLecturas.importeConsumo(lectura);
         labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
+        dataModel.setTlxImpEn(importeConsumo);
 
         double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
         dataModel.setTlxDesTdi(tarifaDignidad);
@@ -176,18 +187,27 @@ public class DataFragment extends Fragment {
 
         double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
         labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
+        dataModel.setTlxConsumo(totalConsumo);
 
         double totalSuministro = GenLecturas.totalSuministro(totalConsumo);
         labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
+        dataModel.setTlxConsFacturado(totalSuministro);
+        dataModel.setTlxImpFac(totalSuministro);
 
-        double totalSuministroTap = GenLecturas.totalSuministroTap(totalSuministro, lectura);
+        double totalSuministroTap = GenLecturas.totalSuministroTap(lectura);
+        dataModel.setTlxImpTap(totalSuministroTap);
+
+        double totalSuministroAseo = GenLecturas.totalSuministroAseo(lectura);
+        dataModel.setTlxImpAse(totalSuministroAseo);
+
+        dataModel.setTlxImpTot(totalSuministro + totalSuministroTap + totalSuministroAseo);
 
         double totalFacturar = GenLecturas.totalFacturar(totalSuministroTap);
         labelTotalFacturar.setText("Importe total a facturar: " + totalFacturar);
     }
 
-    private void validSaved(){
-        if (dataModel.getTlxNvaLec() > 0){
+    private void validSaved() {
+        if (dataModel.getTlxFecEmi() != null) {
             inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
             int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec());
             labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);

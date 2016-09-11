@@ -33,8 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        app:errorEnabled="true">
+        android:layout_marginTop="@dimen/activity_horizontal_margin">
 
         <EditText
             android:id="@+id/edit_tpl"
@@ -50,7 +49,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:text="Guardar" />
 
     <TextView
@@ -59,6 +57,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
+
         android:text="Obtener tarifas, usuarios y observaciones."
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

@@ -112,7 +112,8 @@ public class DBAdapter {
 
     public int getCountSave() {
         open();
-        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " where not " + DataModel.Columns.TlxNvaLec.name() + " = 0", null);
+        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " " +
+                "where not " + DataModel.Columns.TlxFecEmi.name() + " is null", null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();

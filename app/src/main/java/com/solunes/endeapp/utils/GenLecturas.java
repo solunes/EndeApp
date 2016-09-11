@@ -72,15 +72,19 @@ public class GenLecturas {
         return round(totalConsumo + Constants.CONEXION_RECONEXION + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO);
     }
 
-    public static double totalSuministroTap(double totalSuministro, int kWhConsumo) {
-        return round(totalSuministro + (kWhConsumo * Constants.ALUMBRADO_PUBLICO));
+    public static double totalSuministroTap(int kWhConsumo) {
+        return round(kWhConsumo * Constants.ALUMBRADO_PUBLICO);
     }
 
-    public static double totalFacturar(double totalSuministroTap){
+    public static double totalSuministroAseo(int kWhConsumo) {
+        return round(kWhConsumo * Constants.TASA_ASEO);
+    }
+
+    public static double totalFacturar(double totalSuministroTap) {
         return round(totalSuministroTap + Constants.TASA_ASEO);
     }
 
-    public static double totalConsumo(double importeConsumo, double tarifaDignidad, double ley1886){
+    public static double totalConsumo(double importeConsumo, double tarifaDignidad, double ley1886) {
         return round(importeConsumo + tarifaDignidad + ley1886);
     }
 

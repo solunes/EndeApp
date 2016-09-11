@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startReading(View view) {
         if (!wasDownload || !isRate) {
-            Toast.makeText(MainActivity.this, "No se han descargado las rutas o tarifas", Toast.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las rutas o tarifas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class));
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         if (dbAdapter.getSizeData() > 0) {
             if (!UserPreferences.getBoolean(this, KEY_WAS_UPLOAD)) {
-                Toast.makeText(MainActivity.this, "No se han subido los datos", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "No se han subido los datos", Snackbar.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.setOnDismissListener(null);
                 progressDialog.dismiss();
-                Toast.makeText(MainActivity.this, "Error al descargar los datos", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Error al descargar los datos", Snackbar.LENGTH_SHORT).show();
             }
         }).execute();
         progressDialog.show();
@@ -178,14 +178,14 @@ public class MainActivity extends AppCompatActivity {
                 updateStates();
                 String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
                 textDownload.setText(humanDate);
-                Toast.makeText(MainActivity.this, "Datos descargados", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Datos descargados", Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
     public void sendReading(final View view) {
         if (!wasDownload) {
-            Toast.makeText(MainActivity.this, "No se han descargado las rutas", Toast.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 textSend.setText(humanDate);
                 progressDialog.dismiss();
 
-                Toast.makeText(MainActivity.this, "Datos enviados", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
                 UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
                 UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
             }
@@ -211,12 +211,12 @@ public class MainActivity extends AppCompatActivity {
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
-                Toast.makeText(MainActivity.this, "Error al enviar datos", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
             }
         }).execute();
     }
 
-    public void updateRate(View view) {
+    public void updateRate(final View view) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 int month = Calendar.getInstance().get(Calendar.MONTH);
                 UserPreferences.putInt(getApplicationContext(), KEY_RATE_MONTH, month);
                 cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
-                Toast.makeText(MainActivity.this, "Se ha actualizado la estructura tarifaria", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Se ha actualizado la estructura tarifaria", Snackbar.LENGTH_SHORT).show();
                 isRate = true;
             }
 
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
-                Toast.makeText(MainActivity.this, "Error al descargar los parametros", Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "Error al descargar los parametros", Snackbar.LENGTH_SHORT).show();
             }
         }).execute();
         progressDialog.show();
@@ -376,6 +376,7 @@ public class MainActivity extends AppCompatActivity {
         int sizeData = dbAdapter.getSizeData();
         stateTotal.setText(String.valueOf(sizeData));
         int countSave = dbAdapter.getCountSave();
+
         dbAdapter.close();
         statePerformed.setText(String.valueOf(countSave));
         stateMissing.setText(String.valueOf(sizeData - countSave));
