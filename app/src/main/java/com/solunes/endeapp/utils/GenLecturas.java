@@ -1,6 +1,13 @@
 package com.solunes.endeapp.utils;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.solunes.endeapp.Constants;
+import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.models.Tarifa;
+
+import java.util.ArrayList;
 
 /**
  * Created by jhonlimaster on 15-08-16.
@@ -18,38 +25,49 @@ public class GenLecturas {
         return lecturaActual - lecturaAnterior;
     }
 
-    public static double subTotal(int kWhConsumo) {
+    public static double subTotal(Context context, int kWhConsumo) {
         if (kWhConsumo <= 20) {
             return 0;
         }
-        kWhConsumo = kWhConsumo - 20;
+        int descuento = 20;
+        kWhConsumo = kWhConsumo - descuento;
         double res = 0;
-        if (kWhConsumo > 30) {
-            res = Constants.CARGO_ENERGIA_21_50 * 30;
-            kWhConsumo = kWhConsumo - 30;
-        } else {
-            res = Constants.CARGO_ENERGIA_21_50 * kWhConsumo;
-            return round(res);
+        DBAdapter dbAdapter = new DBAdapter(context);
+        ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia();
+        for (int i = 0; i < cargoEnergia.size(); i++) {
+            Tarifa tarifa = cargoEnergia.get(i);
+            if (i == 0) {
+                if (kWhConsumo > 30) {
+                    res = tarifa.getImporte() * 30;
+                    kWhConsumo = kWhConsumo - 30;
+                } else {
+                    res = tarifa.getImporte() * kWhConsumo;
+                    Log.e(TAG, "subTotal: " + i + " - " + res);
+                    return round(res);
+                }
+                descuento = 50;
+            } else {
+                if (tarifa.getKwh_hasta() == 0) {
+                    Log.e(TAG, "subTotal: " + i + " - " + res);
+                    return round(res + (tarifa.getImporte() * kWhConsumo));
+                }
+                if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
+                    res = res + tarifa.getImporte() * (tarifa.getKwh_hasta() - descuento);
+                    kWhConsumo -= (tarifa.getKwh_hasta() - descuento);
+                    descuento += tarifa.getKwh_hasta();
+                } else {
+                    res = res + tarifa.getImporte() * kWhConsumo;
+                    Log.e(TAG, "subTotal: "+ i +" - " + res);
+                    return round(res);
+                }
+            }
+            Log.e(TAG, "subTotal: " + i + " - " + res);
         }
-        if (kWhConsumo > 250) {
-            res = res + (Constants.CARGO_ENERGIA_51_300 * 250);
-            kWhConsumo = kWhConsumo - 250;
-        } else {
-            res = res + (Constants.CARGO_ENERGIA_51_300 * kWhConsumo);
-            return round(res);
-        }
-        if (kWhConsumo > 200) {
-            res = res + (Constants.CARGO_ENERGIA_301_500 * 200);
-            kWhConsumo = kWhConsumo - 200;
-        } else {
-            res = res + (Constants.CARGO_ENERGIA_301_500 * kWhConsumo);
-            return round(res);
-        }
-        return round(res + (Constants.CARGO_ENERGIA_501_ * kWhConsumo));
+        return 0;
     }
 
-    public static double importeConsumo(int kWhConsumo) {
-        return round(subTotal(kWhConsumo) + Constants.CARGO_MINIMO);
+    public static double importeConsumo(Context context, int kWhConsumo) {
+        return round(subTotal(context, kWhConsumo) + Constants.CARGO_MINIMO);
     }
 
     public static double tarifaDignidad(int kWhConsumo, double importeConsumo) {
@@ -60,11 +78,13 @@ public class GenLecturas {
         }
     }
 
-    public static double ley1886(int kWhConsumo) {
+    public static double ley1886(Context context, int kWhConsumo) {
         if (kWhConsumo <= 100) {
-            return round(-0.2 * (Constants.CARGO_MINIMO + subTotal(kWhConsumo)));
+            return round(-0.2 * (Constants.CARGO_MINIMO + subTotal(context, kWhConsumo)));
         } else {
-            return round(-0.2 * (Constants.CARGO_MINIMO + (Constants.CARGO_ENERGIA_21_50 * 30) + (Constants.CARGO_ENERGIA_51_300 * 50)));
+            DBAdapter dbAdapter = new DBAdapter(context);
+            ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia();
+            return round(-0.2 * (Constants.CARGO_MINIMO + (cargoEnergia.get(0).getImporte() * 30) + (cargoEnergia.get(1).getImporte() * 50)));
         }
     }
 
@@ -80,8 +100,8 @@ public class GenLecturas {
         return round(kWhConsumo * Constants.TASA_ASEO);
     }
 
-    public static double totalFacturar(double totalSuministroTap) {
-        return round(totalSuministroTap + Constants.TASA_ASEO);
+    public static double totalFacturar(double totalSuministro, double tap, double aseo) {
+        return round(totalSuministro + tap + aseo);
     }
 
     public static double totalConsumo(double importeConsumo, double tarifaDignidad, double ley1886) {

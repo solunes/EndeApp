@@ -11,10 +11,10 @@ public class Constants {
     public static final double CARGO_MINIMO = 18.7850;
 
     // CARGO POR ENERGIA
-    public static final double CARGO_ENERGIA_21_50 = 0.517;
-    public static final double CARGO_ENERGIA_51_300 = 0.527;
-    public static final double CARGO_ENERGIA_301_500= 0.548;
-    public static final double CARGO_ENERGIA_501_ = 0.570;
+//    public static final double CARGO_ENERGIA_21_50 = 0.517;
+//    public static final double CARGO_ENERGIA_51_300 = 0.527;
+//    public static final double CARGO_ENERGIA_301_500= 0.548;
+//    public static final double CARGO_ENERGIA_501_ = 0.570;
 
     // MÁS CARGO POR CONEXIÓN (O RECONEXIÓN)
     public static final double CONEXION_RECONEXION = 55.0000;

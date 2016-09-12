@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
@@ -137,7 +138,7 @@ public class AdminActivity extends AppCompatActivity {
             }
             values.put(Tarifa.Columns.importe.name(), object.getDouble(Tarifa.Columns.importe.name()));
             // guardar values
-            dbAdapter.saveObject(DBAdapter.TABLE_TARIFA, values);
+            dbAdapter.saveObject(DBHelper.TARIFA_TABLE, values);
         }
 
         JSONArray usuarios = jsonObject.getJSONArray("usuarios");
@@ -154,7 +155,7 @@ public class AdminActivity extends AppCompatActivity {
 //            values.put(User.Columns.LecAct.name(), object.getInt(User.Columns.LecAct.name()));
 //            values.put(User.Columns.AreaCod.name(), object.getInt(User.Columns.AreaCod.name()));
             // guardar values
-            dbAdapter.saveObject(DBAdapter.TABLE_USER, values);
+            dbAdapter.saveObject(DBHelper.USER_TABLE, values);
         }
 
         JSONArray observaciones = jsonObject.getJSONArray("observaciones");
@@ -167,7 +168,7 @@ public class AdminActivity extends AppCompatActivity {
             values.put(Obs.Columns.ObsLec.name(), object.getInt(Obs.Columns.ObsLec.name()));
             values.put(Obs.Columns.ObsFac.name(), object.getInt(Obs.Columns.ObsFac.name()));
             // guardar values
-            dbAdapter.saveObject(DBAdapter.TABLE_OBS, values);
+            dbAdapter.saveObject(DBHelper.OBS_TABLE, values);
         }
      }
 }

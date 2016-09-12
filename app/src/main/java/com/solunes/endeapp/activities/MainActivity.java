@@ -17,7 +17,9 @@ import android.widget.TextView;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
@@ -336,8 +338,39 @@ public class MainActivity extends AppCompatActivity {
 //            values.put(DataModel.Columns.TlxPerdidas.name(), object.getDouble(DataModel.Columns.TlxPerdidas.name()));
 //            values.put(DataModel.Columns.TlxConsFacturado.name(), object.getDouble(DataModel.Columns.TlxConsFacturado.name()));
             values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
+            dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
-            dbAdapter.saveObject(DBAdapter.TABLE_DATA, values);
+            JSONObject historico = object.getJSONObject("historico");
+            ContentValues valuesH = new ContentValues();
+            valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
+            valuesH.put(Historico.Columns.ConRem.name(), historico.getInt(Historico.Columns.ConRem.name()));
+            valuesH.put(Historico.Columns.ConAre.name(), historico.getInt(Historico.Columns.ConAre.name()));
+            valuesH.put(Historico.Columns.ConCli.name(), historico.getInt(Historico.Columns.ConCli.name()));
+            valuesH.put(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()));
+            valuesH.put(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()));
+            valuesH.put(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()));
+            valuesH.put(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name()));
+            valuesH.put(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name()));
+            valuesH.put(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name()));
+            valuesH.put(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name()));
+            valuesH.put(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name()));
+            valuesH.put(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name()));
+            valuesH.put(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name()));
+            valuesH.put(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name()));
+            valuesH.put(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name()));
+            valuesH.put(Historico.Columns.ConKwh01.name(), historico.getInt(Historico.Columns.ConKwh01.name()));
+            valuesH.put(Historico.Columns.ConKwh02.name(), historico.getInt(Historico.Columns.ConKwh02.name()));
+            valuesH.put(Historico.Columns.ConKwh03.name(), historico.getInt(Historico.Columns.ConKwh03.name()));
+            valuesH.put(Historico.Columns.ConKwh04.name(), historico.getInt(Historico.Columns.ConKwh04.name()));
+            valuesH.put(Historico.Columns.ConKwh05.name(), historico.getInt(Historico.Columns.ConKwh05.name()));
+            valuesH.put(Historico.Columns.ConKwh06.name(), historico.getInt(Historico.Columns.ConKwh06.name()));
+            valuesH.put(Historico.Columns.ConKwh07.name(), historico.getInt(Historico.Columns.ConKwh07.name()));
+            valuesH.put(Historico.Columns.ConKwh08.name(), historico.getInt(Historico.Columns.ConKwh08.name()));
+            valuesH.put(Historico.Columns.ConKwh09.name(), historico.getInt(Historico.Columns.ConKwh09.name()));
+            valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
+            valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
+            valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
+
         }
         dbAdapter.close();
     }

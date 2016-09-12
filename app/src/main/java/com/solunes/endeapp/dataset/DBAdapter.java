@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 
 import java.io.UnsupportedEncodingException;
@@ -22,10 +23,6 @@ import java.util.ArrayList;
 public class DBAdapter {
 
     private static final String TAG = "DBAdapter";
-    public static final String TABLE_USER = "user_table";
-    public static final String TABLE_DATA = "data_table";
-    public static final String TABLE_TARIFA = "tarifa_table";
-    public static final String TABLE_OBS = "obs_table";
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
@@ -36,7 +33,7 @@ public class DBAdapter {
 
     public Cursor checkUser(String username, String password) {
         open();
-        Cursor cursor = db.query(TABLE_USER, null,
+        Cursor cursor = db.query(DBHelper.USER_TABLE, null,
                 User.Columns.LecCod.name() + " = '" + username + "' AND " + User.Columns.LecPas.name() + " = '" + password + "'",
                 null, null, null, null, null);
         cursor.moveToFirst();
@@ -46,7 +43,7 @@ public class DBAdapter {
 
     public User getUser(int id) {
         open();
-        Cursor query = db.query(TABLE_USER, null, User.Columns.id.name() + " = " + id, null, null, null, null);
+        Cursor query = db.query(DBHelper.USER_TABLE, null, User.Columns.id.name() + " = " + id, null, null, null, null);
         query.moveToFirst();
         User user = User.fromCursor(query);
         query.close();
@@ -60,9 +57,9 @@ public class DBAdapter {
 
     public void clearTables() {
         open();
-        db.delete(TABLE_OBS, null, null);
-        db.delete(TABLE_USER, null, null);
-        db.delete(TABLE_TARIFA, null, null);
+        db.delete(DBHelper.OBS_TABLE, null, null);
+        db.delete(DBHelper.USER_TABLE, null, null);
+        db.delete(DBHelper.TARIFA_TABLE, null, null);
     }
 
     public void saveObject(String table, ContentValues values) {
@@ -72,13 +69,13 @@ public class DBAdapter {
 
     public void updateData(int client, ContentValues contentValues) {
         open();
-        db.update(TABLE_DATA, contentValues, "TlxCli = " + client, null);
+        db.update(DBHelper.DATA_TABLE, contentValues, DataModel.Columns.TlxCli.name() + " = " + client, null);
     }
 
     public ArrayList<DataModel> getAllData() {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(TABLE_DATA, null, null, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, null);
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
@@ -88,13 +85,14 @@ public class DBAdapter {
 
     public int deleteAllData() {
         open();
-        int delete = db.delete(TABLE_DATA, null, null);
+        int delete = db.delete(DBHelper.DATA_TABLE, null, null);
+        db.delete(DBHelper.HISTORICO_TABLE, null, null);
         return delete;
     }
 
     public DataModel getData(int id) {
         open();
-        Cursor query = db.query(TABLE_DATA, null, DataModel.Columns._id.name() + " = " + id, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns._id.name() + " = " + id, null, null, null, null);
         query.moveToNext();
         DataModel dataModel = DataModel.fromCursor(query);
         query.close();
@@ -103,7 +101,7 @@ public class DBAdapter {
 
     public int getSizeData() {
         open();
-        Cursor query = db.rawQuery("select count(*) from " + TABLE_DATA, null);
+        Cursor query = db.rawQuery("select count(*) from " + DBHelper.DATA_TABLE, null);
         query.moveToNext();
         int size = query.getInt(0);
         query.close();
@@ -112,7 +110,7 @@ public class DBAdapter {
 
     public int getCountSave() {
         open();
-        Cursor cursor = db.rawQuery("select count(*) from " + TABLE_DATA + " " +
+        Cursor cursor = db.rawQuery("select count(*) from " + DBHelper.DATA_TABLE + " " +
                 "where not " + DataModel.Columns.TlxFecEmi.name() + " is null", null);
         cursor.moveToFirst();
         int count = cursor.getInt(0);
@@ -146,7 +144,19 @@ public class DBAdapter {
 
     public Cursor getObs() {
         open();
-        Cursor query = db.query(TABLE_OBS, null, null, null, null, null, null);
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, null, null, null, null, null);
         return query;
+    }
+
+    public ArrayList<Tarifa> getCargoEnergia() {
+        open();
+        Cursor query = db.query(DBHelper.TARIFA_TABLE,
+                null, Tarifa.Columns.categoria_tarifa_id.name() + " = 1", null, null,
+                null, Tarifa.Columns.kwh_desde.name() + " ASC");
+        ArrayList<Tarifa> arrayList = new ArrayList<>();
+        while (query.moveToNext()) {
+            arrayList.add(Tarifa.fromCursor(query));
+        }
+        return arrayList;
     }
 }

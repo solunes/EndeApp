@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -110,6 +109,7 @@ public class DataFragment extends Fragment {
                 // TODO: 02-09-16 validar los tipos de lecturas y si es nuevo cliente
 
                 int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
+
                 // lectura ajustada
                 if (dataModel.getTlxTipLec() == 6) {
                     lectura = lectura - dataModel.getTlxUltInd();
@@ -161,6 +161,10 @@ public class DataFragment extends Fragment {
         cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
         cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
+        cv.put(DataModel.Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
+        cv.put(DataModel.Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
+        cv.put(DataModel.Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+        cv.put(DataModel.Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
         dbAdapter.close();
@@ -175,14 +179,14 @@ public class DataFragment extends Fragment {
     private void calculo(int lectura) {
         labelEnergiaFacturada.setText("Energia facturada: " + lectura);
 
-        double importeConsumo = GenLecturas.importeConsumo(lectura);
+        double importeConsumo = GenLecturas.importeConsumo(getContext(), lectura);
         labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
         dataModel.setTlxImpEn(importeConsumo);
 
         double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
         dataModel.setTlxDesTdi(tarifaDignidad);
 
-        double ley1886 = GenLecturas.ley1886(lectura);
+        double ley1886 = GenLecturas.ley1886(getContext(), lectura);
         dataModel.setTlxLey1886(ley1886);
 
         double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
@@ -195,15 +199,13 @@ public class DataFragment extends Fragment {
         dataModel.setTlxImpFac(totalSuministro);
 
         double totalSuministroTap = GenLecturas.totalSuministroTap(lectura);
-        dataModel.setTlxImpTap(totalSuministroTap);
+        dataModel.setTlxImpTap(totalSuministro + totalSuministroTap);
 
         double totalSuministroAseo = GenLecturas.totalSuministroAseo(lectura);
         dataModel.setTlxImpAse(totalSuministroAseo);
 
-        dataModel.setTlxImpTot(totalSuministro + totalSuministroTap + totalSuministroAseo);
-
-        double totalFacturar = GenLecturas.totalFacturar(totalSuministroTap);
-        labelTotalFacturar.setText("Importe total a facturar: " + totalFacturar);
+        dataModel.setTlxImpTot(GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo));
+        labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
     }
 
     private void validSaved() {
@@ -211,7 +213,10 @@ public class DataFragment extends Fragment {
             inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
             int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec());
             labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);
-            buttonConfirm.setEnabled(false);
+            labelImporteConsumo.setText("importe por consumo: " + dataModel.getTlxImpEn());
+            labelTotalConsumo.setText("Importe total por consumo: " + dataModel.getTlxConsumo());
+            labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
+            labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
         }
     }
 }
