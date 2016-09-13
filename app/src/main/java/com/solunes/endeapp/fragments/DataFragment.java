@@ -42,9 +42,6 @@ public class DataFragment extends Fragment {
     private TextView labelTotalSuministro;
     private TextView labelTotalFacturar;
 
-    private TextView nameData;
-    private TextView clientData;
-
     private DataModel dataModel;
 
     public DataFragment() {
@@ -83,10 +80,18 @@ public class DataFragment extends Fragment {
     }
 
     public void setupUI(View view, final DataModel data) {
-        nameData = (TextView) view.findViewById(R.id.data_name);
-        nameData.setText(data.getTlxNom());
-        clientData = (TextView) view.findViewById(R.id.data_client);
-        clientData.setText(String.valueOf(data.getTlxCli()));
+        TextView nameData = (TextView) view.findViewById(R.id.data_name);
+        nameData.setText("Nombre: " + data.getTlxNom());
+        TextView dataClient = (TextView) view.findViewById(R.id.data_client);
+        dataClient.setText("N° Cliente: " + data.getTlxCli());
+        TextView adressCliente = (TextView) view.findViewById(R.id.adress_client);
+        adressCliente.setText("Direccion: " + data.getTlxDir());
+        TextView categoryCliente = (TextView) view.findViewById(R.id.category_client);
+        categoryCliente.setText("Categoria: " + data.getTlxSgl());
+        TextView medidorCliente = (TextView) view.findViewById(R.id.medidor_client);
+        medidorCliente.setText("N° Medidor: " + data.getTlxNroMed());
+//        TextView monthCliente = (TextView) view.findViewById(R.id.month_client);
+//        monthCliente.setText("Fecha");
 
         labelEnergiaFacturada = (TextView) view.findViewById(R.id.label_energia_facturada);
         labelImporteConsumo = (TextView) view.findViewById(R.id.label_importe_consumo);
