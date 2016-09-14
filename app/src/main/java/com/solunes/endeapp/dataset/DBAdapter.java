@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 
@@ -110,12 +111,33 @@ public class DBAdapter {
 
     public int getCountSave() {
         open();
+        long ini = System.currentTimeMillis();
         Cursor cursor = db.rawQuery("select count(*) from " + DBHelper.DATA_TABLE + " " +
                 "where not " + DataModel.Columns.TlxFecEmi.name() + " is null", null);
+        long fin = System.currentTimeMillis();
+        Log.e(TAG, "getCountSave: " + (fin - ini));
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();
         return count;
+    }
+
+    public int getCountPrinted() {
+        open();
+        long ini = System.currentTimeMillis();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1", null, null, null, null);
+        long fin = System.currentTimeMillis();
+        Log.e(TAG, "getCountPrinted: " + (fin - ini));
+        return query.getCount();
+    }
+
+    public int getCountPostponed() {
+        open();
+        long ini = System.currentTimeMillis();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 2", null, null, null, null);
+        long fin = System.currentTimeMillis();
+        Log.e(TAG, "getCountPostponed: " + (fin - ini));
+        return query.getCount();
     }
 
     public void close() {
@@ -148,6 +170,20 @@ public class DBAdapter {
         return query;
     }
 
+    public Cursor getObs(int obsCod) {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsCod.name() + " = " + obsCod, null, null, null, null);
+        query.moveToNext();
+        return query;
+    }
+
+    public Cursor getObs(String desc) {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsDes.name() + " = '" + desc + "'", null, null, null, null);
+        query.moveToNext();
+        return query;
+    }
+
     public ArrayList<Tarifa> getCargoEnergia() {
         open();
         Cursor query = db.query(DBHelper.TARIFA_TABLE,
@@ -158,5 +194,13 @@ public class DBAdapter {
             arrayList.add(Tarifa.fromCursor(query));
         }
         return arrayList;
+    }
+
+    public Cursor searchClienteMedidor(String filter) {
+        open();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.TlxCli.name() + " = '" + filter + "' " +
+                "OR " + DataModel.Columns.TlxNroMed.name() + " = '" + filter + "'", null, null, null, null);
+        query.moveToNext();
+        return query;
     }
 }

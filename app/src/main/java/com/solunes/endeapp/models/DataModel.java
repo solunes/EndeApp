@@ -93,6 +93,8 @@ public class DataModel {
     private double TlxPerdidas;
     private double TlxConsFacturado;
     private String TlxDebAuto;
+    private int estadoLectura;
+    private int enviado;
 
     public enum Columns {
         _id,
@@ -174,7 +176,9 @@ public class DataModel {
         TlxConsumo,
         TlxPerdidas,
         TlxConsFacturado,
-        TlxDebAuto
+        TlxDebAuto,
+        estado_lectura,
+        enviado
     }
 
     public int get_id() {
@@ -817,6 +821,22 @@ public class DataModel {
         TlxDebAuto = tlxDebAuto;
     }
 
+    public int getEstadoLectura() {
+        return estadoLectura;
+    }
+
+    public void setEstadoLectura(int estadoLectura) {
+        this.estadoLectura = estadoLectura;
+    }
+
+    public int getEnviado() {
+        return enviado;
+    }
+
+    public void setEnviado(int enviado) {
+        this.enviado = enviado;
+    }
+
     public static DataModel fromCursor(Cursor cursor) {
         DataModel dataModel = new DataModel();
         dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
@@ -899,13 +919,14 @@ public class DataModel {
         dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
         dataModel.setTlxConsFacturado(cursor.getDouble(Columns.TlxConsFacturado.ordinal()));
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
+        dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
+        dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));
         return dataModel;
     }
 
     public String getJsonToSend(DataModel dataModel) {
         JSONObject jsonObject = new JSONObject();
         try {
-//            jsonObject.put(Columns.TlxFecLec.name(), dataModel.getTlxFecLec());
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
             jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
@@ -923,11 +944,6 @@ public class DataModel {
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
-
-//            jsonObject.put(DataModel.Columns.TlxFecCor.name(), dataModel.getTlxFecCor());
-//            jsonObject.put(DataModel.Columns.TlxFecVto.name(), dataModel.getTlxFecVto());
-//            jsonObject.put(DataModel.Columns.TlxFecproEmi.name(), dataModel.getTlxFecproEmi());
-//            jsonObject.put(DataModel.Columns.TlxFecproMed.name(), dataModel.getTlxFecproMed());
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }

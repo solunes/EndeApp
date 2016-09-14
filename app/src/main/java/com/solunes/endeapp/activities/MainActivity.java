@@ -37,8 +37,8 @@ import java.util.Hashtable;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String KEY_RATE = "update_rate";
-    private static final String KEY_RATE_MONTH = "update_rate_month";
+    public static final String KEY_RATE = "update_rate";
+    public static final String KEY_RATE_MONTH = "update_rate_month";
     private static final String KEY_DOWNLOAD = "download";
     private static final String KEY_WAS_UPLOAD = "was_upload";
     private static final String KEY_SEND = "send";
@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView statePerformed;
     private TextView stateMissing;
     private TextView stateAverage;
+    private TextView statePrinted;
+    private TextView statePostponed;
 
     private CardView cardRate;
 
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         stateMissing = (TextView) findViewById(R.id.state_missing);
         statePerformed = (TextView) findViewById(R.id.state_performed);
         stateTotal = (TextView) findViewById(R.id.state_total);
+        statePrinted = (TextView) findViewById(R.id.state_printed);
+        statePostponed = (TextView) findViewById(R.id.state_postponed);
 
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
@@ -119,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startReading(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas o tarifas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class));
@@ -243,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 int month = Calendar.getInstance().get(Calendar.MONTH);
                 UserPreferences.putInt(getApplicationContext(), KEY_RATE_MONTH, month);
                 cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
-                Snackbar.make(view, "Se ha actualizado la estructura tarifaria", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, "Se ha actualizado los parametros fijos", Snackbar.LENGTH_SHORT).show();
                 isRate = true;
             }
 
@@ -412,13 +416,19 @@ public class MainActivity extends AppCompatActivity {
     private void updateStates() {
         DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         int sizeData = dbAdapter.getSizeData();
-        stateTotal.setText(String.valueOf(sizeData));
-        int countSave = dbAdapter.getCountSave();
+        if (sizeData != 0) {
+            int countSave = dbAdapter.getCountSave();
+            int countPrinted = dbAdapter.getCountPrinted();
+            int countPostponed = dbAdapter.getCountPostponed();
+            stateTotal.setText(String.valueOf(sizeData));
+            statePerformed.setText(String.valueOf(countSave));
+            stateMissing.setText(String.valueOf(sizeData - countSave));
+            stateAverage.setText("0");
+            statePrinted.setText(String.valueOf(countPrinted));
+            statePostponed.setText(String.valueOf(countPostponed));
+        }
 
         dbAdapter.close();
-        statePerformed.setText(String.valueOf(countSave));
-        stateMissing.setText(String.valueOf(sizeData - countSave));
-        stateAverage.setText("0");
     }
 
     @Override

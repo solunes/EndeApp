@@ -1,5 +1,6 @@
 package com.solunes.endeapp.fragments;
 
+import android.animation.LayoutTransition;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,14 +8,24 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -28,12 +39,13 @@ import java.util.Calendar;
 /**
  * Created by jhonlimaster on 01-12-15.
  */
-public class DataFragment extends Fragment {
-    private static final String TAG = "PostFragment";
+public class DataFragment extends Fragment implements SearchView.OnQueryTextListener {
+    private static final String TAG = "DataFragment";
     private static final String KEY_POSITION = "position";
     private OnFragmentListener onFragmentListener;
 
     private EditText inputReading;
+    private EditText obsCode;
     private Button buttonConfirm;
     private Button buttonObs;
     private TextView labelEnergiaFacturada;
@@ -41,6 +53,10 @@ public class DataFragment extends Fragment {
     private TextView labelTotalConsumo;
     private TextView labelTotalSuministro;
     private TextView labelTotalFacturar;
+    private TextView labelObs;
+    private TextView estadoMedidor;
+    private SearchView searchView;
+    private MenuItem searchItem;
 
     private DataModel dataModel;
 
@@ -64,6 +80,28 @@ public class DataFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
+        searchItem = menu.findItem(R.id.action_search);
+        searchItem.collapseActionView();
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Cliente o Medidor");
+        searchView.setLayoutTransition(new LayoutTransition());
     }
 
     @Override
@@ -72,9 +110,10 @@ public class DataFragment extends Fragment {
         Bundle arguments = getArguments();
         DBAdapter dbAdapter = new DBAdapter(getContext());
         dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
-        Log.e(TAG, "onCreateView: tipo de lectura " + dataModel.getTlxTipLec() + " ---- ultimo tipo " + dataModel.getTlxUltTipL());
+//        Log.e(TAG, "onCreateView: tipo de lectura " + dataModel.getTlxTipLec() + " ---- ultimo tipo " + dataModel.getTlxUltTipL());
         dbAdapter.close();
         setupUI(view, dataModel);
+        actionButtons();
         validSaved();
         return view;
     }
@@ -89,18 +128,28 @@ public class DataFragment extends Fragment {
         TextView categoryCliente = (TextView) view.findViewById(R.id.category_client);
         categoryCliente.setText("Categoria: " + data.getTlxSgl());
         TextView medidorCliente = (TextView) view.findViewById(R.id.medidor_client);
-        medidorCliente.setText("N° Medidor: " + data.getTlxNroMed());
-//        TextView monthCliente = (TextView) view.findViewById(R.id.month_client);
-//        monthCliente.setText("Fecha");
+        medidorCliente.setText("N°: " + data.getTlxNroMed());
+        TextView digitosCliente = (TextView) view.findViewById(R.id.digitos_client);
+        digitosCliente.setText("Digitos: " + data.getTlxNroDig());
+        TextView ordenCliente = (TextView) view.findViewById(R.id.orden_client);
+        ordenCliente.setText("Orden: " + data.getTlxOrdTpl());
 
         labelEnergiaFacturada = (TextView) view.findViewById(R.id.label_energia_facturada);
         labelImporteConsumo = (TextView) view.findViewById(R.id.label_importe_consumo);
         labelTotalConsumo = (TextView) view.findViewById(R.id.label_total_consumo);
         labelTotalSuministro = (TextView) view.findViewById(R.id.label_total_suministro);
         labelTotalFacturar = (TextView) view.findViewById(R.id.label_total_facturar);
+        labelObs = (TextView) view.findViewById(R.id.label_obs);
         inputReading = (EditText) view.findViewById(R.id.input_reading);
         inputReading.setSelected(false);
         buttonConfirm = (Button) view.findViewById(R.id.button_confirm);
+        buttonObs = (Button) view.findViewById(R.id.button_obs);
+        obsCode = (EditText) view.findViewById(R.id.obs_code);
+        estadoMedidor = (TextView) view.findViewById(R.id.estado_client);
+        estadoMedidor.setText(DataFragment.estados_lectura.values()[data.getEstadoLectura()].name());
+    }
+
+    private void actionButtons() {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,33 +178,56 @@ public class DataFragment extends Fragment {
                 saveLectura(view);
             }
         });
-        buttonObs = (Button) view.findViewById(R.id.button_obs);
         buttonObs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Selecionar una observacion");
-                DBAdapter dbAdapter = new DBAdapter(getContext());
-                Cursor obs = dbAdapter.getObs();
-                String[] stringObs = new String[obs.getCount()];
-                for (int i = 0; i < obs.getCount(); i++) {
-                    obs.moveToNext();
-                    stringObs[i] = Obs.fromCursor(obs).getObsDes();
+                final DBAdapter dbAdapter = new DBAdapter(getContext());
+                Cursor cursor = dbAdapter.getObs();
+                final String[] stringObs = new String[cursor.getCount()];
+                for (int i = 0; i < cursor.getCount(); i++) {
+                    cursor.moveToNext();
+                    stringObs[i] = Obs.fromCursor(cursor).getObsDes();
                 }
+                cursor.close();
                 alertDialog.setSingleChoiceItems(stringObs, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
-                        Log.e(TAG, "onClick: " + position);
                         dialogInterface.dismiss();
+                        Obs obs = Obs.fromCursor(dbAdapter.getObs(stringObs[position]));
+                        labelObs.setText(obs.getObsDes());
+                        obsCode.setText(String.valueOf(obs.getObsCod()));
                     }
                 });
                 alertDialog.show();
             }
         });
-    }
+        obsCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
-    public interface OnFragmentListener {
-        void onTabListener();
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.toString().isEmpty()) {
+                    return;
+                }
+                DBAdapter dbAdapter = new DBAdapter(getContext());
+                int idOBs = Integer.parseInt(editable.toString());
+                Cursor cursor = dbAdapter.getObs(idOBs);
+                if (cursor.getCount() > 0) {
+                    Obs obs = Obs.fromCursor(cursor);
+                    labelObs.setText(obs.getObsDes());
+                } else {
+                    labelObs.setText("Codigo incorrecto");
+                }
+            }
+        });
     }
 
     private void saveLectura(View view) {
@@ -223,5 +295,37 @@ public class DataFragment extends Fragment {
             labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
             labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        String filter = !TextUtils.isEmpty(query) ? query : null;
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+        Cursor cursor = dbAdapter.searchClienteMedidor(filter);
+        if (cursor.getCount() > 0) {
+            DataModel dataModel = DataModel.fromCursor(cursor);
+            onFragmentListener.onSetItem(dataModel.get_id() - 1);
+        } else {
+            Snackbar.make(buttonConfirm, "no hay conincidencias", Snackbar.LENGTH_SHORT).show();
+        }
+        cursor.close();
+        dbAdapter.close();
+        Log.e(TAG, "onQueryTextSubmit: " + filter);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    public interface OnFragmentListener {
+        void onTabListener();
+
+        void onSetItem(int pos);
+    }
+
+    private enum estados_lectura {
+        Pendiente, Impreso, Postergado
     }
 }

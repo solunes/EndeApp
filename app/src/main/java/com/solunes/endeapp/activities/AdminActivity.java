@@ -32,12 +32,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
+
 public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
     public static final String KEY_TPL = "key_tpl";
 
     private EditText editTpl;
+    private TextView nroTpl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,12 @@ public class AdminActivity extends AppCompatActivity {
         TextView textUsername = (TextView) findViewById(R.id.text_username);
         Button btnSaveTpl = (Button) findViewById(R.id.btn_save_tpl);
         Button btnFixParams = (Button) findViewById(R.id.btn_fix_params);
+        nroTpl = (TextView) findViewById(R.id.label_nro_tpl);
+        int nro = UserPreferences.getInt(getApplicationContext(), KEY_TPL);
+        if (nro > 0) {
+            nroTpl.setText("Nro. TPL: " + nro);
+            editTpl.setText(nro + "");
+        }
 
         int id_user = getIntent().getExtras().getInt("id_user");
         DBAdapter dbAdapter = new DBAdapter(this);
@@ -65,6 +74,7 @@ public class AdminActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!editTpl.getText().toString().isEmpty()) {
                     UserPreferences.putInt(getApplicationContext(), KEY_TPL, Integer.parseInt(editTpl.getText().toString()));
+                    nroTpl.setText("Nro. TPL: " + editTpl.getText().toString());
                 }
             }
         });
@@ -81,10 +91,13 @@ public class AdminActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(String result, int statusCode) {
                         try {
-                            processResultFixParams(getApplicationContext(),result);
+                            processResultFixParams(getApplicationContext(), result);
                             progressDialog.dismiss();
                             builder.setMessage("Los datos de tarifas, observaciones y usuarios han sido descargados");
                             builder.show();
+                            UserPreferences.putLong(getApplicationContext(), MainActivity.KEY_RATE, Calendar.getInstance().getTimeInMillis());
+                            int month = Calendar.getInstance().get(Calendar.MONTH);
+                            UserPreferences.putInt(getApplicationContext(), MainActivity.KEY_RATE_MONTH, month);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -170,5 +183,5 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBHelper.OBS_TABLE, values);
         }
-     }
+    }
 }

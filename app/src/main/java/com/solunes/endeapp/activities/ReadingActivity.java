@@ -74,6 +74,11 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     @Override
+    public void onSetItem(int pos) {
+        viewPager.setCurrentItem(pos);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

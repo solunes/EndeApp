@@ -131,7 +131,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxPerdidas numeric, " +
                 "TlxConsFacturado numeric, " +
                 "TlxDebAuto text, " +
-                "save_state integer)");
+                "estado_lectura integer, " +
+                "enviado integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + HISTORICO_TABLE + " (" +
                 "id integer," +
