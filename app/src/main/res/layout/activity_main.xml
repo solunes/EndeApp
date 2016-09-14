@@ -8,72 +8,84 @@
 
     <include layout="@layout/toolbar" />
 
-    <android.support.v7.widget.CardView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="@dimen/activity_horizontal_margin">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <ImageView
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/activity_horizontal_margin">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin_half"
+                        android:src="@drawable/ic_near_me_black_24dp"
+                        android:tint="#ff6e40" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin_half"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Realizar lecturas"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Numero de lecturas" />
+                    </LinearLayout>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+                        android:onClick="startReading"
+                        android:text="Empezar"
+                        android:textColor="@android:color/white"
+                        android:theme="@style/MyButton" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/activity_horizontal_margin_half"
-                android:src="@drawable/ic_near_me_black_24dp"
-                android:tint="#ff6e40" />
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:text="Estados"
+                android:textAppearance="?android:textAppearanceMedium" />
 
-            <LinearLayout
+            <include layout="@layout/layout_status" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
-                android:layout_marginRight="@dimen/activity_horizontal_margin_half"
-                android:orientation="vertical">
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:text="Acciones"
+                android:textAppearance="?android:textAppearanceMedium" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Realizar lecturas"
-                    android:textColor="@android:color/black" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Numero de lecturas" />
-            </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
-                android:onClick="startReading"
-                android:text="Empezar"
-                android:textColor="@android:color/white"
-                android:theme="@style/MyButton" />
+            <include layout="@layout/layout_actions" />
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </ScrollView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:text="Estados"
-        android:textAppearance="?android:textAppearanceMedium" />
-
-    <include layout="@layout/layout_status" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:text="Acciones"
-        android:textAppearance="?android:textAppearanceMedium" />
-
-    <include layout="@layout/layout_actions" />
 </LinearLayout>

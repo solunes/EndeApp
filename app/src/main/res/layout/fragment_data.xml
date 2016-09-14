@@ -44,19 +44,15 @@
                         android:id="@+id/data_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nombre: Eduardo Mejia" />
-
-                    <TextView
-                        android:id="@+id/data_client"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="N° Cliente: 659854-1-1" />
+                        android:text="Nombre: Eduardo Mejia"
+                        android:textAppearance="?android:textAppearanceMedium" />
 
                     <TextView
                         android:id="@+id/adress_client"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ciudad/Localidad: LA PAZ" />
+                        android:text="Ciudad/Localidad: LA PAZ"
+                        android:textAppearance="?android:textAppearanceMedium" />
 
                     <TextView
                         android:id="@+id/category_client"
@@ -65,18 +61,69 @@
                         android:text="Categoria: B2-PD-BT" />
 
                     <TextView
-                        android:id="@+id/medidor_client"
+                        android:id="@+id/data_client"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="N° Medidor: 457812" />
+                        android:text="N° Cliente: 659854-1-1" />
 
-                    <!--<TextView-->
-                        <!--android:id="@+id/month_client"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="Mes: Jul-12" />-->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="#e7e7e7" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Datos Medidor" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/medidor_client"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="457812" />
+
+                        <TextView
+                            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                            android:id="@+id/digitos_client"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Digitos: 5" />
+
+                        <TextView
+                            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                            android:id="@+id/orden_client"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Orden: 4" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:background="#e7e7e7" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Estado Medidor" />
+
+                    <TextView
+                        android:id="@+id/estado_client"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pendiente"
+                        android:textAppearance="?android:textAppearanceMedium" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
+
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
@@ -105,16 +152,24 @@
                         android:hint="Lectura"
                         android:inputType="number" />
 
+                    <Button
+                        android:id="@+id/button_confirm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorAccent"
+                        android:text="Confirmar" />
+
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <Button
-                            android:id="@+id/button_confirm"
-                            android:layout_width="wrap_content"
+                        <EditText
+                            android:layout_width="52dp"
+                            android:lines="1"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/colorAccent"
-                            android:text="Confirmar" />
+                            android:hint="Obs" />
 
                         <Button
                             android:id="@+id/button_obs"
@@ -122,6 +177,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Observaciones" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:paddingLeft="@dimen/activity_horizontal_margin_half"
+                            android:text="Ningumo"
+                            android:textAppearance="?android:textAppearanceMedium" />
                     </LinearLayout>
 
                     <TextView

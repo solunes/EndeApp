@@ -81,11 +81,11 @@ public class DataFragment extends Fragment {
 
     public void setupUI(View view, final DataModel data) {
         TextView nameData = (TextView) view.findViewById(R.id.data_name);
-        nameData.setText("Nombre: " + data.getTlxNom());
+        nameData.setText(data.getTlxNom());
         TextView dataClient = (TextView) view.findViewById(R.id.data_client);
         dataClient.setText("N° Cliente: " + data.getTlxCli());
         TextView adressCliente = (TextView) view.findViewById(R.id.adress_client);
-        adressCliente.setText("Direccion: " + data.getTlxDir());
+        adressCliente.setText(data.getTlxDir());
         TextView categoryCliente = (TextView) view.findViewById(R.id.category_client);
         categoryCliente.setText("Categoria: " + data.getTlxSgl());
         TextView medidorCliente = (TextView) view.findViewById(R.id.medidor_client);

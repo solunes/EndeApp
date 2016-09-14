@@ -190,32 +190,37 @@ public class MainActivity extends AppCompatActivity {
             Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
             return;
         }
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Enviando....");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        DBAdapter dbAdapter = new DBAdapter(this);
+        if (dbAdapter.getSizeData() == dbAdapter.getCountSave()) {
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Enviando....");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
 
-        Hashtable<String, String> params = prepareDataToPost();
-        new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
-            @Override
-            public void onSuccess(String result, int statusCode) {
-                Log.e(TAG, "onSuccess: " + result);
-                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                textSend.setText(humanDate);
-                progressDialog.dismiss();
+            Hashtable<String, String> params = prepareDataToPost();
+            new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
+                @Override
+                public void onSuccess(String result, int statusCode) {
+                    Log.e(TAG, "onSuccess: " + result);
+                    String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                    textSend.setText(humanDate);
+                    progressDialog.dismiss();
 
-                Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
-                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
-                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
-            }
+                    Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
+                    UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                    UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
+                }
 
-            @Override
-            public void onFailed(String reason, int statusCode) {
-                Log.e(TAG, "onFailed: " + reason);
-                progressDialog.dismiss();
-                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
-            }
-        }).execute();
+                @Override
+                public void onFailed(String reason, int statusCode) {
+                    Log.e(TAG, "onFailed: " + reason);
+                    progressDialog.dismiss();
+                    Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
+                }
+            }).execute();
+        } else {
+            Snackbar.make(view, "No se han completado las lecturas", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     public void updateRate(final View view) {
