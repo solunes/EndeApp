@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
@@ -182,6 +183,19 @@ public class DBAdapter {
         Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsDes.name() + " = '" + desc + "'", null, null, null, null);
         query.moveToNext();
         return query;
+    }
+
+    public ArrayList<Obs> getObs(int rem, int are, int cli) {
+        open();
+        ArrayList<Obs> objects = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObsRem.name() + " = " + rem + " AND " +
+                "" + DataObs.Columns.ObsAre.name() + " = " + are + " AND " +
+                "" + DataObs.Columns.ObsCli.name() + " = " + cli, null, null, null, null);
+        while (cursor.moveToNext()) {
+            objects.add(Obs.fromCursor(cursor));
+        }
+        cursor.close();
+        return objects;
     }
 
     public ArrayList<Tarifa> getCargoEnergia() {

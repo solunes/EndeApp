@@ -2,6 +2,9 @@ package com.solunes.endeapp.models;
 
 import android.database.Cursor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by jhonlimaster on 07-09-16.
  */
@@ -28,6 +31,20 @@ public class Obs {
         obs.setObsLec(cursor.getInt(Columns.ObsLec.ordinal()));
         obs.setObsFac(cursor.getInt(Columns.ObsFac.ordinal()));
         return obs;
+    }
+
+    public JSONObject toJson(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Columns.ObsCod.name(), getObsCod());
+            jsonObject.put(Columns.ObsDes.name(), getObsDes());
+            jsonObject.put(Columns.ObsTip.name(), getObsTip());
+            jsonObject.put(Columns.ObsLec.name(), getObsLec());
+            jsonObject.put(Columns.ObsFac.name(), getObsFac());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     public int getObsCod() {

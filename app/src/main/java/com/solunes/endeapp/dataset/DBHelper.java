@@ -11,12 +11,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
+
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
     public static final String TARIFA_TABLE = "tarifa_table";
     public static final String OBS_TABLE = "obs_table";
     public static final String HISTORICO_TABLE = "historico_table";
+    public static final String DATA_OBS_TABLE = "data_obs_table";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -164,6 +166,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 "ConMes12 text," +
                 "ConKwh12 integer)");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
+                "ObsRem integer," +
+                "ObsAre integer," +
+                "ObsCli integer," +
+                "ObsCod integer)");
+
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
@@ -184,6 +192,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + OBS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + HISTORICO_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATA_OBS_TABLE);
 
         onCreate(sqLiteDatabase);
     }

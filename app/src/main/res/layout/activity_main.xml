@@ -71,8 +71,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
                 android:text="Estados"
-                android:textAppearance="?android:textAppearanceMedium" />
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textSize="14dp" />
 
             <include layout="@layout/layout_status" />
 
@@ -81,8 +84,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
                 android:text="Acciones"
-                android:textAppearance="?android:textAppearanceMedium" />
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textSize="14dp" />
 
             <include layout="@layout/layout_actions" />
         </LinearLayout>

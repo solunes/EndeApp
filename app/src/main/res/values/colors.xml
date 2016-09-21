@@ -3,4 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FFFF00</color>
+
+    <color name="colorPrint">#3D5AFE</color>
+    <color name="colorPostponed">#FFEA00</color>
+    <color name="colorPendiente">#ff3d00</color>
 </resources>

@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.text.Editable;
@@ -23,13 +22,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.StringUtils;
@@ -45,7 +44,7 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     private OnFragmentListener onFragmentListener;
 
     private EditText inputReading;
-    private EditText obsCode;
+    private EditText inputObsCode;
     private Button buttonConfirm;
     private Button buttonObs;
     private TextView labelEnergiaFacturada;
@@ -97,7 +96,6 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_search, menu);
         searchItem = menu.findItem(R.id.action_search);
-        searchItem.collapseActionView();
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Cliente o Medidor");
@@ -144,38 +142,77 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         inputReading.setSelected(false);
         buttonConfirm = (Button) view.findViewById(R.id.button_confirm);
         buttonObs = (Button) view.findViewById(R.id.button_obs);
-        obsCode = (EditText) view.findViewById(R.id.obs_code);
+        inputObsCode = (EditText) view.findViewById(R.id.obs_code);
         estadoMedidor = (TextView) view.findViewById(R.id.estado_client);
         estadoMedidor.setText(DataFragment.estados_lectura.values()[data.getEstadoLectura()].name());
+        estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
     }
 
     private void actionButtons() {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String input = inputReading.getText().toString();
-                if (input.isEmpty()) {
-                    return;
+                int obsCod = 104;
+                if (!inputObsCode.getText().toString().isEmpty()) {
+                    obsCod = Integer.parseInt(inputObsCode.getText().toString());
                 }
-                int nuevaLectura = Integer.parseInt(input);
-                dataModel.setTlxNvaLec(nuevaLectura);
+                DBAdapter dbAdapter = new DBAdapter(getContext());
+                Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
-                // TODO: 02-09-16 validar los tipos de lecturas y si es nuevo cliente
+                String input = inputReading.getText().toString();
 
-                int lectura = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
+                int lecturaKwh;
+                if (obs.getObsLec() == 3) {
+                    lecturaKwh = dataModel.getTlxConPro();
+                    dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
+                    dataModel.setTlxKwhDev(lecturaKwh);
+                } else if (input.isEmpty()) {
+                    Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    int nuevaLectura = Integer.parseInt(input);
+                    dataModel.setTlxNvaLec(nuevaLectura);
+                    lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
+                }
 
-                // lectura ajustada
-                if (dataModel.getTlxTipLec() == 6) {
-                    lectura = lectura - dataModel.getTlxUltInd();
-                    if (lectura > 0) {
+                // lecturaKwh ajustada
+                if (dataModel.getTlxUltTipL() == 3) {
+                    lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
+                    if (lecturaKwh > 0) {
                         dataModel.setTlxKwhDev(0);
                     } else {
-                        dataModel.setTlxKwhDev(lectura);
-                        lectura = 0;
+                        dataModel.setTlxKwhDev(lecturaKwh);
+                        lecturaKwh = 0;
                     }
                 }
-                calculo(lectura);
-                saveLectura(view);
+                if (dataModel.getTlxKwhDev() > 0) {
+                    lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
+                    if (lecturaKwh > 0) {
+                        dataModel.setTlxKwhDev(0);
+                    } else {
+                        dataModel.setTlxKwhDev(lecturaKwh);
+                        lecturaKwh = 0;
+                    }
+                }
+                lecturaKwh = lecturaKwh + dataModel.getTlxKwhAdi();
+                Log.e(TAG, "lectura Kwh: " + lecturaKwh);
+                dataModel.setTlxKwhAdi(0);
+                calculo(lecturaKwh);
+                if (obs.getObsFac() == 1) {
+                    dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
+                    estadoMedidor.setText(estados_lectura.Impreso.name());
+                    estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
+                    buttonConfirm.setEnabled(false);
+                    buttonObs.setEnabled(false);
+                    inputObsCode.setEnabled(false);
+                    inputReading.setEnabled(false);
+                } else {
+                    dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+                    estadoMedidor.setText(estados_lectura.Postergado.name());
+                    estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+                }
+                saveLectura(obs);
+                printFactura(view, obs);
             }
         });
         buttonObs.setOnClickListener(new View.OnClickListener() {
@@ -197,13 +234,13 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
                         dialogInterface.dismiss();
                         Obs obs = Obs.fromCursor(dbAdapter.getObs(stringObs[position]));
                         labelObs.setText(obs.getObsDes());
-                        obsCode.setText(String.valueOf(obs.getObsCod()));
+                        inputObsCode.setText(String.valueOf(obs.getObsCod()));
                     }
                 });
                 alertDialog.show();
             }
         });
-        obsCode.addTextChangedListener(new TextWatcher() {
+        inputObsCode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -215,6 +252,7 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
             @Override
             public void afterTextChanged(Editable editable) {
                 if (editable.toString().isEmpty()) {
+                    labelObs.setText("Ninguno");
                     return;
                 }
                 DBAdapter dbAdapter = new DBAdapter(getContext());
@@ -230,11 +268,19 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         });
     }
 
-    private void saveLectura(View view) {
+    private void printFactura(View view, Obs obs) {
+        if (obs.getObsFac() == 1) {
+            Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
+        } else {
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveLectura(Obs obs) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         ContentValues cv = new ContentValues();
         Calendar calendar = Calendar.getInstance();
-        Log.e(TAG, "saveLectura: " + StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
+
         cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
         cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
@@ -242,15 +288,36 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         cv.put(DataModel.Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
         cv.put(DataModel.Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
         cv.put(DataModel.Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
+        cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
+
+        cv = new ContentValues();
+        cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
+        cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
+        cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
+        cv.put(DataObs.Columns.ObsCod.name(), obs.getObsCod());
+
+        dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
+        int conPro = dataModel.getTlxConPro();
+        if (conPro > (conPro + conPro * 0.2)) {
+            cv = new ContentValues();
+            cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
+            cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
+            cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
+            cv.put(DataObs.Columns.ObsCod.name(), 80);
+            dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
+        } else if (conPro < (conPro * 0.8)) {
+            cv = new ContentValues();
+            cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
+            cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
+            cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
+            cv.put(DataObs.Columns.ObsCod.name(), 81);
+            dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
+        }
+
         dbAdapter.close();
         onFragmentListener.onTabListener();
-        if (dataModel.getTlxTipLec() == 4) {
-            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
-        } else {
-            Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
-        }
     }
 
     private void calculo(int lectura) {
@@ -294,6 +361,20 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
             labelTotalConsumo.setText("Importe total por consumo: " + dataModel.getTlxConsumo());
             labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
             labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
+            if (dataModel.getEstadoLectura() == 1) {
+                estadoMedidor.setText(estados_lectura.Impreso.name());
+                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
+                buttonConfirm.setEnabled(false);
+                inputReading.setEnabled(false);
+                buttonObs.setEnabled(false);
+                inputObsCode.setEnabled(false);
+            } else if (dataModel.getEstadoLectura() == 2) {
+                estadoMedidor.setText(estados_lectura.Postergado.name());
+                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+            } else {
+                estadoMedidor.setText(estados_lectura.Pendiente.name());
+                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
+            }
         }
     }
 

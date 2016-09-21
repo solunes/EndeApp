@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_DOWNLOAD = "download";
     private static final String KEY_WAS_UPLOAD = "was_upload";
     private static final String KEY_SEND = "send";
+    private static final String KEY_ENDPOINT_GESTION = "endpoint_gestion";
+    private static final String KEY_ENDPOINT_MONTH = "endpoint_month";
+    private static final String KEY_ENDPOINT_REMESA = "endpoint_remesa";
+    private static final String KEY_ENDPOINT_TPL = "endpoint_tpl";
 
     private boolean isRate;
     private boolean wasDownload;
@@ -50,10 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView textSend;
     private TextView textTarifa;
 
-    private TextView stateTotal;
     private TextView statePerformed;
     private TextView stateMissing;
-    private TextView stateAverage;
     private TextView statePrinted;
     private TextView statePostponed;
 
@@ -63,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        long ini = System.currentTimeMillis();
+        Log.e(TAG, "onCreate: ini");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -71,13 +74,10 @@ public class MainActivity extends AppCompatActivity {
         textSend = (TextView) findViewById(R.id.text_date_send);
         textTarifa = (TextView) findViewById(R.id.text_date_tarifa);
 
-        stateAverage = (TextView) findViewById(R.id.state_average);
         stateMissing = (TextView) findViewById(R.id.state_missing);
         statePerformed = (TextView) findViewById(R.id.state_performed);
-        stateTotal = (TextView) findViewById(R.id.state_total);
         statePrinted = (TextView) findViewById(R.id.state_printed);
         statePostponed = (TextView) findViewById(R.id.state_postponed);
-
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
         if (dateDownload > 0) {
@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         validDay();
         updateStates();
+        Log.e(TAG, "onCreate: fin " + (ini - System.currentTimeMillis()));
     }
 
     @Override
@@ -142,11 +143,15 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
         final Calendar calendar = Calendar.getInstance();
+        final String gestion = calendar.get(Calendar.YEAR) + "";
+        final String month = calendar.get(Calendar.MONTH) + "";
         String remesa = calendar.get(Calendar.DAY_OF_MONTH) + "";
+        final String tpl = UserPreferences.getInt(this, AdminActivity.KEY_TPL) + "";
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
         }
-        String url = "http://ende.solunes.com/api/descarga/" + remesa + "/12345";
+        String url = "http://ende.solunes.com/api/descarga/"+gestion+"/"+month+"/" + remesa + "/"+tpl;
+        final String finalRemesa = remesa;
         new GetRequest(url, new CallbackAPI() {
             @Override
             public void onSuccess(final String result, int statusCode) {
@@ -164,6 +169,11 @@ public class MainActivity extends AppCompatActivity {
                         UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
                         UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
                         UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
+
+                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
+                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
+                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
+                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_TPL, tpl);
                     }
                 };
                 new Thread(runSaveData).start();
@@ -194,37 +204,37 @@ public class MainActivity extends AppCompatActivity {
             Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
             return;
         }
-        DBAdapter dbAdapter = new DBAdapter(this);
-        if (dbAdapter.getSizeData() == dbAdapter.getCountSave()) {
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Enviando....");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
+//        DBAdapter dbAdapter = new DBAdapter(this);
+//        if (dbAdapter.getSizeData() == dbAdapter.getCountSave()) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Enviando....");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
-            Hashtable<String, String> params = prepareDataToPost();
-            new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
-                @Override
-                public void onSuccess(String result, int statusCode) {
-                    Log.e(TAG, "onSuccess: " + result);
-                    String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                    textSend.setText(humanDate);
-                    progressDialog.dismiss();
+        Hashtable<String, String> params = prepareDataToPost();
+        new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
+            @Override
+            public void onSuccess(String result, int statusCode) {
+                Log.e(TAG, "onSuccess: " + result);
+                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                textSend.setText(humanDate);
+                progressDialog.dismiss();
 
-                    Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
-                    UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
-                    UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
-                }
+                Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
+                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
+            }
 
-                @Override
-                public void onFailed(String reason, int statusCode) {
-                    Log.e(TAG, "onFailed: " + reason);
-                    progressDialog.dismiss();
-                    Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
-                }
-            }).execute();
-        } else {
-            Snackbar.make(view, "No se han completado las lecturas", Snackbar.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailed(String reason, int statusCode) {
+                Log.e(TAG, "onFailed: " + reason);
+                progressDialog.dismiss();
+                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
+            }
+        }).execute();
+//        } else {
+//            Snackbar.make(view, "No se han completado las lecturas", Snackbar.LENGTH_SHORT).show();
+//        }
     }
 
     public void updateRate(final View view) {
@@ -390,11 +400,16 @@ public class MainActivity extends AppCompatActivity {
         DBAdapter dbAdapter = new DBAdapter(this);
         ArrayList<DataModel> allData = dbAdapter.getAllData();
 
-        params.put("TlxRem", String.valueOf(allData.get(0).getTlxRem()));
-        params.put("TlxAre", String.valueOf(allData.get(0).getTlxAre()));
-        params.put("TlxRutA", String.valueOf(allData.get(0).getTlxRutA()));
+        DataModel model = allData.get(0);
+
+        params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
+        params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
+        params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
+        params.put("tpl", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_TPL));
+
+
         for (DataModel dataModel : allData) {
-            String json = dataModel.getJsonToSend(dataModel);
+            String json = dataModel.getJsonToSend(dataModel, dbAdapter.getObs(model.getTlxRem(), model.getTlxAre(), model.getTlxCli()));
             params.put("" + (dataModel.getTlxCli()), json);
         }
         return params;
@@ -420,10 +435,8 @@ public class MainActivity extends AppCompatActivity {
             int countSave = dbAdapter.getCountSave();
             int countPrinted = dbAdapter.getCountPrinted();
             int countPostponed = dbAdapter.getCountPostponed();
-            stateTotal.setText(String.valueOf(sizeData));
             statePerformed.setText(String.valueOf(countSave));
             stateMissing.setText(String.valueOf(sizeData - countSave));
-            stateAverage.setText("0");
             statePrinted.setText(String.valueOf(countPrinted));
             statePostponed.setText(String.valueOf(countPostponed));
         }

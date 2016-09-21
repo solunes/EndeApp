@@ -3,9 +3,11 @@ package com.solunes.endeapp.models;
 import android.database.Cursor;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -924,7 +926,7 @@ public class DataModel {
         return dataModel;
     }
 
-    public String getJsonToSend(DataModel dataModel) {
+    public String getJsonToSend(DataModel dataModel, ArrayList<Obs> obsArray) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
@@ -944,6 +946,11 @@ public class DataModel {
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < obsArray.size(); i++) {
+                jsonArray.put(i,obsArray.get(i).toJson());
+            }
+            jsonObject.put("observaciones", jsonArray);
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }
