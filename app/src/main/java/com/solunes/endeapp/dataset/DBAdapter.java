@@ -185,16 +185,13 @@ public class DBAdapter {
         return query;
     }
 
-    public ArrayList<Obs> getObs(int rem, int are, int cli) {
+    public ArrayList<DataObs> getObsByCli(int cli) {
         open();
-        ArrayList<Obs> objects = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObsRem.name() + " = " + rem + " AND " +
-                "" + DataObs.Columns.ObsAre.name() + " = " + are + " AND " +
-                "" + DataObs.Columns.ObsCli.name() + " = " + cli, null, null, null, null);
+        ArrayList<DataObs> objects = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObsCli.name() + " = " + cli, null, null, null, null);
         while (cursor.moveToNext()) {
-            objects.add(Obs.fromCursor(cursor));
+            objects.add(DataObs.fromCursor(cursor));
         }
-        cursor.close();
         return objects;
     }
 

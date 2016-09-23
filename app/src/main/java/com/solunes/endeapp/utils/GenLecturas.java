@@ -16,10 +16,10 @@ public class GenLecturas {
 
     private static final String TAG = "GenLecturas";
 
-    public static int lecturaNormal(int lecturaAnterior, int lecturaActual) {
+    public static int lecturaNormal(int lecturaAnterior, int lecturaActual, int nroDig) {
         if (lecturaActual < lecturaAnterior) {
             String.valueOf(lecturaAnterior).length();
-            double pow = Math.pow(10, String.valueOf(lecturaAnterior).length());
+            double pow = Math.pow(10, nroDig);
             return (int) (lecturaActual + (pow - lecturaAnterior));
         }
         return lecturaActual - lecturaAnterior;

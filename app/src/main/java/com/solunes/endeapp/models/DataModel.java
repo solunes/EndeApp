@@ -926,7 +926,7 @@ public class DataModel {
         return dataModel;
     }
 
-    public String getJsonToSend(DataModel dataModel, ArrayList<Obs> obsArray) {
+    public String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
@@ -948,7 +948,9 @@ public class DataModel {
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < obsArray.size(); i++) {
-                jsonArray.put(i,obsArray.get(i).toJson());
+                DataObs dataObs = obsArray.get(i);
+                Log.e(TAG, "getJsonToSend: "+dataObs.toJson());
+                jsonArray.put(i, dataObs.toJson());
             }
             jsonObject.put("observaciones", jsonArray);
         } catch (JSONException e) {

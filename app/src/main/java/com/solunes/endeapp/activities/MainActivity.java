@@ -102,6 +102,13 @@ public class MainActivity extends AppCompatActivity {
         validDay();
         updateStates();
         Log.e(TAG, "onCreate: fin " + (ini - System.currentTimeMillis()));
+        CardView cardSendReading = (CardView) findViewById(R.id.card_send_reading);
+        cardSendReading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReading(view);
+            }
+        });
     }
 
     @Override
@@ -144,13 +151,13 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         final Calendar calendar = Calendar.getInstance();
         final String gestion = calendar.get(Calendar.YEAR) + "";
-        final String month = calendar.get(Calendar.MONTH) + "";
+        final String month = (calendar.get(Calendar.MONTH) + 1) + "";
         String remesa = calendar.get(Calendar.DAY_OF_MONTH) + "";
         final String tpl = UserPreferences.getInt(this, AdminActivity.KEY_TPL) + "";
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
         }
-        String url = "http://ende.solunes.com/api/descarga/"+gestion+"/"+month+"/" + remesa + "/"+tpl;
+        String url = "http://ende.solunes.com/api/descarga/" + gestion + "/" + month + "/" + remesa + "/" + tpl;
         final String finalRemesa = remesa;
         new GetRequest(url, new CallbackAPI() {
             @Override
@@ -211,27 +218,34 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        Hashtable<String, String> params = prepareDataToPost();
-        new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
-            @Override
-            public void onSuccess(String result, int statusCode) {
-                Log.e(TAG, "onSuccess: " + result);
-                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                textSend.setText(humanDate);
-                progressDialog.dismiss();
-
-                Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
-                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
-                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
-            }
+        Runnable runSaveData = new Runnable() {
 
             @Override
-            public void onFailed(String reason, int statusCode) {
-                Log.e(TAG, "onFailed: " + reason);
-                progressDialog.dismiss();
-                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
+            public void run() {
+                Hashtable<String, String> params = prepareDataToPost();
+                new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
+                    @Override
+                    public void onSuccess(String result, int statusCode) {
+                        Log.e(TAG, "onSuccess: " + result);
+                        String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                        textSend.setText(humanDate);
+                        progressDialog.dismiss();
+
+                        Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
+                        UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                        UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
+                    }
+
+                    @Override
+                    public void onFailed(String reason, int statusCode) {
+                        Log.e(TAG, "onFailed: " + reason);
+                        progressDialog.dismiss();
+                        Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
+                    }
+                }).execute();
             }
-        }).execute();
+        };
+        new Thread(runSaveData).start();
 //        } else {
 //            Snackbar.make(view, "No se han completado las lecturas", Snackbar.LENGTH_SHORT).show();
 //        }
@@ -400,18 +414,16 @@ public class MainActivity extends AppCompatActivity {
         DBAdapter dbAdapter = new DBAdapter(this);
         ArrayList<DataModel> allData = dbAdapter.getAllData();
 
-        DataModel model = allData.get(0);
-
         params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
         params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
         params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
         params.put("tpl", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_TPL));
 
-
         for (DataModel dataModel : allData) {
-            String json = dataModel.getJsonToSend(dataModel, dbAdapter.getObs(model.getTlxRem(), model.getTlxAre(), model.getTlxCli()));
+            String json = dataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getTlxCli()));
             params.put("" + (dataModel.getTlxCli()), json);
         }
+        dbAdapter.close();
         return params;
     }
 

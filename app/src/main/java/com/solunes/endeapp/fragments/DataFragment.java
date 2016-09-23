@@ -172,7 +172,7 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
                 } else {
                     int nuevaLectura = Integer.parseInt(input);
                     dataModel.setTlxNvaLec(nuevaLectura);
-                    lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura);
+                    lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
                 }
 
                 // lecturaKwh ajustada
@@ -297,23 +297,26 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
         cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
         cv.put(DataObs.Columns.ObsCod.name(), obs.getObsCod());
-
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
+        Log.e(TAG, "saveLectura: save obs " + obs.getObsCod());
+
         int conPro = dataModel.getTlxConPro();
-        if (conPro > (conPro + conPro * 0.2)) {
+        if (dataModel.getTlxNvaLec() > (conPro + conPro * 0.2)) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
             cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
             cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
             cv.put(DataObs.Columns.ObsCod.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        } else if (conPro < (conPro * 0.8)) {
+            Log.e(TAG, "saveLectura: consumo elevado");
+        } else if (dataModel.getTlxNvaLec() < (conPro * 0.8)) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
             cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
             cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
             cv.put(DataObs.Columns.ObsCod.name(), 81);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
+            Log.e(TAG, "saveLectura: consumo bajo");
         }
 
         dbAdapter.close();
@@ -355,12 +358,12 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     private void validSaved() {
         if (dataModel.getTlxFecEmi() != null) {
             inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
-            int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec());
-            labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);
-            labelImporteConsumo.setText("importe por consumo: " + dataModel.getTlxImpEn());
-            labelTotalConsumo.setText("Importe total por consumo: " + dataModel.getTlxConsumo());
-            labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
-            labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
+//            int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec(), dataModel.getTlxNroDig());
+//            labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);
+//            labelImporteConsumo.setText("importe por consumo: " + dataModel.getTlxImpEn());
+//            labelTotalConsumo.setText("Importe total por consumo: " + dataModel.getTlxConsumo());
+//            labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
+//            labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
             if (dataModel.getEstadoLectura() == 1) {
                 estadoMedidor.setText(estados_lectura.Impreso.name());
                 estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
