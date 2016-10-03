@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 8;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -19,6 +19,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String OBS_TABLE = "obs_table";
     public static final String HISTORICO_TABLE = "historico_table";
     public static final String DATA_OBS_TABLE = "data_obs_table";
+    public static final String PARAMETRO_TABLE = "parametro_table";
+    public static final String ITEM_FACTURACION_TABLE = "item_facturacion_table";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -65,7 +67,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxNom text, " +
                 "TlxDir text, " +
                 "TlxCtaAnt text, " +
-                "TlxCtg text, " +
+                "TlxCtg integer, " +
                 "TlxNroMed text, " +
                 "TlxNroDig integer, " +
                 "TlxFacMul decimal(15, 2), " +
@@ -90,13 +92,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxCotaseo integer, " +
                 "TlxTap numeric, " +
                 "TlxPotCon integer, " +
+                "TlxPotLei integer, " +
                 "TlxPotFac integer, " +
                 "TlxCliNit numeric, " +
                 "TlxFecCor numeric, " +
                 "TlxFecVto numeric, " +
                 "TlxFecproEmi numeric, " +
                 "TlxFecproMed numeric, " +
-                "TlxTope decimal(15, 2), " +
+                "TlxTope integer, " +
                 "TlxLeyTag integer, " +
                 "TlxTpoTap integer, " +
                 "TlxImpTot decimal(15, 2), " +
@@ -121,7 +124,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxUltTipL integer, " +
                 "TlxCliNew integer, " +
                 "TlxEntEne integer, " +
+                "TlxDecEne integer, " +
                 "TlxEntPot integer, " +
+                "TlxDecPot integer, " +
                 "TlxPotFacM integer, " +
                 "TlxPerCo3 numeric, " +
                 "TlxPerHr3 numeric, " +
@@ -133,6 +138,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxPerdidas numeric, " +
                 "TlxConsFacturado numeric, " +
                 "TlxDebAuto text, " +
+                "TlxRecordatorio text, " +
                 "estado_lectura integer, " +
                 "enviado integer)");
 
@@ -172,6 +178,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 "ObsCli integer," +
                 "ObsCod integer)");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + PARAMETRO_TABLE + " (" +
+                "id integer," +
+                "valor integer," +
+                "texto text)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + ITEM_FACTURACION_TABLE + " (" +
+                "id integer," +
+                "codigo  integer," +
+                "concepto integer," +
+                "descripcion text," +
+                "estado integer," +
+                "credito_fiscal integer)");
+
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
@@ -193,6 +212,8 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + OBS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + HISTORICO_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATA_OBS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PARAMETRO_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ITEM_FACTURACION_TABLE);
 
         onCreate(sqLiteDatabase);
     }

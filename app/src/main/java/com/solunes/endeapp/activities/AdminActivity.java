@@ -21,7 +21,9 @@ import android.widget.TextView;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
+import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.Obs;
+import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
@@ -182,6 +184,39 @@ public class AdminActivity extends AppCompatActivity {
             values.put(Obs.Columns.ObsFac.name(), object.getInt(Obs.Columns.ObsFac.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.OBS_TABLE, values);
+        }
+
+        JSONArray parametros = jsonObject.getJSONArray("parametros");
+        for (int i = 0; i < parametros.length(); i++) {
+            JSONObject object = parametros.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(Parametro.Columns.id.name(), object.getInt(Parametro.Columns.id.name()));
+            try {
+                values.put(Parametro.Columns.valor.name(), object.getString(Parametro.Columns.valor.name()));
+            } catch (JSONException e) {
+                values.put(Parametro.Columns.valor.name(), 0);
+            }
+            try {
+                values.put(Parametro.Columns.texto.name(), object.getInt(Parametro.Columns.texto.name()));
+            } catch (JSONException e) {
+                values.put(Parametro.Columns.texto.name(), "");
+            }
+            // guardar values
+            dbAdapter.saveObject(DBHelper.PARAMETRO_TABLE, values);
+        }
+
+        JSONArray itemFacturacion = jsonObject.getJSONArray("item_facturacion");
+        for (int i = 0; i < itemFacturacion.length(); i++) {
+            JSONObject object = itemFacturacion.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(ItemFacturacion.Columns.id.name(), object.getInt(ItemFacturacion.Columns.id.name()));
+            values.put(ItemFacturacion.Columns.codigo.name(), object.getInt(ItemFacturacion.Columns.codigo.name()));
+            values.put(ItemFacturacion.Columns.concepto.name(), object.getInt(ItemFacturacion.Columns.concepto.name()));
+            values.put(ItemFacturacion.Columns.descripcion.name(), object.getString(ItemFacturacion.Columns.descripcion.name()));
+            values.put(ItemFacturacion.Columns.estado.name(), object.getInt(ItemFacturacion.Columns.estado.name()));
+            values.put(ItemFacturacion.Columns.credito_fiscal.name(), object.getInt(ItemFacturacion.Columns.credito_fiscal.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.ITEM_FACTURACION_TABLE, values);
         }
     }
 }

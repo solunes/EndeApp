@@ -33,6 +33,7 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -151,17 +152,19 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     private void actionButtons() {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 int obsCod = 104;
                 if (!inputObsCode.getText().toString().isEmpty()) {
                     obsCod = Integer.parseInt(inputObsCode.getText().toString());
                 }
                 DBAdapter dbAdapter = new DBAdapter(getContext());
-                Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
+                Log.e(TAG, "onClick: " + obsCod);
+                final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
                 String input = inputReading.getText().toString();
 
                 int lecturaKwh;
+                boolean giro = false;
                 if (obs.getObsLec() == 3) {
                     lecturaKwh = dataModel.getTlxConPro();
                     dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
@@ -171,21 +174,22 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
                     return;
                 } else {
                     int nuevaLectura = Integer.parseInt(input);
+                    Log.e(TAG, "onClick: " + nuevaLectura + " - " + dataModel.getTlxTope());
+                    if (nuevaLectura > dataModel.getTlxTope()) {
+                        Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+                        return;
+                    }
+                    // verificacion de decimales y enteros FUNCION
+                    nuevaLectura = correcionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
+                    if (nuevaLectura < dataModel.getTlxUltInd()) {
+                        giro = true;
+                    }
                     dataModel.setTlxNvaLec(nuevaLectura);
                     lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
                 }
 
-                // lecturaKwh ajustada
-                if (dataModel.getTlxUltTipL() == 3) {
-                    lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
-                    if (lecturaKwh > 0) {
-                        dataModel.setTlxKwhDev(0);
-                    } else {
-                        dataModel.setTlxKwhDev(lecturaKwh);
-                        lecturaKwh = 0;
-                    }
-                }
-                if (dataModel.getTlxKwhDev() > 0) {
+                dataModel.setTlxConsumo(lecturaKwh);
+                if (dataModel.getTlxKwhDev() > 0 && obs.getObsLec() != 3) {
                     lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
                     if (lecturaKwh > 0) {
                         dataModel.setTlxKwhDev(0);
@@ -195,24 +199,46 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
                     }
                 }
                 lecturaKwh = lecturaKwh + dataModel.getTlxKwhAdi();
-                Log.e(TAG, "lectura Kwh: " + lecturaKwh);
+                dataModel.setTlxConsFacturado(lecturaKwh);
                 dataModel.setTlxKwhAdi(0);
-                calculo(lecturaKwh);
-                if (obs.getObsFac() == 1) {
-                    dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
-                    estadoMedidor.setText(estados_lectura.Impreso.name());
-                    estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
-                    buttonConfirm.setEnabled(false);
-                    buttonObs.setEnabled(false);
-                    inputObsCode.setEnabled(false);
-                    inputReading.setEnabled(false);
-                } else {
-                    dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
-                    estadoMedidor.setText(estados_lectura.Postergado.name());
-                    estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+
+                int conPro = dataModel.getTlxConPro();
+
+                boolean isAlert = false;
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Alerta!");
+                String message = "Se ha detectado:";
+                if (dataModel.getTlxNvaLec() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
+                    message = message + "\n- Consumo elevado";
+                    isAlert = true;
+                } else if (dataModel.getTlxNvaLec() < (conPro * dbAdapter.getBajoElevado())) {
+                    message = message + "\n- Consumo bajo";
+                    isAlert = true;
+                } else if (giro) {
+                    message = message + "\n- Giro de medidor";
+                    isAlert = true;
                 }
-                saveLectura(obs);
-                printFactura(view, obs);
+                builder.setMessage(message);
+                builder.setNegativeButton("Cancelar", null);
+                final int finalLecturaKwh = lecturaKwh;
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        calculo(finalLecturaKwh);
+                        hidingViews(obs);
+                        saveLectura(obs);
+                        printFactura(view, obs);
+                    }
+                });
+                if (isAlert) {
+                    builder.show();
+                } else {
+                    calculo(finalLecturaKwh);
+                    hidingViews(obs);
+                    saveLectura(obs);
+                    printFactura(view, obs);
+                }
+
             }
         });
         buttonObs.setOnClickListener(new View.OnClickListener() {
@@ -268,8 +294,25 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         });
     }
 
+    private void hidingViews(Obs obs) {
+        if (obs.getObsFac() == 1) {
+            dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
+            estadoMedidor.setText(estados_lectura.Impreso.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
+            buttonConfirm.setEnabled(false);
+            buttonObs.setEnabled(false);
+            inputObsCode.setEnabled(false);
+            inputReading.setEnabled(false);
+        } else {
+            dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+            estadoMedidor.setText(estados_lectura.Postergado.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+        }
+    }
+
     private void printFactura(View view, Obs obs) {
         if (obs.getObsFac() == 1) {
+            onFragmentListener.onPrinting("codigo para imprimir");
             Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
         } else {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
@@ -278,17 +321,26 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
 
     private void saveLectura(Obs obs) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
+        dataModel.setTlxCarFij(dbAdapter.getCargoFijo(dataModel.getTlxCtg()));
+
         ContentValues cv = new ContentValues();
         Calendar calendar = Calendar.getInstance();
 
         cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
-        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
+//        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
         cv.put(DataModel.Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
         cv.put(DataModel.Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
         cv.put(DataModel.Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
         cv.put(DataModel.Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
+        cv.put(DataModel.Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
+        cv.put(DataModel.Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
+        cv.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
+        cv.put(DataModel.Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
+        cv.put(DataModel.Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
         cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
+        String jsonToSend = DataModel.getJsonToSend(dataModel, new ArrayList<DataObs>());
+        Log.e(TAG, "saveLectura: " + jsonToSend);
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
 
@@ -324,26 +376,28 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void calculo(int lectura) {
-        labelEnergiaFacturada.setText("Energia facturada: " + lectura);
+//        labelEnergiaFacturada.setText("Energia facturada: " + lectura);
+        // multiplicador de energia
+        lectura = (int) (lectura * dataModel.getTlxFacMul());
 
-        double importeConsumo = GenLecturas.importeConsumo(getContext(), lectura);
-        labelImporteConsumo.setText("importe por consumo: " + importeConsumo);
-        dataModel.setTlxImpEn(importeConsumo);
+        double importeEnergia = GenLecturas.importeConsumo(getContext(), lectura, dataModel.getTlxCtg());
+        dataModel.setTlxImpEn(importeEnergia);
+//        labelImporteConsumo.setText("importe por consumo: " + importeEnergia);
+        double importeConsumo = importeEnergia;
 
         double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
         dataModel.setTlxDesTdi(tarifaDignidad);
 
-        double ley1886 = GenLecturas.ley1886(getContext(), lectura);
+        double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad);
+
+        double ley1886 = GenLecturas.ley1886(getContext(), lectura, dataModel.getTlxCtg());
         dataModel.setTlxLey1886(ley1886);
+//        labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
 
-        double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad, ley1886);
-        labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
-        dataModel.setTlxConsumo(totalConsumo);
-
-        double totalSuministro = GenLecturas.totalSuministro(totalConsumo);
-        labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
-        dataModel.setTlxConsFacturado(totalSuministro);
+        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, ley1886);
+//        labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
         dataModel.setTlxImpFac(totalSuministro);
+
 
         double totalSuministroTap = GenLecturas.totalSuministroTap(lectura);
         dataModel.setTlxImpTap(totalSuministro + totalSuministroTap);
@@ -352,7 +406,7 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         dataModel.setTlxImpAse(totalSuministroAseo);
 
         dataModel.setTlxImpTot(GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo));
-        labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
+//        labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
     }
 
     private void validSaved() {
@@ -407,9 +461,28 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         void onTabListener();
 
         void onSetItem(int pos);
+
+        void onPrinting(String srcToPrint);
     }
 
     private enum estados_lectura {
         Pendiente, Impreso, Postergado
+    }
+
+    private int correcionDeDigitos(int nuevaLectura, int decEne) {
+        if (decEne == 0) {
+            return nuevaLectura;
+        }
+        String strlectura = String.valueOf(nuevaLectura);
+        String res = strlectura.substring(strlectura.length() - decEne, strlectura.length());
+        int intDec = Integer.parseInt(res);
+        Double as = Double.parseDouble("0." + intDec);
+
+        long factor = (long) Math.pow(10, 0);
+        as = as * factor;
+        long tmp = Math.round(as);
+        int newInt = (int) ((double) tmp / factor);
+        int intLecttura = Integer.parseInt(strlectura.substring(0, strlectura.length() - decEne));
+        return intLecttura + newInt;
     }
 }

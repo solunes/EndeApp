@@ -27,7 +27,7 @@ public class DataModel {
     private String TlxNom;
     private String TlxDir;
     private String TlxCtaAnt;
-    private String TlxCtg;
+    private int TlxCtg;
     private String TlxNroMed;
     private int TlxNroDig;
     private double TlxFacMul;
@@ -58,7 +58,7 @@ public class DataModel {
     private String TlxFecVto;
     private String TlxFecproEmi;
     private String TlxFecproMed;
-    private double TlxTope;
+    private int TlxTope;
     private int TlxLeyTag;
     private int TlxTpoTap;
     private double TlxImpTot;
@@ -98,6 +98,11 @@ public class DataModel {
     private int estadoLectura;
     private int enviado;
 
+    private int TlxPotLei;
+    private int TlxDecEne;
+    private int TlxDecPot;
+    private int TlxRecordatorio;
+
     public enum Columns {
         _id,
         TlxRem,
@@ -136,6 +141,7 @@ public class DataModel {
         TlxCotaseo,
         TlxTap,
         TlxPotCon,
+        TlxPotLei,
         TlxPotFac,
         TlxCliNit,
         TlxFecCor,
@@ -167,7 +173,9 @@ public class DataModel {
         TlxUltTipL,
         TlxCliNew,
         TlxEntEne,
+        TlxDecEne,
         TlxEntPot,
+        TlxDecPot,
         TlxPotFacM,
         TlxPerCo3,
         TlxPerHr3,
@@ -179,6 +187,7 @@ public class DataModel {
         TlxPerdidas,
         TlxConsFacturado,
         TlxDebAuto,
+        TlxRecordatorio,
         estado_lectura,
         enviado
     }
@@ -279,12 +288,44 @@ public class DataModel {
         TlxCtaAnt = tlxCtaAnt;
     }
 
-    public String getTlxCtg() {
+    public int getTlxCtg() {
         return TlxCtg;
     }
 
-    public void setTlxCtg(String tlxCtg) {
+    public void setTlxCtg(int tlxCtg) {
         TlxCtg = tlxCtg;
+    }
+
+    public int getTlxPotLei() {
+        return TlxPotLei;
+    }
+
+    public void setTlxPotLei(int tlxPotLei) {
+        TlxPotLei = tlxPotLei;
+    }
+
+    public int getTlxDecEne() {
+        return TlxDecEne;
+    }
+
+    public void setTlxDecEne(int tlxDecEne) {
+        TlxDecEne = tlxDecEne;
+    }
+
+    public int getTlxDecPot() {
+        return TlxDecPot;
+    }
+
+    public void setTlxDecPot(int tlxDecPot) {
+        TlxDecPot = tlxDecPot;
+    }
+
+    public int getTlxRecordatorio() {
+        return TlxRecordatorio;
+    }
+
+    public void setTlxRecordatorio(int tlxRecordatorio) {
+        TlxRecordatorio = tlxRecordatorio;
     }
 
     public String getTlxNroMed() {
@@ -527,11 +568,11 @@ public class DataModel {
         TlxFecproMed = tlxFecproMed;
     }
 
-    public double getTlxTope() {
+    public int getTlxTope() {
         return TlxTope;
     }
 
-    public void setTlxTope(double tlxTope) {
+    public void setTlxTope(int tlxTope) {
         TlxTope = tlxTope;
     }
 
@@ -853,7 +894,7 @@ public class DataModel {
         dataModel.setTlxNom(cursor.getString(Columns.TlxNom.ordinal()));
         dataModel.setTlxDir(cursor.getString(Columns.TlxDir.ordinal()));
         dataModel.setTlxCtaAnt(cursor.getString(Columns.TlxCtaAnt.ordinal()));
-        dataModel.setTlxCtg(cursor.getString(Columns.TlxCtg.ordinal()));
+        dataModel.setTlxCtg(cursor.getInt(Columns.TlxCtg.ordinal()));
         dataModel.setTlxNroMed(cursor.getString(Columns.TlxNroMed.ordinal()));
         dataModel.setTlxNroDig(cursor.getInt(Columns.TlxNroDig.ordinal()));
         dataModel.setTlxFacMul(cursor.getDouble(Columns.TlxFacMul.ordinal()));
@@ -884,7 +925,7 @@ public class DataModel {
         dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
         dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
         dataModel.setTlxFecproMed(cursor.getString(Columns.TlxFecproMed.ordinal()));
-        dataModel.setTlxTope(cursor.getDouble(Columns.TlxTope.ordinal()));
+        dataModel.setTlxTope(cursor.getInt(Columns.TlxTope.ordinal()));
         dataModel.setTlxLeyTag(cursor.getInt(Columns.TlxLeyTag.ordinal()));
         dataModel.setTlxTpoTap(cursor.getInt(Columns.TlxTpoTap.ordinal()));
         dataModel.setTlxImpTot(cursor.getDouble(Columns.TlxImpTot.ordinal()));
@@ -923,10 +964,14 @@ public class DataModel {
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
         dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
         dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));
+        dataModel.setTlxPotLei(cursor.getInt(Columns.TlxPotLei.ordinal()));
+        dataModel.setTlxDecPot(cursor.getInt(Columns.TlxDecPot.ordinal()));
+        dataModel.setTlxDecEne(cursor.getInt(Columns.TlxDecEne.ordinal()));
+        dataModel.setTlxRecordatorio(cursor.getInt(Columns.TlxRecordatorio.ordinal()));
         return dataModel;
     }
 
-    public String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
+    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
@@ -940,12 +985,14 @@ public class DataModel {
             jsonObject.put(Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
             jsonObject.put(Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
             jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
+            jsonObject.put(Columns.TlxPotLei.name(), dataModel.getTlxPotLei());
             jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
             jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
             jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+            jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < obsArray.size(); i++) {
                 DataObs dataObs = obsArray.get(i);

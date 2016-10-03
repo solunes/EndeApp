@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
+import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 
@@ -62,6 +63,8 @@ public class DBAdapter {
         db.delete(DBHelper.OBS_TABLE, null, null);
         db.delete(DBHelper.USER_TABLE, null, null);
         db.delete(DBHelper.TARIFA_TABLE, null, null);
+        db.delete(DBHelper.ITEM_FACTURACION_TABLE, null, null);
+        db.delete(DBHelper.PARAMETRO_TABLE, null, null);
     }
 
     public void saveObject(String table, ContentValues values) {
@@ -195,10 +198,12 @@ public class DBAdapter {
         return objects;
     }
 
-    public ArrayList<Tarifa> getCargoEnergia() {
+    public ArrayList<Tarifa> getCargoEnergia(int categoria) {
         open();
         Cursor query = db.query(DBHelper.TARIFA_TABLE,
-                null, Tarifa.Columns.categoria_tarifa_id.name() + " = 1", null, null,
+                null, Tarifa.Columns.categoria_tarifa_id.name() + " = " + categoria + "" +
+                        " AND " + Tarifa.Columns.item_facturacion_id.name() + " > 1" +
+                        " AND " + Tarifa.Columns.item_facturacion_id.name() + " < 8", null, null,
                 null, Tarifa.Columns.kwh_desde.name() + " ASC");
         ArrayList<Tarifa> arrayList = new ArrayList<>();
         while (query.moveToNext()) {
@@ -213,5 +218,38 @@ public class DBAdapter {
                 "OR " + DataModel.Columns.TlxNroMed.name() + " = '" + filter + "'", null, null, null, null);
         query.moveToNext();
         return query;
+    }
+
+    private static final int CONSUMO_ELEVADO = 1;
+    private static final int CONSUMO_BAJO = 2;
+
+    public double getConsumoElevado() {
+        open();
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + CONSUMO_ELEVADO, null, null, null, null);
+        query.moveToNext();
+        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
+    }
+
+    public double getBajoElevado() {
+        open();
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + CONSUMO_BAJO, null, null, null, null);
+        query.moveToNext();
+        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
+    }
+
+    public double getCargoFijo(int categoria) {
+        open();
+        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
+                + " AND " + Tarifa.Columns.item_facturacion_id + " = 1", null, null, null, null);
+        cursor.moveToNext();
+        return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+    }
+
+    public int getCargoFijoDescuento(int categoria) {
+        open();
+        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
+                + " AND " + Tarifa.Columns.item_facturacion_id + " = 1", null, null, null, null);
+        cursor.moveToNext();
+        return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
     }
 }

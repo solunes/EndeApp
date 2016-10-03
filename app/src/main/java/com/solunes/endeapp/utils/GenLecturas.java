@@ -18,6 +18,7 @@ public class GenLecturas {
 
     public static int lecturaNormal(int lecturaAnterior, int lecturaActual, int nroDig) {
         if (lecturaActual < lecturaAnterior) {
+
             String.valueOf(lecturaAnterior).length();
             double pow = Math.pow(10, nroDig);
             return (int) (lecturaActual + (pow - lecturaAnterior));
@@ -25,49 +26,50 @@ public class GenLecturas {
         return lecturaActual - lecturaAnterior;
     }
 
-    public static double subTotal(Context context, int kWhConsumo) {
-        if (kWhConsumo <= 20) {
+    public static double subTotal(Context context, int kWhConsumo, int categoria) {
+        DBAdapter dbAdapter = new DBAdapter(context);
+        //
+        int descuento = dbAdapter.getCargoFijoDescuento(categoria);
+        if (kWhConsumo <= descuento) {
             return 0;
         }
-        int descuento = 20;
         kWhConsumo = kWhConsumo - descuento;
         double res = 0;
-        DBAdapter dbAdapter = new DBAdapter(context);
-        ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia();
+        ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
-            if (i == 0) {
-                if (kWhConsumo > 30) {
-                    res = tarifa.getImporte() * 30;
-                    kWhConsumo = kWhConsumo - 30;
-                } else {
-                    res = tarifa.getImporte() * kWhConsumo;
-                    Log.e(TAG, "subTotal: " + i + " - " + res);
-                    return round(res);
-                }
-                descuento = 50;
+//            if (i == 0) {
+//                if (kWhConsumo > 30) {
+//                    res = tarifa.getImporte() * 30;
+//                    kWhConsumo = kWhConsumo - 30;
+//                } else {
+//                    res = tarifa.getImporte() * kWhConsumo;
+//                    Log.e(TAG, "subTotal: " + i + " - " + res);
+//                    return round(res);
+//                }
+//                descuento = 50;
+//            } else {
+//            if (tarifa.getKwh_hasta() == 999999) {
+//                Log.e(TAG, "subTotal: " + i + " - " + res);
+//                return round(res + (tarifa.getImporte() * kWhConsumo));
+//            }
+            if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
+                res = res + tarifa.getImporte() * (tarifa.getKwh_hasta() - descuento);
+                kWhConsumo -= (tarifa.getKwh_hasta() - descuento);
+                descuento += tarifa.getKwh_hasta();
             } else {
-                if (tarifa.getKwh_hasta() == 0) {
-                    Log.e(TAG, "subTotal: " + i + " - " + res);
-                    return round(res + (tarifa.getImporte() * kWhConsumo));
-                }
-                if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
-                    res = res + tarifa.getImporte() * (tarifa.getKwh_hasta() - descuento);
-                    kWhConsumo -= (tarifa.getKwh_hasta() - descuento);
-                    descuento += tarifa.getKwh_hasta();
-                } else {
-                    res = res + tarifa.getImporte() * kWhConsumo;
-                    Log.e(TAG, "subTotal: "+ i +" - " + res);
-                    return round(res);
-                }
+                res = res + tarifa.getImporte() * kWhConsumo;
+                Log.e(TAG, "subTotal: " + i + " - " + res);
+                return round(res);
             }
+//            }
             Log.e(TAG, "subTotal: " + i + " - " + res);
         }
         return 0;
     }
 
-    public static double importeConsumo(Context context, int kWhConsumo) {
-        return round(subTotal(context, kWhConsumo) + Constants.CARGO_MINIMO);
+    public static double importeConsumo(Context context, int kWhConsumo, int categoria) {
+        return round(subTotal(context, kWhConsumo, categoria) + Constants.CARGO_MINIMO);
     }
 
     public static double tarifaDignidad(int kWhConsumo, double importeConsumo) {
@@ -78,18 +80,18 @@ public class GenLecturas {
         }
     }
 
-    public static double ley1886(Context context, int kWhConsumo) {
+    public static double ley1886(Context context, int kWhConsumo, int categoria) {
         if (kWhConsumo <= 100) {
-            return round(-0.2 * (Constants.CARGO_MINIMO + subTotal(context, kWhConsumo)));
+            return round(-0.2 * (Constants.CARGO_MINIMO + subTotal(context, kWhConsumo, categoria)));
         } else {
             DBAdapter dbAdapter = new DBAdapter(context);
-            ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia();
+            ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
             return round(-0.2 * (Constants.CARGO_MINIMO + (cargoEnergia.get(0).getImporte() * 30) + (cargoEnergia.get(1).getImporte() * 50)));
         }
     }
 
-    public static double totalSuministro(double totalConsumo) {
-        return round(totalConsumo + Constants.CONEXION_RECONEXION + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO);
+    public static double totalSuministro(double totalConsumo ,double ley1886) {
+        return round(totalConsumo + Constants.CONEXION_RECONEXION + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
     }
 
     public static double totalSuministroTap(int kWhConsumo) {
@@ -104,8 +106,8 @@ public class GenLecturas {
         return round(totalSuministro + tap + aseo);
     }
 
-    public static double totalConsumo(double importeConsumo, double tarifaDignidad, double ley1886) {
-        return round(importeConsumo + tarifaDignidad + ley1886);
+    public static double totalConsumo(double importeConsumo, double tarifaDignidad) {
+        return round(importeConsumo - tarifaDignidad);
     }
 
     private static double round(double value) {

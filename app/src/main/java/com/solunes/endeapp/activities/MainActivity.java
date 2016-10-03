@@ -1,6 +1,8 @@
 package com.solunes.endeapp.activities;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +35,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -109,6 +112,16 @@ public class MainActivity extends AppCompatActivity {
                 sendReading(view);
             }
         });
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null) {
+            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+                    Log.e(TAG, "onBluetooth: " + device.getName() + " - " + device.getAddress());
+                }
+            }
+        }
     }
 
     @Override
@@ -334,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
 //            values.put(DataModel.Columns.TlxFecVto.name(), object.getDouble(DataModel.Columns.TlxFecVto.name()));
 //            values.put(DataModel.Columns.TlxFecproEmi.name(), object.getDouble(DataModel.Columns.TlxFecproEmi.name()));
 //            values.put(DataModel.Columns.TlxFecproMed.name(), object.getDouble(DataModel.Columns.TlxFecproMed.name()));
-//            values.put(DataModel.Columns.TlxTope.name(), object.getDouble(DataModel.Columns.TlxTope.name()));
+            values.put(DataModel.Columns.TlxTope.name(), object.getInt(DataModel.Columns.TlxTope.name()));
             values.put(DataModel.Columns.TlxLeyTag.name(), object.getInt(DataModel.Columns.TlxLeyTag.name()));
             values.put(DataModel.Columns.TlxTpoTap.name(), object.getInt(DataModel.Columns.TlxTpoTap.name()));
 //            values.put(DataModel.Columns.TlxImpTot.name(), object.getDouble(DataModel.Columns.TlxImpTot.name()));
