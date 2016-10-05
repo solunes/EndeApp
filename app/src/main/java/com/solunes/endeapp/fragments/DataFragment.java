@@ -42,16 +42,9 @@ public class DataFragment extends Fragment {
     private EditText inputObsCode;
     private Button buttonConfirm;
     private Button buttonObs;
-    private TextView labelEnergiaFacturada;
-    private TextView labelImporteConsumo;
-    private TextView labelTotalConsumo;
-    private TextView labelTotalSuministro;
-    private TextView labelTotalFacturar;
     private TextView labelObs;
     private TextView estadoMedidor;
-
-//    private SearchView searchView;
-//    private MenuItem searchItem;
+    private EditText inputRemenber;
 
     private DataModel dataModel;
 
@@ -78,7 +71,6 @@ public class DataFragment extends Fragment {
         Bundle arguments = getArguments();
         DBAdapter dbAdapter = new DBAdapter(getContext());
         dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
-//        Log.e(TAG, "onCreateView: tipo de lectura " + dataModel.getTlxTipLec() + " ---- ultimo tipo " + dataModel.getTlxUltTipL());
         dbAdapter.close();
         setupUI(view, dataModel);
         actionButtons();
@@ -102,11 +94,6 @@ public class DataFragment extends Fragment {
         TextView ordenCliente = (TextView) view.findViewById(R.id.orden_client);
         ordenCliente.setText("Orden: " + data.getTlxOrdTpl());
 
-        labelEnergiaFacturada = (TextView) view.findViewById(R.id.label_energia_facturada);
-        labelImporteConsumo = (TextView) view.findViewById(R.id.label_importe_consumo);
-        labelTotalConsumo = (TextView) view.findViewById(R.id.label_total_consumo);
-        labelTotalSuministro = (TextView) view.findViewById(R.id.label_total_suministro);
-        labelTotalFacturar = (TextView) view.findViewById(R.id.label_total_facturar);
         labelObs = (TextView) view.findViewById(R.id.label_obs);
         inputReading = (EditText) view.findViewById(R.id.input_reading);
         inputReading.setSelected(false);
@@ -116,98 +103,127 @@ public class DataFragment extends Fragment {
         estadoMedidor = (TextView) view.findViewById(R.id.estado_client);
         estadoMedidor.setText(DataFragment.estados_lectura.values()[data.getEstadoLectura()].name());
         estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
+        inputRemenber = (EditText) view.findViewById(R.id.input_remenber);
+        if (data.getTlxRecordatorio() != null) {
+            inputRemenber.setText(data.getTlxRecordatorio());
+        }
+        inputRemenber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                dataModel.setTlxRecordatorio(inputRemenber.getText().toString());
+                DBAdapter dbAdapter = new DBAdapter(getContext());
+                ContentValues values = new ContentValues();
+                values.put(DataModel.Columns.TlxRecordatorio.name(), inputRemenber.getText().toString());
+                dbAdapter.updateData(data.getTlxCli(), values);
+                dbAdapter.close();
+            }
+        });
     }
 
     private void actionButtons() {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                int obsCod = 104;
-                if (!inputObsCode.getText().toString().isEmpty()) {
-                    obsCod = Integer.parseInt(inputObsCode.getText().toString());
-                }
-                DBAdapter dbAdapter = new DBAdapter(getContext());
-                Log.e(TAG, "onClick: " + obsCod);
-                final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
-
-                String input = inputReading.getText().toString();
-
-                int lecturaKwh;
-                boolean giro = false;
-                if (obs.getObsLec() == 3) {
-                    lecturaKwh = dataModel.getTlxConPro();
-                    dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
-                    dataModel.setTlxKwhDev(lecturaKwh);
-                } else if (input.isEmpty()) {
-                    Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
-                    return;
+                if (dataModel.getEstadoLectura() == estados_lectura.Impreso.ordinal()) {
+                    AlertDialog.Builder reprintDialog = new AlertDialog.Builder(getContext());
+                    reprintDialog.setTitle("Selecionar una observacion");
+                    reprintDialog.setSingleChoiceItems(estados_reimpresion, -1, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int position) {
+                            dialogInterface.dismiss();
+                            String obsReprint = estados_reimpresion[position];
+                            // guardar la observacion
+                            // llamar al metodo para generar la factura
+                            // enviarlo a imprimir
+                        }
+                    });
+                    reprintDialog.show();
                 } else {
-                    int nuevaLectura = Integer.parseInt(input);
-                    Log.e(TAG, "onClick: " + nuevaLectura + " - " + dataModel.getTlxTope());
-                    if (nuevaLectura > dataModel.getTlxTope()) {
-                        Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
-                        return;
+                    int obsCod = 104;
+                    if (!inputObsCode.getText().toString().isEmpty()) {
+                        obsCod = Integer.parseInt(inputObsCode.getText().toString());
                     }
-                    // verificacion de decimales y enteros FUNCION
-                    nuevaLectura = correcionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
-                    if (nuevaLectura < dataModel.getTlxUltInd()) {
-                        giro = true;
-                    }
-                    dataModel.setTlxNvaLec(nuevaLectura);
-                    lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
-                }
+                    DBAdapter dbAdapter = new DBAdapter(getContext());
+                    final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
-                dataModel.setTlxConsumo(lecturaKwh);
-                if (dataModel.getTlxKwhDev() > 0 && obs.getObsLec() != 3) {
-                    lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
-                    if (lecturaKwh > 0) {
-                        dataModel.setTlxKwhDev(0);
-                    } else {
+                    String input = inputReading.getText().toString();
+
+                    int lecturaKwh;
+                    boolean giro = false;
+                    if (obs.getObsLec() == 3) {
+                        lecturaKwh = dataModel.getTlxConPro();
+                        dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
                         dataModel.setTlxKwhDev(lecturaKwh);
-                        lecturaKwh = 0;
+                    } else if (input.isEmpty()) {
+                        Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        int nuevaLectura = Integer.parseInt(input);
+                        Log.e(TAG, "onClick: " + nuevaLectura + " - " + dataModel.getTlxTope());
+                        if (nuevaLectura > dataModel.getTlxTope()) {
+                            Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // verificacion de decimales y enteros FUNCION
+                        nuevaLectura = correcionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
+                        if (nuevaLectura < dataModel.getTlxUltInd()) {
+                            giro = true;
+                        }
+                        dataModel.setTlxNvaLec(nuevaLectura);
+                        lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
                     }
-                }
-                lecturaKwh = lecturaKwh + dataModel.getTlxKwhAdi();
-                dataModel.setTlxConsFacturado(lecturaKwh);
-                dataModel.setTlxKwhAdi(0);
 
-                int conPro = dataModel.getTlxConPro();
+                    dataModel.setTlxConsumo(lecturaKwh);
+                    if (dataModel.getTlxKwhDev() > 0 && obs.getObsLec() != 3) {
+                        lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
+                        if (lecturaKwh > 0) {
+                            dataModel.setTlxKwhDev(0);
+                        } else {
+                            dataModel.setTlxKwhDev(lecturaKwh);
+                            lecturaKwh = 0;
+                        }
+                    }
+                    lecturaKwh = lecturaKwh + dataModel.getTlxKwhAdi();
+                    dataModel.setTlxConsFacturado(lecturaKwh);
+                    dataModel.setTlxKwhAdi(0);
 
-                boolean isAlert = false;
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Alerta!");
-                String message = "Se ha detectado:";
-                if (dataModel.getTlxNvaLec() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
-                    message = message + "\n- Consumo elevado";
-                    isAlert = true;
-                } else if (dataModel.getTlxNvaLec() < (conPro * dbAdapter.getBajoElevado())) {
-                    message = message + "\n- Consumo bajo";
-                    isAlert = true;
-                } else if (giro) {
-                    message = message + "\n- Giro de medidor";
-                    isAlert = true;
-                }
-                builder.setMessage(message);
-                builder.setNegativeButton("Cancelar", null);
-                final int finalLecturaKwh = lecturaKwh;
-                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    int conPro = dataModel.getTlxConPro();
+
+                    boolean isAlert = false;
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Alerta!");
+                    String message = "Se ha detectado:";
+                    if (dataModel.getTlxNvaLec() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
+                        message = message + "\n- Consumo elevado";
+                        isAlert = true;
+                    } else if (dataModel.getTlxNvaLec() < (conPro * dbAdapter.getBajoElevado())) {
+                        message = message + "\n- Consumo bajo";
+                        isAlert = true;
+                    } else if (giro) {
+                        message = message + "\n- Giro de medidor";
+                        isAlert = true;
+                    }
+                    builder.setMessage(message);
+                    builder.setNegativeButton("Cancelar", null);
+                    final int finalLecturaKwh = lecturaKwh;
+                    builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            calculo(finalLecturaKwh);
+                            hidingViews(obs);
+                            saveLectura(obs);
+                            printFactura(view, obs);
+                        }
+                    });
+                    if (isAlert) {
+                        builder.show();
+                    } else {
                         calculo(finalLecturaKwh);
                         hidingViews(obs);
                         saveLectura(obs);
                         printFactura(view, obs);
                     }
-                });
-                if (isAlert) {
-                    builder.show();
-                } else {
-                    calculo(finalLecturaKwh);
-                    hidingViews(obs);
-                    saveLectura(obs);
-                    printFactura(view, obs);
                 }
-
             }
         });
         buttonObs.setOnClickListener(new View.OnClickListener() {
@@ -268,7 +284,7 @@ public class DataFragment extends Fragment {
             dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
             estadoMedidor.setText(estados_lectura.Impreso.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
-            buttonConfirm.setEnabled(false);
+            buttonConfirm.setText(R.string.re_print);
             buttonObs.setEnabled(false);
             inputObsCode.setEnabled(false);
             inputReading.setEnabled(false);
@@ -383,7 +399,7 @@ public class DataFragment extends Fragment {
         if (dataModel.getEstadoLectura() == 1) {
             estadoMedidor.setText(estados_lectura.Impreso.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
-            buttonConfirm.setEnabled(false);
+            buttonConfirm.setText(R.string.re_print);
             inputReading.setEnabled(false);
             buttonObs.setEnabled(false);
             inputObsCode.setEnabled(false);
@@ -407,6 +423,8 @@ public class DataFragment extends Fragment {
     private enum estados_lectura {
         Pendiente, Impreso, Postergado
     }
+
+    private String[] estados_reimpresion = new String[]{"Impresora apagada", "Impresora sin papel", "Mala conexión", "Mala impresión"};
 
     private int correcionDeDigitos(int nuevaLectura, int decEne) {
         if (decEne == 0) {

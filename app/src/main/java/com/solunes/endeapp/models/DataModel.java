@@ -101,7 +101,7 @@ public class DataModel {
     private int TlxPotLei;
     private int TlxDecEne;
     private int TlxDecPot;
-    private int TlxRecordatorio;
+    private String TlxRecordatorio;
 
     public enum Columns {
         _id,
@@ -320,11 +320,11 @@ public class DataModel {
         TlxDecPot = tlxDecPot;
     }
 
-    public int getTlxRecordatorio() {
+    public String getTlxRecordatorio() {
         return TlxRecordatorio;
     }
 
-    public void setTlxRecordatorio(int tlxRecordatorio) {
+    public void setTlxRecordatorio(String tlxRecordatorio) {
         TlxRecordatorio = tlxRecordatorio;
     }
 
@@ -967,7 +967,7 @@ public class DataModel {
         dataModel.setTlxPotLei(cursor.getInt(Columns.TlxPotLei.ordinal()));
         dataModel.setTlxDecPot(cursor.getInt(Columns.TlxDecPot.ordinal()));
         dataModel.setTlxDecEne(cursor.getInt(Columns.TlxDecEne.ordinal()));
-        dataModel.setTlxRecordatorio(cursor.getInt(Columns.TlxRecordatorio.ordinal()));
+        dataModel.setTlxRecordatorio(cursor.getString(Columns.TlxRecordatorio.ordinal()));
         return dataModel;
     }
 

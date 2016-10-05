@@ -202,40 +202,13 @@
                             android:text="Confirmar" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/label_energia_facturada"
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/input_remenber"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone" />
+                        android:hint="Recordatorio"
+                        android:inputType="text" />
 
-                    <TextView
-                        android:id="@+id/label_importe_consumo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/label_total_consumo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/label_total_suministro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/label_total_facturar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:visibility="gone" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>

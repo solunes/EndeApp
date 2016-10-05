@@ -4,4 +4,5 @@
     <string name="admin_activity">Administrador</string>
     <string name="menu_search">Buscar</string>
     <string name="action_select_search">seleccion de busqueda</string>
+    <string name="re_print">Reimprimir</string>
 </resources>

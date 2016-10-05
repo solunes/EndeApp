@@ -18,12 +18,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:layout_weight="1"
-            android:background="?selectableItemBackground"
             android:onClick="statusReady">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_half"
                 android:paddingRight="@dimen/activity_horizontal_margin_half">
@@ -62,12 +62,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:layout_weight="1"
-            android:background="?selectableItemBackground"
             android:onClick="statusMissing">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_half"
                 android:paddingRight="@dimen/activity_horizontal_margin_half">
@@ -112,12 +112,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:layout_weight="1"
-            android:background="?selectableItemBackground"
             android:onClick="statusPrint">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_half"
                 android:paddingRight="@dimen/activity_horizontal_margin_half">
@@ -156,12 +156,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="1dp"
             android:layout_weight="1"
-            android:background="?selectableItemBackground"
             android:onClick="StatusPostponed">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
                 android:orientation="horizontal"
                 android:paddingLeft="@dimen/activity_horizontal_margin_half"
                 android:paddingRight="@dimen/activity_horizontal_margin_half">
