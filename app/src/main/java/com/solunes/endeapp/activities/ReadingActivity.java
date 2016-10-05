@@ -2,18 +2,24 @@ package com.solunes.endeapp.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
@@ -25,7 +31,6 @@ import com.solunes.endeapp.utils.UserPreferences;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.printer.PrinterLanguage;
 import com.zebra.sdk.printer.PrinterStatus;
 import com.zebra.sdk.printer.SGD;
 import com.zebra.sdk.printer.ZebraPrinter;
@@ -36,7 +41,7 @@ import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener {
+public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener, SearchView.OnQueryTextListener {
 
     private static final String TAG = "ReadingActivity";
 
@@ -48,6 +53,14 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private PagerAdapter adapter;
+
+    private SearchView searchView;
+    private MenuItem searchItem;
+
+    private RadioGroup radioGroup;
+    private RadioButton radioCli;
+
+    private int currentState = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,24 +79,24 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         ArrayList<DataModel> datas = new ArrayList<>();
         if (getIntent().getExtras() != null) {
             int filter = getIntent().getExtras().getInt(MainActivity.KEY_FILTER);
+            currentState = filter;
             switch (filter) {
                 case MainActivity.KEY_READY:
                     datas = dbAdapter.getReady();
                     break;
                 case MainActivity.KEY_MISSING:
-                    datas = dbAdapter.getMissing();
+                    datas = dbAdapter.getState(0);
                     break;
                 case MainActivity.KEY_PRINT:
-                    datas = dbAdapter.getPrint();
+                    datas = dbAdapter.getState(1);
                     break;
                 case MainActivity.KEY_POSTPONED:
-                    datas = dbAdapter.getPostponed();
+                    datas = dbAdapter.getState(2);
                     break;
             }
         } else {
             datas = dbAdapter.getAllData();
         }
-        Log.e(TAG, "onCreate: " + datas.size());
         adapter = new PagerAdapter(getSupportFragmentManager(), datas.size(), datas);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -91,7 +104,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
-            tabText.setText(String.valueOf(i + 1));
+            tabText.setText(String.valueOf(datas.get(i).get_id()));
             if (datas.get(i).getTlxNvaLec() > 0) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
@@ -110,6 +123,9 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
         int pagerPosition = UserPreferences.getInt(getApplicationContext(), KEY_LAST_PAGER_PSOTION);
         viewPager.setCurrentItem(pagerPosition);
+
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        radioCli = (RadioButton) findViewById(R.id.cli_radio);
     }
 
     @Override
@@ -118,11 +134,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         View customView = tabLayout.getTabAt(viewPager.getCurrentItem()).getCustomView();
         TextView textTab = (TextView) customView.findViewById(R.id.textview_custom_tab);
         textTab.setTextColor(getResources().getColor(android.R.color.white));
-    }
-
-    @Override
-    public void onSetItem(int pos) {
-        viewPager.setCurrentItem(pos);
     }
 
     @Override
@@ -135,6 +146,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.action_search:
                 return true;
         }
         return false;
@@ -329,5 +342,55 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setIconifiedByDefault(false);
+        searchView.setSubmitButtonEnabled(false);
+        searchView.setQueryHint("Cliente o Medidor");
+
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                radioGroup.setVisibility(View.VISIBLE);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                radioGroup.setVisibility(View.GONE);
+                return true;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        String filter = !TextUtils.isEmpty(query) ? query : null;
+        DBAdapter dbAdapter = new DBAdapter(this);
+        boolean isCli = radioCli.isChecked();
+        Cursor cursor = dbAdapter.searchClienteMedidor(filter, isCli, currentState);
+        if (cursor.getCount() > 0) {
+            DataModel dataModel = DataModel.fromCursor(cursor);
+            viewPager.setCurrentItem(adapter.getItemPosition(dataModel));
+            searchItem.collapseActionView();
+            searchView.onActionViewCollapsed();
+        } else {
+            Snackbar.make(searchView, "no hay conincidencias", Snackbar.LENGTH_SHORT).show();
+        }
+        cursor.close();
+        dbAdapter.close();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
     }
 }

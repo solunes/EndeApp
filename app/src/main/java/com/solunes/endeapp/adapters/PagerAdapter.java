@@ -29,7 +29,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
         this.size = sizeTable;
         this.dataModels = dataModels;
-        Log.e(TAG, "PagerAdapter: datas");
     }
 
     @Override
@@ -44,7 +43,17 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Log.e(TAG, "getPageTitle: " + dataModels.get(position).get_id());
         return String.valueOf(dataModels.get(position).get_id());
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        DataModel dataModel = (DataModel) object;
+        for (int i = 0; i < dataModels.size(); i++) {
+            if (dataModel.get_id() == dataModels.get(i).get_id()){
+                return i;
+            }
+        }
+        return super.getItemPosition(object);
     }
 }

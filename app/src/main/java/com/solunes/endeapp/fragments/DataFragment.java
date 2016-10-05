@@ -1,6 +1,5 @@
 package com.solunes.endeapp.fragments;
 
-import android.animation.LayoutTransition;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,15 +8,10 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SearchView;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,7 +33,7 @@ import java.util.Calendar;
 /**
  * Created by jhonlimaster on 01-12-15.
  */
-public class DataFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class DataFragment extends Fragment {
     private static final String TAG = "DataFragment";
     private static final String KEY_POSITION = "position";
     private OnFragmentListener onFragmentListener;
@@ -55,8 +49,9 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     private TextView labelTotalFacturar;
     private TextView labelObs;
     private TextView estadoMedidor;
-    private SearchView searchView;
-    private MenuItem searchItem;
+
+//    private SearchView searchView;
+//    private MenuItem searchItem;
 
     private DataModel dataModel;
 
@@ -75,31 +70,6 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         DataFragment dataFragment = new DataFragment();
         dataFragment.setArguments(bundle);
         return dataFragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_search, menu);
-        searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        searchView.setQueryHint("Cliente o Medidor");
-        searchView.setLayoutTransition(new LayoutTransition());
     }
 
     @Override
@@ -428,32 +398,8 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         }
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        String filter = !TextUtils.isEmpty(query) ? query : null;
-        DBAdapter dbAdapter = new DBAdapter(getContext());
-        Cursor cursor = dbAdapter.searchClienteMedidor(filter);
-        if (cursor.getCount() > 0) {
-            DataModel dataModel = DataModel.fromCursor(cursor);
-            onFragmentListener.onSetItem(dataModel.get_id() - 1);
-        } else {
-            Snackbar.make(buttonConfirm, "no hay conincidencias", Snackbar.LENGTH_SHORT).show();
-        }
-        cursor.close();
-        dbAdapter.close();
-        Log.e(TAG, "onQueryTextSubmit: " + filter);
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
-
     public interface OnFragmentListener {
         void onTabListener();
-
-        void onSetItem(int pos);
 
         void onPrinting(String srcToPrint);
     }

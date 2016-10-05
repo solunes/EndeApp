@@ -3,4 +3,5 @@
     <string name="action_logout">Salir</string>
     <string name="admin_activity">Administrador</string>
     <string name="menu_search">Buscar</string>
+    <string name="action_select_search">seleccion de busqueda</string>
 </resources>

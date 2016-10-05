@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.solunes.endeapp.activities.MainActivity;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
@@ -100,32 +101,10 @@ public class DBAdapter {
         return dataModels;
     }
 
-    public ArrayList<DataModel> getMissing() {
+    public ArrayList<DataModel> getState(int state) {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 0 ", null, null, null, null);
-        while (query.moveToNext()) {
-            dataModels.add(DataModel.fromCursor(query));
-        }
-        query.close();
-        return dataModels;
-    }
-
-    public ArrayList<DataModel> getPrint() {
-        open();
-        ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1 ", null, null, null, null);
-        while (query.moveToNext()) {
-            dataModels.add(DataModel.fromCursor(query));
-        }
-        query.close();
-        return dataModels;
-    }
-
-    public ArrayList<DataModel> getPostponed() {
-        open();
-        ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 2 ", null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = " + state, null, null, null, null);
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
@@ -258,12 +237,35 @@ public class DBAdapter {
         return arrayList;
     }
 
-    public Cursor searchClienteMedidor(String filter) {
+    public Cursor searchClienteMedidor(String filter, boolean isCli, int currentState) {
         open();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.TlxCli.name() + " = '" + filter + "' " +
-                "OR " + DataModel.Columns.TlxNroMed.name() + " = '" + filter + "'", null, null, null, null);
-        query.moveToNext();
-        return query;
+        String query;
+        if (isCli) {
+            query = DataModel.Columns.TlxCli.name() + " = '" + filter + "'";
+        } else {
+            query = DataModel.Columns.TlxNroMed.name() + " = '" + filter + "'";
+        }
+        if (currentState >= 0) {
+            query = query + " AND ";
+            switch (currentState) {
+                case MainActivity.KEY_READY:
+                    query = query + DataModel.Columns.estado_lectura.name() + " = 1 " +
+                            "OR " + DataModel.Columns.estado_lectura.name() + " = 2";
+                    break;
+                case MainActivity.KEY_MISSING:
+                    query = query + DataModel.Columns.estado_lectura.name() + " = 0";
+                    break;
+                case MainActivity.KEY_PRINT:
+                    query = query + DataModel.Columns.estado_lectura.name() + " = 1";
+                    break;
+                case MainActivity.KEY_POSTPONED:
+                    query = query + DataModel.Columns.estado_lectura.name() + " = 2";
+                    break;
+            }
+        }
+        Cursor cursor = db.query(DBHelper.DATA_TABLE, null, query, null, null, null, null);
+        cursor.moveToNext();
+        return cursor;
     }
 
     private static final int CONSUMO_ELEVADO = 1;
