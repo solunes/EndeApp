@@ -88,7 +88,6 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
         switch (item.getItemId()) {
             case R.id.action_search:
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -312,6 +311,7 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
 
     private void printFactura(View view, Obs obs) {
         if (obs.getObsFac() == 1) {
+            // funcion para generar impresion
             onFragmentListener.onPrinting("codigo para imprimir");
             Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
         } else {
@@ -410,28 +410,21 @@ public class DataFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void validSaved() {
-        if (dataModel.getTlxFecEmi() != null) {
+        if (dataModel.getEstadoLectura() == 1) {
+            estadoMedidor.setText(estados_lectura.Impreso.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
+            buttonConfirm.setEnabled(false);
+            inputReading.setEnabled(false);
+            buttonObs.setEnabled(false);
+            inputObsCode.setEnabled(false);
+            inputReading.setEnabled(false);
             inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
-//            int lecturaNormal = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), dataModel.getTlxNvaLec(), dataModel.getTlxNroDig());
-//            labelEnergiaFacturada.setText("Energia facturada: " + lecturaNormal);
-//            labelImporteConsumo.setText("importe por consumo: " + dataModel.getTlxImpEn());
-//            labelTotalConsumo.setText("Importe total por consumo: " + dataModel.getTlxConsumo());
-//            labelTotalSuministro.setText("Importe total por el suminstro: " + dataModel.getTlxConsFacturado());
-//            labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
-            if (dataModel.getEstadoLectura() == 1) {
-                estadoMedidor.setText(estados_lectura.Impreso.name());
-                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
-                buttonConfirm.setEnabled(false);
-                inputReading.setEnabled(false);
-                buttonObs.setEnabled(false);
-                inputObsCode.setEnabled(false);
-            } else if (dataModel.getEstadoLectura() == 2) {
-                estadoMedidor.setText(estados_lectura.Postergado.name());
-                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
-            } else {
-                estadoMedidor.setText(estados_lectura.Pendiente.name());
-                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
-            }
+        } else if (dataModel.getEstadoLectura() == 2) {
+            estadoMedidor.setText(estados_lectura.Postergado.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+        } else {
+            estadoMedidor.setText(estados_lectura.Pendiente.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
         }
     }
 

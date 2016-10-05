@@ -28,7 +28,7 @@ public class GenLecturas {
 
     public static double subTotal(Context context, int kWhConsumo, int categoria) {
         DBAdapter dbAdapter = new DBAdapter(context);
-        //
+        Log.e(TAG, "subTotal: kwh " + kWhConsumo);
         int descuento = dbAdapter.getCargoFijoDescuento(categoria);
         if (kWhConsumo <= descuento) {
             return 0;
@@ -38,21 +38,6 @@ public class GenLecturas {
         ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
-//            if (i == 0) {
-//                if (kWhConsumo > 30) {
-//                    res = tarifa.getImporte() * 30;
-//                    kWhConsumo = kWhConsumo - 30;
-//                } else {
-//                    res = tarifa.getImporte() * kWhConsumo;
-//                    Log.e(TAG, "subTotal: " + i + " - " + res);
-//                    return round(res);
-//                }
-//                descuento = 50;
-//            } else {
-//            if (tarifa.getKwh_hasta() == 999999) {
-//                Log.e(TAG, "subTotal: " + i + " - " + res);
-//                return round(res + (tarifa.getImporte() * kWhConsumo));
-//            }
             if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
                 res = res + tarifa.getImporte() * (tarifa.getKwh_hasta() - descuento);
                 kWhConsumo -= (tarifa.getKwh_hasta() - descuento);
@@ -90,7 +75,7 @@ public class GenLecturas {
         }
     }
 
-    public static double totalSuministro(double totalConsumo ,double ley1886) {
+    public static double totalSuministro(double totalConsumo, double ley1886) {
         return round(totalConsumo + Constants.CONEXION_RECONEXION + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
     }
 

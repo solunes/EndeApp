@@ -88,6 +88,51 @@ public class DBAdapter {
         return dataModels;
     }
 
+    public ArrayList<DataModel> getReady() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1 " +
+                "OR " + DataModel.Columns.estado_lectura.name() + " = 2", null, null, null, null);
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
+    public ArrayList<DataModel> getMissing() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 0 ", null, null, null, null);
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
+    public ArrayList<DataModel> getPrint() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1 ", null, null, null, null);
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
+    public ArrayList<DataModel> getPostponed() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 2 ", null, null, null, null);
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
     public int deleteAllData() {
         open();
         int delete = db.delete(DBHelper.DATA_TABLE, null, null);
@@ -117,7 +162,8 @@ public class DBAdapter {
         open();
         long ini = System.currentTimeMillis();
         Cursor cursor = db.rawQuery("select count(*) from " + DBHelper.DATA_TABLE + " " +
-                "where not " + DataModel.Columns.TlxFecEmi.name() + " is null", null);
+                "where " + DataModel.Columns.estado_lectura.name() + " = 1 OR " +
+                DataModel.Columns.estado_lectura.name() + " = 2", null);
         long fin = System.currentTimeMillis();
         Log.e(TAG, "getCountSave: " + (fin - ini));
         cursor.moveToFirst();

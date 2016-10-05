@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
@@ -61,16 +63,36 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
         DBAdapter dbAdapter = new DBAdapter(this);
-        adapter = new PagerAdapter(getSupportFragmentManager(), dbAdapter.getSizeData());
+        ArrayList<DataModel> datas = new ArrayList<>();
+        if (getIntent().getExtras() != null) {
+            int filter = getIntent().getExtras().getInt(MainActivity.KEY_FILTER);
+            switch (filter) {
+                case MainActivity.KEY_READY:
+                    datas = dbAdapter.getReady();
+                    break;
+                case MainActivity.KEY_MISSING:
+                    datas = dbAdapter.getMissing();
+                    break;
+                case MainActivity.KEY_PRINT:
+                    datas = dbAdapter.getPrint();
+                    break;
+                case MainActivity.KEY_POSTPONED:
+                    datas = dbAdapter.getPostponed();
+                    break;
+            }
+        } else {
+            datas = dbAdapter.getAllData();
+        }
+        Log.e(TAG, "onCreate: " + datas.size());
+        adapter = new PagerAdapter(getSupportFragmentManager(), datas.size(), datas);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        ArrayList<DataModel> allData = dbAdapter.getAllData();
         for (int i = 0; i < adapter.getCount(); i++) {
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
             tabText.setText(String.valueOf(i + 1));
-            if (allData.get(i).getTlxNvaLec() > 0) {
+            if (datas.get(i).getTlxNvaLec() > 0) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
             tabAt.setCustomView(inflate);
@@ -87,7 +109,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         }).start();
 
         int pagerPosition = UserPreferences.getInt(getApplicationContext(), KEY_LAST_PAGER_PSOTION);
-        Log.e(TAG, "onCreate: " + pagerPosition);
         viewPager.setCurrentItem(pagerPosition);
     }
 
@@ -228,109 +249,77 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private byte[] getConfigLabel() {
-        byte[] configLabel = null;
-        try {
-            PrinterLanguage printerLanguage = printer.getPrinterControlLanguage();
-            Log.e(TAG, "printerLanguage: " + printerLanguage);
-            SGD.SET("device.languages", "ZPL", connection);
-            Log.e(TAG, "printerLanguages: " + printerLanguage);
-            String cpclConfigLabel = "! 0 200 200 170 1\r\n" +
-                    "ENCODING UTF-8\r\n" +
-                    "! U1 SETLP 7 0 26\r\n" +
-//                    "! U1 SETLF 12\r\n" +
-//                    "T 7 0 10 10 A°°°°°°A\r\n" +
-//                    "RIGHT 782\r\n" +
-//                    "T 7 0 10 30 n° categóría\r\n" +
+        byte[] configLabel;
+        String cpclConfigLabel = "! 0 200 200 170 1\r\n" +
+                "ENCODING UTF-8\r\n" +
+                "CENTER\r\n" +
+                "T 7 0 10 70 13\r\n" +
 
-                    "CENTER\r\n" +
-                    "T 7 0 10 70 13\r\n" +
+                "LEFT\r\n" +
+                "T 7 0 45 132 Fecha emision: \r\n" +
+                "CENTER\r\n" +
+                "T 7 0 50 132 LA PAZ 22 DE SEPTIEMBRE DE 2016 \r\n" +
 
-//                    "! U1 SETLF 18\r\n"+
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 132 Fecha emision: \r\n" +
-//                    "CENTER\r\n"+
-//                    "T 7 0 50 132 LA PAZ 22 DE SEPTIEMBRE DE 2016 \r\n" +
-//
-//                    "! U1 SETLF 16\r\n"+
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 152 Nombre: Alex Jhonny Cruz Mamani \r\n" +
+                "LEFT\r\n" +
+                "T 7 0 45 152 Nombre: Alex Jhonny Cruz Mamani \r\n" +
 
-//                    "SETLP 7 0 14\r\n"+
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 172 NIT/CI:\r\n" +
-//                    "T 7 0 280 172 Nro CLIENTE:\r\n" +
-//                    "T 7 0 575 172 Nro MEDIDOR:\r\n" +
-//                    "RIGHT 100\r\n"+
-//                    "T 7 0 150 172 3216549870\r\n" +
-//                    "T 7 0 445 172 654321-5-5\r\n" +
-//                    "T 7 0 720 172 654987\r\n" +
-//
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 192 DIRECCION: Av. Invavi #84 Viacha\r\n" +
-//
-//                    "T 7 0 45 212 CIUDAD/LOCALIDAD: LA PAZ\r\n" +
-//                    "T 7 0 450 212 ACTIVIDAD: VIVIENDA\r\n" +
-//
-//                    "T 7 0 45 232 REMESA/RUTA: 16/13020\r\n" +
-//                    "T 7 0 450 232 CARTA FACTURA:  \r\n" +
-//
-//                    "T 7 0 45 252 MES DE LA FACTURA: \r\n" +
-//                    "T 7 0 245 252 AGOSTO-2016\r\n" +
-//                    "T 7 0 430 252 CATEGORIA: D2-PD-BT\r\n" +
-//
-//                    "T 7 0 45 272 FECHA DE LECTURA:\r\n" +
-//                    "T 7 0 250 272 ANTERIOR:\r\n" +
-//                    "T 7 0 530 272 ACTUAL:\r\n" +
-//                    "RIGHT 100\r\n"+
-//                    "T 7 0 375 272 25-JUL-16\r\n" +
-//                    "RIGHT 782\r\n"+
-//                    "T 7 0 720 272 26-AGO-16\r\n" +
-//
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 292 LECTURA MEDIDOR:\r\n" +
-//                    "T 7 0 250 292 ANTERIOR:\r\n" +
-//                    "T 7 0 530 292 ACTUAL:\r\n" +
-//                    "RIGHT 100\r\n"+
-//                    "T 7 0 375 292 2516\r\n" +
-//                    "RIGHT 782\r\n"+
-//                    "T 7 0 720 292 2616\r\n" +
-//
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 312 TIPO LECTURA:  LECTURA NORMAL\r\n" +
-//
-//                    "T 7 0 45 332 ENERGIA CONSUMIDO EN (30) DIAS\r\n" +
-//                    "RIGHT 782\r\n"+
-//                    "T 7 0 720 332 232 kWh\r\n" +
-//
-//                    "LEFT\r\n"+
-//                    "T 7 0 45 352 TOTAL ENERGIA A FACTURAR:\r\n" +
-//                    "RIGHT 782\r\n"+
-//                    "T 7 0 720 352 323 kWh\r\n" +
+                "SETLP 7 0 14\r\n" +
+                "LEFT\r\n" +
+                "T 7 0 45 172 NIT/CI:\r\n" +
+                "T 7 0 280 172 Nro CLIENTE:\r\n" +
+                "T 7 0 575 172 Nro MEDIDOR:\r\n" +
+                "RIGHT 100\r\n" +
+                "T 7 0 150 172 3216549870\r\n" +
+                "T 7 0 445 172 654321-5-5\r\n" +
+                "T 7 0 720 172 654987\r\n" +
 
-//                    "T 7 0 0 10 0\r\n" +
-//                    "T 7 0 100 10 100\r\n" +
-//                    "T 7 0 200 10 200\r\n" +
-//                    "T 7 0 300 10 300\r\n" +
-//                    "T 7 0 400 10 400\r\n" +
-//                    "T 7 0 500 10 500\r\n" +
-//                    "T 7 0 600 10 600\r\n" +
-//                    "T 7 0 700 10 700\r\n" +
-//                    "T 7 0 0 30 0\r\n" +
-//                    "T 7 0 100 30 100\r\n" +
-//                    "T 7 0 200 30 200\r\n" +
-//                    "T 7 0 300 30 300\r\n" +
-//                    "T 7 0 400 30 400\r\n" +
-//                    "T 7 0 500 30 500\r\n" +
-//                    "T 7 0 600 30 600\r\n" +
-//                    "T 7 0 700 30 700\r\n" +
+                "LEFT\r\n" +
+                "T 7 0 45 192 DIRECCION: Av. Invavi #84 Viacha\r\n" +
+
+                "T 7 0 45 212 CIUDAD/LOCALIDAD: LA PAZ\r\n" +
+                "T 7 0 450 212 ACTIVIDAD: VIVIENDA\r\n" +
+
+                "T 7 0 45 232 REMESA/RUTA: 16/13020\r\n" +
+                "T 7 0 450 232 CARTA FACTURA:  \r\n" +
+
+                "T 7 0 45 252 MES DE LA FACTURA: \r\n" +
+                "T 7 0 245 252 AGOSTO-2016\r\n" +
+                "T 7 0 430 252 CATEGORIA: D2-PD-BT\r\n" +
+
+                "T 7 0 45 272 FECHA DE LECTURA:\r\n" +
+                "T 7 0 250 272 ANTERIOR:\r\n" +
+                "T 7 0 530 272 ACTUAL:\r\n" +
+                "RIGHT 100\r\n" +
+                "T 7 0 375 272 25-JUL-16\r\n" +
+                "RIGHT 782\r\n" +
+                "T 7 0 720 272 26-AGO-16\r\n" +
+
+                "LEFT\r\n" +
+                "T 7 0 45 292 LECTURA MEDIDOR:\r\n" +
+                "T 7 0 250 292 ANTERIOR:\r\n" +
+                "T 7 0 530 292 ACTUAL:\r\n" +
+                "RIGHT 100\r\n" +
+                "T 7 0 375 292 2516\r\n" +
+                "RIGHT 782\r\n" +
+                "T 7 0 720 292 2616\r\n" +
+
+                "LEFT\r\n" +
+                "T 7 0 45 312 TIPO LECTURA:  LECTURA NORMAL\r\n" +
+
+                "T 7 0 45 332 ENERGIA CONSUMIDO EN (30) DIAS\r\n" +
+                "RIGHT 782\r\n" +
+                "T 7 0 720 332 232 kWh\r\n" +
+
+                "LEFT\r\n" +
+                "T 7 0 45 352 TOTAL ENERGIA A FACTURAR:\r\n" +
+                "RIGHT 782\r\n" +
+                "T 7 0 720 352 323 kWh\r\n" +
+
 //                    "FORM\r\n"+
-                    "PRINT\r\n";
+                "PRINT\r\n";
 
-            configLabel = cpclConfigLabel.getBytes();
+        configLabel = cpclConfigLabel.getBytes();
 
-        } catch (ConnectionException e) {
-            Log.e(TAG, "getConfigLabel exception: ", e);
-        }
         return configLabel;
     }
 

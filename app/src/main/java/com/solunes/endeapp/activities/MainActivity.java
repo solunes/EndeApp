@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isRate;
     private boolean wasDownload;
 
+    private TextView labelReady;
+
     private TextView textDownload;
     private TextView textSend;
     private TextView textTarifa;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "onCreate: ini");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        labelReady = (TextView) findViewById(R.id.label_info);
 
         textDownload = (TextView) findViewById(R.id.text_date_download);
         textSend = (TextView) findViewById(R.id.text_date_send);
@@ -105,13 +109,6 @@ public class MainActivity extends AppCompatActivity {
         validDay();
         updateStates();
         Log.e(TAG, "onCreate: fin " + (ini - System.currentTimeMillis()));
-        CardView cardSendReading = (CardView) findViewById(R.id.card_send_reading);
-        cardSendReading.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendReading(view);
-            }
-        });
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
@@ -140,14 +137,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void startReading(View view) {
-        if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
-            return;
-        }
-        startActivity(new Intent(MainActivity.this, ReadingActivity.class));
     }
 
     public void downloadRoutes(final View view) {
@@ -384,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
 //            values.put(DataModel.Columns.TlxPerdidas.name(), object.getDouble(DataModel.Columns.TlxPerdidas.name()));
 //            values.put(DataModel.Columns.TlxConsFacturado.name(), object.getDouble(DataModel.Columns.TlxConsFacturado.name()));
             values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
+            values.put(DataModel.Columns.estado_lectura.name(), 0);
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
             JSONObject historico = object.getJSONObject("historico");
@@ -465,13 +455,61 @@ public class MainActivity extends AppCompatActivity {
             statePrinted.setText(String.valueOf(countPrinted));
             statePostponed.setText(String.valueOf(countPostponed));
         }
-
         dbAdapter.close();
+
+        String dateFromstring = StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT_1, Calendar.getInstance().getTime());
+        labelReady.setText(dateFromstring);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateStates();
+    }
+
+    public static final String KEY_FILTER = "filter";
+    public static final int KEY_READY = 1;
+    public static final int KEY_MISSING = 2;
+    public static final int KEY_PRINT = 3;
+    public static final int KEY_POSTPONED = 4;
+
+    public void startReading(View view) {
+        if (!wasDownload || !isRate) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(new Intent(MainActivity.this, ReadingActivity.class));
+    }
+
+    public void statusReady(View view) {
+        if (!wasDownload || !isRate) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_READY));
+    }
+
+    public void statusMissing(View view) {
+        if (!wasDownload || !isRate) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_MISSING));
+    }
+
+    public void statusPrint(View view) {
+        if (!wasDownload || !isRate) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_PRINT));
+    }
+
+    public void StatusPostponed(View view) {
+        if (!wasDownload || !isRate) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_POSTPONED));
     }
 }

@@ -11,6 +11,7 @@ public class StringUtils {
     private static final String TAG = "StringUtils";
 
     public static String DATE_FORMAT = "yyyy-MM-dd";
+    public static String DATE_FORMAT_1 = "dd/MM/yyyy";
     public static String HUMAN_DATE_FORMAT = "dd, MMM yyyy";
     public static String HUMAN_HOUR_FORMAT = "HH:mm";
 
