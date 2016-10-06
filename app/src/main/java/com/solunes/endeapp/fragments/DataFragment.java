@@ -25,6 +25,7 @@ import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.utils.GenLecturas;
+import com.solunes.endeapp.utils.PrintGenerator;
 import com.solunes.endeapp.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -127,14 +128,21 @@ public class DataFragment extends Fragment {
                 if (dataModel.getEstadoLectura() == estados_lectura.Impreso.ordinal()) {
                     AlertDialog.Builder reprintDialog = new AlertDialog.Builder(getContext());
                     reprintDialog.setTitle("Selecionar una observacion");
-                    reprintDialog.setSingleChoiceItems(estados_reimpresion, -1, new DialogInterface.OnClickListener() {
+                    reprintDialog.setSingleChoiceItems(estados_reimpresion, 0, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int position) {
-                            dialogInterface.dismiss();
                             String obsReprint = estados_reimpresion[position];
+                            // TODO: 05-10-16
                             // guardar la observacion
                             // llamar al metodo para generar la factura
+                        }
+                    });
+                    reprintDialog.setNegativeButton("Cancelar", null);
+                    reprintDialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             // enviarlo a imprimir
+                            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel));
                         }
                     });
                     reprintDialog.show();
@@ -164,7 +172,6 @@ public class DataFragment extends Fragment {
                             Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                             return;
                         }
-                        // verificacion de decimales y enteros FUNCION
                         nuevaLectura = correcionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
                         if (nuevaLectura < dataModel.getTlxUltInd()) {
                             giro = true;
@@ -298,7 +305,7 @@ public class DataFragment extends Fragment {
     private void printFactura(View view, Obs obs) {
         if (obs.getObsFac() == 1) {
             // funcion para generar impresion
-            onFragmentListener.onPrinting("codigo para imprimir");
+            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel));
             Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
         } else {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();

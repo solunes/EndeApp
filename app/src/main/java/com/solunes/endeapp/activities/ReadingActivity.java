@@ -138,7 +138,9 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     @Override
     public void onPrinting(String srcToPrint) {
+        Log.e(TAG, "onPrinting: " + srcToPrint);
         Log.e(TAG, "onPrinting: connection " + connection.isConnected());
+        sendLabelToPrint(srcToPrint);
     }
 
     @Override
@@ -230,16 +232,12 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         }
     }
 
-    private void sendTestLabel() {
+    private void sendLabelToPrint(String label) {
         try {
             ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);
-
             PrinterStatus printerStatus = (linkOsPrinter != null) ? linkOsPrinter.getCurrentStatus() : printer.getCurrentStatus();
-
             if (printerStatus.isReadyToPrint) {
-                byte[] configLabel = getConfigLabel();
-                Log.e("TAG", "sendTestLabel: " + configLabel);
-                connection.write(configLabel);
+                connection.write(label.getBytes());
                 Log.e(TAG, "sending data");
             } else if (printerStatus.isHeadOpen) {
                 Log.e(TAG, "printer head open");
@@ -256,8 +254,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             }
         } catch (ConnectionException e) {
             Log.e(TAG, e.getMessage());
-        } finally {
-            disconnect();
         }
     }
 

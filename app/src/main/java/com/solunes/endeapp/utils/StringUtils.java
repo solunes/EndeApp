@@ -1,10 +1,7 @@
 package com.solunes.endeapp.utils;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class StringUtils {
@@ -20,6 +17,19 @@ public class StringUtils {
         SimpleDateFormat dfOutput = new SimpleDateFormat(outputFormat, java.util.Locale.getDefault());
         outputDate = dfOutput.format(inputDate);
         return outputDate;
+    }
+
+    public static Date formateStringFromDate(String outputFormat, String inputDate) {
+        String outputDate = "";
+        SimpleDateFormat dfOutput = new SimpleDateFormat(outputFormat, java.util.Locale.getDefault());
+        Date date = null;
+        try {
+            date = dfOutput.parse(inputDate);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 
     public static String getHumanDate(Date inputDate) {
