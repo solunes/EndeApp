@@ -1,14 +1,18 @@
 package com.solunes.endeapp.fragments;
 
-
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.solunes.endeapp.R;
+import com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter;
+import com.solunes.endeapp.dataset.DBAdapter;
 
 public class StatisticFragment extends Fragment {
     private static final String TAG = "StatisticFragment";
@@ -17,8 +21,6 @@ public class StatisticFragment extends Fragment {
     private int param;
 
     public StatisticFragment() {
-        Log.e(TAG, "StatisticFragment: ");
-        setMenuVisibility(true);
     }
 
     public static StatisticFragment newInstance(int param1) {
@@ -26,7 +28,6 @@ public class StatisticFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, param1);
         fragment.setArguments(args);
-        Log.e(TAG, "newInstance: ");
         return fragment;
     }
 
@@ -36,14 +37,24 @@ public class StatisticFragment extends Fragment {
         if (getArguments() != null) {
             param = getArguments().getInt(ARG_PARAM1);
         }
-        Log.e(TAG, "onCreate: ");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e(TAG, "onCreateView: ");
-        return inflater.inflate(R.layout.fragment_statistic, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_statistic, container, false);
+        if (view instanceof RecyclerView) {
+            Context context = view.getContext();
+            DBAdapter dbAdapter = new DBAdapter(context);
+            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            StatisticsRecyclerViewAdapter recyclerViewAdapter =
+                    new StatisticsRecyclerViewAdapter(getActivity(), dbAdapter.getSt(param));
+            recyclerView.setAdapter(recyclerViewAdapter);
+            dbAdapter.close();
+        }
+        return view;
     }
 
 }

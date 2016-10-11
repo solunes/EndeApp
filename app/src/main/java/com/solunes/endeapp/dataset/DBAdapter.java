@@ -9,17 +9,22 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.solunes.endeapp.activities.MainActivity;
+import com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.utils.StatisticsItem;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter.*;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -299,5 +304,16 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id + " = 1", null, null, null, null);
         cursor.moveToNext();
         return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
+    }
+
+    public List<StatisticsItem> getSt(int param) {
+        open();
+        ArrayList<StatisticsItem> items = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.OBS_TABLE, null, "", null, "", "", null);
+        while (cursor.moveToNext()) {
+            items.add(new StatisticsItem("Casa cerrada", 22));
+        }
+        items.add(new StatisticsItem("Casa cerrada", 22));
+        return items;
     }
 }
