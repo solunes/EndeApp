@@ -18,15 +18,18 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "PagerAdapter";
     private int size;
     private ArrayList<DataModel> dataModels;
+    private FragmentManager fragmentManager;
 
     public PagerAdapter(FragmentManager fm, int sizeTable) {
         super(fm);
+        this.fragmentManager = fm;
         this.size = sizeTable;
         this.dataModels = new ArrayList<>();
     }
 
     public PagerAdapter(FragmentManager fm, int sizeTable, ArrayList<DataModel> dataModels) {
         super(fm);
+        this.fragmentManager = fm;
         this.size = sizeTable;
         this.dataModels = dataModels;
     }
@@ -34,6 +37,19 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         return DataFragment.newInstance(dataModels.get(position).get_id());
+    }
+
+    public DataFragment getFragment(int position) {
+        ArrayList<Fragment> fragments = (ArrayList<Fragment>) fragmentManager.getFragments();
+        for (int i = 0; i < fragments.size(); i++) {
+            DataFragment dataFragment = (DataFragment) fragments.get(i);
+            if (dataFragment != null) {
+                if (dataFragment.getArguments().getInt(DataFragment.KEY_POSITION) == position) {
+                    return dataFragment;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -50,7 +66,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public int getItemPosition(Object object) {
         DataModel dataModel = (DataModel) object;
         for (int i = 0; i < dataModels.size(); i++) {
-            if (dataModel.get_id() == dataModels.get(i).get_id()){
+            if (dataModel.get_id() == dataModels.get(i).get_id()) {
                 return i;
             }
         }

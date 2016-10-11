@@ -22,6 +22,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String PARAMETRO_TABLE = "parametro_table";
     public static final String ITEM_FACTURACION_TABLE = "item_facturacion_table";
 
+    public static final String PRINT_OBS_DATA_TABLE = "print_obs_data_table";
+    public static final String PRINT_OBS_TABLE = "print_obs_table";
+    public static final String MED_ENTRE_LINEAS_TABLE = "med_entre_lineas_table";
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -191,6 +195,25 @@ public class DBHelper extends SQLiteOpenHelper {
                 "estado integer," +
                 "credito_fiscal integer)");
 
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_DATA_TABLE + " (" +
+                "OigId integer," +
+                "OigRem integer," +
+                "OigAre integer," +
+                "OigCli integer," +
+                "OigObs integer)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
+                "ObiId integer," +
+                "ObiDes text)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + MED_ENTRE_LINEAS_TABLE + " (" +
+                "id integer," +
+                "MelRem integer," +
+                "MelAre integer," +
+                "MelMed integer," +
+                "MelLec integer)");
+
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
@@ -214,6 +237,9 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATA_OBS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PARAMETRO_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ITEM_FACTURACION_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PRINT_OBS_DATA_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PRINT_OBS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MED_ENTRE_LINEAS_TABLE);
 
         onCreate(sqLiteDatabase);
     }

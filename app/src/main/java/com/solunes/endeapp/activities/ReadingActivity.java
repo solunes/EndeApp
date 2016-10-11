@@ -38,6 +38,7 @@ import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -138,7 +139,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     @Override
     public void onPrinting(String srcToPrint) {
-        Log.e(TAG, "onPrinting: " + srcToPrint);
         sendLabelToPrint(srcToPrint);
     }
 
@@ -165,17 +165,21 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private String getMacAddress() {
+        DataFragment fragment = (DataFragment) adapter.getItem(viewPager.getCurrentItem());
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Log.e(TAG, "getMacAddress: " + bluetoothAdapter);
         if (bluetoothAdapter != null) {
             Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
             if (pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
-                    Log.e(TAG, "onBluetooth: " + device.getName() + " - " + device.getAddress());
                     if (device.getName().equalsIgnoreCase("ende1")) {
+                        Log.e(TAG, "onBluetooth: " + device.getName() + " - " + device.getAddress());
                         return device.getAddress();
                     }
                 }
             }
+        } else {
+            fragment.printResponse("Bluetooth apagado");
         }
         return null;
     }
@@ -232,13 +236,14 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private void sendLabelToPrint(String label) {
-        DataFragment fragment = (DataFragment) adapter.getItem(viewPager.getCurrentItem());
+        Log.e(TAG, "sendLabelToPrint: " + viewPager.getCurrentItem());
+        DataFragment fragment = adapter.getFragment(viewPager.getCurrentItem());
         if (connection.isConnected()) {
             try {
                 ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);
                 PrinterStatus printerStatus = (linkOsPrinter != null) ? linkOsPrinter.getCurrentStatus() : printer.getCurrentStatus();
                 if (printerStatus.isReadyToPrint) {
-                    connection.write(label.getBytes());
+                    connection.write(label.getBytes("ISO-8859-1"));
                     Log.e(TAG, "sending data");
                     fragment.printResponse("Imprimiendo");
                 } else if (printerStatus.isHeadOpen) {
@@ -259,85 +264,12 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 }
             } catch (ConnectionException e) {
                 Log.e(TAG, e.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                Log.e(TAG, "sendLabelToPrint: ", e);
             }
         } else {
-            fragment.printResponse("Impresora apagada");
+            fragment.printResponse("Impresora desconectada");
         }
-    }
-
-    private byte[] getConfigLabel() {
-        byte[] configLabel;
-        String cpclConfigLabel = "! 0 200 200 170 1\r\n" +
-                "ENCODING UTF-8\r\n" +
-                "CENTER\r\n" +
-                "T 7 0 10 70 13\r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 132 Fecha emision: \r\n" +
-                "CENTER\r\n" +
-                "T 7 0 50 132 LA PAZ 22 DE SEPTIEMBRE DE 2016 \r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 152 Nombre: Alex Jhonny Cruz Mamani \r\n" +
-
-                "SETLP 7 0 14\r\n" +
-                "LEFT\r\n" +
-                "T 7 0 45 172 NIT/CI:\r\n" +
-                "T 7 0 280 172 Nro CLIENTE:\r\n" +
-                "T 7 0 575 172 Nro MEDIDOR:\r\n" +
-                "RIGHT 100\r\n" +
-                "T 7 0 150 172 3216549870\r\n" +
-                "T 7 0 445 172 654321-5-5\r\n" +
-                "T 7 0 720 172 654987\r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 192 DIRECCION: Av. Invavi #84 Viacha\r\n" +
-
-                "T 7 0 45 212 CIUDAD/LOCALIDAD: LA PAZ\r\n" +
-                "T 7 0 450 212 ACTIVIDAD: VIVIENDA\r\n" +
-
-                "T 7 0 45 232 REMESA/RUTA: 16/13020\r\n" +
-                "T 7 0 450 232 CARTA FACTURA:  \r\n" +
-
-                "T 7 0 45 252 MES DE LA FACTURA: \r\n" +
-                "T 7 0 245 252 AGOSTO-2016\r\n" +
-                "T 7 0 430 252 CATEGORIA: D2-PD-BT\r\n" +
-
-                "T 7 0 45 272 FECHA DE LECTURA:\r\n" +
-                "T 7 0 250 272 ANTERIOR:\r\n" +
-                "T 7 0 530 272 ACTUAL:\r\n" +
-                "RIGHT 100\r\n" +
-                "T 7 0 375 272 25-JUL-16\r\n" +
-                "RIGHT 782\r\n" +
-                "T 7 0 720 272 26-AGO-16\r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 292 LECTURA MEDIDOR:\r\n" +
-                "T 7 0 250 292 ANTERIOR:\r\n" +
-                "T 7 0 530 292 ACTUAL:\r\n" +
-                "RIGHT 100\r\n" +
-                "T 7 0 375 292 2516\r\n" +
-                "RIGHT 782\r\n" +
-                "T 7 0 720 292 2616\r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 312 TIPO LECTURA:  LECTURA NORMAL\r\n" +
-
-                "T 7 0 45 332 ENERGIA CONSUMIDO EN (30) DIAS\r\n" +
-                "RIGHT 782\r\n" +
-                "T 7 0 720 332 232 kWh\r\n" +
-
-                "LEFT\r\n" +
-                "T 7 0 45 352 TOTAL ENERGIA A FACTURAR:\r\n" +
-                "RIGHT 782\r\n" +
-                "T 7 0 720 352 323 kWh\r\n" +
-
-//                    "FORM\r\n"+
-                "PRINT\r\n";
-
-        configLabel = cpclConfigLabel.getBytes();
-
-        return configLabel;
     }
 
     private void sleeper(int ms) {

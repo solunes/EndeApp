@@ -71,6 +71,7 @@ public class DBAdapter {
         db.delete(DBHelper.TARIFA_TABLE, null, null);
         db.delete(DBHelper.ITEM_FACTURACION_TABLE, null, null);
         db.delete(DBHelper.PARAMETRO_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
     }
 
     public void saveObject(String table, ContentValues values) {
@@ -306,6 +307,7 @@ public class DBAdapter {
         return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
     }
 
+    // TODO: 11-10-16 hacer el group by para obtener una lista de lecturas/observaciones y sus cantidades
     public List<StatisticsItem> getSt(int param) {
         open();
         ArrayList<StatisticsItem> items = new ArrayList<>();

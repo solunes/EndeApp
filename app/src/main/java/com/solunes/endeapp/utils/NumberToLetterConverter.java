@@ -90,7 +90,7 @@ public abstract class NumberToLetterConverter {
             if (miles == 1)
                 converted.append("UN MIL ");
             if (miles > 1)
-                converted.append("**").append(convertNumber(String.valueOf(miles))
+                converted.append("").append(convertNumber(String.valueOf(miles))
                         + "MIL ");
         }
 

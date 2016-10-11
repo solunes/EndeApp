@@ -36,9 +36,10 @@ import java.util.Calendar;
  */
 public class DataFragment extends Fragment {
     private static final String TAG = "DataFragment";
-    private static final String KEY_POSITION = "position";
+    public static final String KEY_POSITION = "position";
     private OnFragmentListener onFragmentListener;
 
+    private View rootView;
     private EditText inputReading;
     private EditText inputObsCode;
     private Button buttonConfirm;
@@ -72,8 +73,10 @@ public class DataFragment extends Fragment {
         Bundle arguments = getArguments();
         DBAdapter dbAdapter = new DBAdapter(getContext());
         dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
+        Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd());
         dbAdapter.close();
         setupUI(view, dataModel);
+        rootView = view.findViewById(R.id.data_layout);
         actionButtons();
         validSaved();
         return view;
@@ -304,9 +307,7 @@ public class DataFragment extends Fragment {
 
     private void printFactura(View view, Obs obs) {
         if (obs.getObsFac() == 1) {
-            // funcion para generar impresion
             onFragmentListener.onPrinting(PrintGenerator.creator(dataModel));
-            Snackbar.make(view, "Imprimiendo...", Snackbar.LENGTH_LONG).show();
         } else {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
         }
@@ -422,7 +423,7 @@ public class DataFragment extends Fragment {
     }
 
     public void printResponse(String response) {
-        Snackbar.make(inputRemenber, response, Snackbar.LENGTH_LONG);
+        Snackbar.make(rootView, response, Snackbar.LENGTH_LONG).show();
     }
 
     public interface OnFragmentListener {

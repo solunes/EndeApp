@@ -431,6 +431,9 @@ public class MainActivity extends AppCompatActivity {
             String json = dataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getTlxCli()));
             params.put("" + (dataModel.getTlxCli()), json);
         }
+        // TODO: 11-10-16 subir los datos de medidor entre lineas
+        // obtener los medidores entre lineas y volverlos un string array json
+        // params.put("med_entre_lineas", new jsonArray);
         dbAdapter.close();
         return params;
     }

@@ -24,6 +24,7 @@ import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
@@ -217,6 +218,15 @@ public class AdminActivity extends AppCompatActivity {
             values.put(ItemFacturacion.Columns.credito_fiscal.name(), object.getInt(ItemFacturacion.Columns.credito_fiscal.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.ITEM_FACTURACION_TABLE, values);
+        }
+        JSONArray observacionesImp = jsonObject.getJSONArray("observaciones_imp");
+        for (int i = 0; i < observacionesImp.length(); i++) {
+            JSONObject object = observacionesImp.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(PrintObs.Columns.id.name(), object.getInt(PrintObs.Columns.id.name()));
+            values.put(PrintObs.Columns.ObiDes.name(), object.getString(PrintObs.Columns.ObiDes.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.PRINT_OBS_TABLE, values);
         }
     }
 }

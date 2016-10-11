@@ -1000,6 +1000,8 @@ public class DataModel {
                 jsonArray.put(i, dataObs.toJson());
             }
             jsonObject.put("observaciones", jsonArray);
+
+            // TODO: 11-10-16 agregar las observaciones print como arriba
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }
