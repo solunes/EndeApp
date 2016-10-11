@@ -91,9 +91,9 @@ public class DataModel {
     private double TlxPerHr2;
     private double TlxPerCo1;
     private double TlxPerHr1;
-    private double TlxConsumo;
+    private int TlxConsumo;
     private double TlxPerdidas;
-    private double TlxConsFacturado;
+    private int TlxConsFacturado;
     private String TlxDebAuto;
     private int estadoLectura;
     private int enviado;
@@ -832,11 +832,11 @@ public class DataModel {
         TlxPerHr1 = tlxPerHr1;
     }
 
-    public double getTlxConsumo() {
+    public int getTlxConsumo() {
         return TlxConsumo;
     }
 
-    public void setTlxConsumo(double tlxConsumo) {
+    public void setTlxConsumo(int tlxConsumo) {
         TlxConsumo = tlxConsumo;
     }
 
@@ -848,11 +848,11 @@ public class DataModel {
         TlxPerdidas = tlxPerdidas;
     }
 
-    public double getTlxConsFacturado() {
+    public int getTlxConsFacturado() {
         return TlxConsFacturado;
     }
 
-    public void setTlxConsFacturado(double tlxConsFacturado) {
+    public void setTlxConsFacturado(int tlxConsFacturado) {
         TlxConsFacturado = tlxConsFacturado;
     }
 
@@ -958,9 +958,9 @@ public class DataModel {
         dataModel.setTlxPerHr2(cursor.getDouble(Columns.TlxPerHr2.ordinal()));
         dataModel.setTlxPerCo1(cursor.getDouble(Columns.TlxPerCo1.ordinal()));
         dataModel.setTlxPerHr1(cursor.getDouble(Columns.TlxPerHr1.ordinal()));
-        dataModel.setTlxConsumo(cursor.getDouble(Columns.TlxConsumo.ordinal()));
+        dataModel.setTlxConsumo(cursor.getInt(Columns.TlxConsumo.ordinal()));
         dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
-        dataModel.setTlxConsFacturado(cursor.getDouble(Columns.TlxConsFacturado.ordinal()));
+        dataModel.setTlxConsFacturado(cursor.getInt(Columns.TlxConsFacturado.ordinal()));
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
         dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
         dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));

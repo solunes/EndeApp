@@ -72,7 +72,7 @@ public abstract class NumberToLetterConverter {
         if (millon == 1)
             converted.append("UN MILLON ");
         else if (millon > 1)
-            converted.append("**").append(convertNumber(String.valueOf(millon))
+            converted.append("").append(convertNumber(String.valueOf(millon))
                     + "MILLONES ");
 
         // Descompone el trio de miles

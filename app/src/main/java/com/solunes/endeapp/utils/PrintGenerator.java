@@ -1,8 +1,11 @@
 package com.solunes.endeapp.utils;
 
+import android.util.Log;
+
 import com.solunes.endeapp.models.DataModel;
 
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 /**
  * Created by jhonlimaster on 05-10-16.
@@ -11,7 +14,23 @@ public class PrintGenerator {
 
     public static String creator(DataModel dataModel) {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
-        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
+//        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
+
+        String deudasEnergia = "";
+        Double impTotFac = dataModel.getTlxImpFac() + dataModel.getTlxTap() + dataModel.getTlxImpAse();
+        Double totalCancelar = impTotFac;
+
+        if (dataModel.getTlxDeuEneC() > 0) {
+            deudasEnergia = "T 7 0 45 925 Mas deuda(s) pendiente(s) de energia  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
+            deudasEnergia = deudasEnergia + "T 7 0 45 925 " + dataModel.getTlxDeuEneI() + "\r\n";
+            totalCancelar += dataModel.getTlxDeuEneI();
+        }
+        String deudasAseo = "";
+        if (dataModel.getTlxDeuAseC() > 0) {
+            deudasAseo = "T 7 0 45 945 Deuda(s) pendiente(s) de tasa de aseo (" + dataModel.getTlxDeuAseC() + ") Bs\r\n";
+            deudasAseo = deudasAseo + "T 7 0 45 945 " + dataModel.getTlxDeuAseI() + "\r\n";
+            totalCancelar += dataModel.getTlxDeuAseI();
+        }
 
         String cpclConfigLabel = "! 0 200 200 1670 1\r\n" +
                 "ENCODING UTF-8\r\n" +
@@ -27,7 +46,7 @@ public class PrintGenerator {
                 "T 7 0 45 135 Fecha emision: \r\n" +
                 "CENTER\r\n" +
                 // TODO: 05-10-16 funciona para este tipo de fecha
-                "T 7 0 50 135 " + dataModel.getTlxCiudad() + " 22 DE SEPTIEMBRE DE 2016 \r\n" +
+                "T 7 0 50 135 " + dataModel.getTlxCiudad() + " " + dataModel.getTlxRem() + " DE " + mesString(dataModel.getTlxMes()) + " DE " + dataModel.getTlxAno() + "\r\n" +
 
                 "LEFT\r\n" +
                 "T 7 0 45 155 Nombre: " + dataModel.getTlxNom() + " \r\n" +
@@ -50,18 +69,16 @@ public class PrintGenerator {
                 "T 7 0 45 235 REMESA/RUTA: " + dataModel.getTlxRem() + "/" + dataModel.getTlxRutO() + "\r\n" +
                 "T 7 0 450 235 CARTA FACTURA:  \r\n" +
 
-                "T 7 0 45 260 MES DE LA FACTURA: \r\n" +
+                "T 7 0 45 260 MES DE LA FACTURA: " + mesString(dataModel.getTlxMes()) + "-" + dataModel.getTlxAno() + "\r\n" +
                 "T 7 0 430 260 CATEGORIA: " + dataModel.getTlxCtg() + "\r\n" +
 
                 "T 7 0 45 280 FECHA DE LECTURA:\r\n" +
                 "T 7 0 250 280 ANTERIOR:\r\n" +
                 "T 7 0 530 280 ACTUAL:\r\n" +
                 "RIGHT 100\r\n" +
-                // TODO: 05-10-16 funciona para la fecha
-                "T 7 0 375 280 25-JUL-16\r\n" +
+                "T 7 0 375 280 " + formatedDate(dataModel.getTlxFecAnt()) + "\r\n" +
                 "RIGHT 782\r\n" +
-                // TODO: 05-10-16 funciona para la fecha
-                "T 7 0 720 280 26-AGO-16\r\n" +
+                "T 7 0 720 280 " + formatedDate(dataModel.getTlxFecLec()) + "\r\n" +
 
                 "LEFT\r\n" +
                 "T 7 0 45 300 LECTURA MEDIDOR:\r\n" +
@@ -106,39 +123,36 @@ public class PrintGenerator {
                 "T 7 0 45 700 Importe total factura\r\n" +
 
                 "RIGHT 782\r\n" +
-                // TODO: 05-10-16 detalle de facturacion
-                "T 7 0 720 480 161.61\r\n" +
-                "T 7 0 720 500 161.61\r\n" +
-                "T 7 0 720 520 161.61\r\n" +
-                "T 7 0 720 540 161.61\r\n" +
-                "T 7 0 720 560 161.61\r\n" +
-                "T 7 0 720 620 161.61\r\n" +
-                "T 7 0 720 640 161.61\r\n" +
-                "T 7 0 720 700 161.61\r\n" +
+                "T 7 0 720 480 " + dataModel.getTlxCarFij() + "\r\n" +
+                "T 7 0 720 500 " + dataModel.getTlxImpEn() + "\r\n" +
+                "T 7 0 720 520 " + dataModel.getTlxImpEn() + "\r\n" +
+                "T 7 0 720 540 " + dataModel.getTlxImpEn() + "\r\n" +
+                "T 7 0 720 560 " + dataModel.getTlxImpFac() + "\r\n" +
+                "T 7 0 720 620 " + dataModel.getTlxTap() + "\r\n" +
+                "T 7 0 720 640 " + dataModel.getTlxImpAse() + "\r\n" +
+                "T 7 0 720 700 " + impTotFac + "\r\n" +
 
                 "LEFT\r\n" +
-                "T 7 0 45 765 Son: " + toLetter + "\r\n" +
+                "T 7 0 45 765 Son: " + NumberToLetterConverter.convertNumberToLetter(impTotFac) + "\r\n" +
+                "T 7 0 45 1004 Son: " + NumberToLetterConverter.convertNumberToLetter(totalCancelar) + "\r\n" +
 
 
                 "T 7 0 45 885 Importe del mes a cancelar:Bs\r\n" +
-
-                "T 7 0 45 925 Mas deuda(s) pendiente(s) de energia  (1) Bs\r\n" +
-                "T 7 0 45 945 Deuda( s ) pendiente(s) de tasa de aseo (1) Bs\r\n" +
                 "T 7 0 45 972 Importe total a cancelar: Bs\r\n" +
-                "T 7 0 45 1004 Son: " + toLetter + "\r\n" +
                 "T 7 0 45 1035 Importe base para credito fiscal: Bs\r\n" +
 
                 "RIGHT 782\r\n" +
-                // TODO: 05-10-16 ultimos montos a calcular
-                "T 7 0 45 885 194.70\r\n" +
-                "T 7 0 45 925 194.70\r\n" +
-                "T 7 0 45 945 194.70\r\n" +
-                "T 7 0 45 972 194.70\r\n" +
-                "T 7 0 45 1035 194.70\r\n" +
+                "T 7 0 45 885 " + impTotFac + "\r\n" +
+                "T 7 0 45 972 " + totalCancelar + "\r\n" +
+                "T 7 0 45 1035 " + dataModel.getTlxImpFac() + "\r\n" +
+
+                deudasEnergia +
+                deudasAseo +
 
 //                    "FORM\r\n"+
                 "PRINT\r\n";
 
+        Log.e("TAG", "creator: " + cpclConfigLabel);
         return cpclConfigLabel;
     }
 
@@ -154,5 +168,43 @@ public class PrintGenerator {
         } else {
             return "--";
         }
+    }
+
+    private static String mesString(int mes) {
+        switch (mes) {
+            case 1:
+                return "ENERO";
+            case 2:
+                return "FEBRERO";
+            case 3:
+                return "MARZO";
+            case 4:
+                return "ABRIL";
+            case 5:
+                return "MAYO";
+            case 6:
+                return "JUNIO";
+            case 7:
+                return "JULIO";
+            case 8:
+                return "AGOSTO";
+            case 9:
+                return "SEPTIEMBRE";
+            case 10:
+                return "OCTUBRE";
+            case 11:
+                return "NOVIEMBRE";
+            case 12:
+                return "DICIEMBRE";
+        }
+        return "";
+    }
+
+    private static String formatedDate(String fecha) {
+        String[] split = fecha.split("-");
+        String year = split[0];
+        String month = split[1];
+        String day = split[2];
+        return day + "-" + mesString(Integer.parseInt(month)).substring(0, 3) + "-" + year.substring(2);
     }
 }

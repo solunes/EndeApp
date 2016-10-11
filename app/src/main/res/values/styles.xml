@@ -25,6 +25,11 @@
         <item name="colorButtonNormal">#2979FF</item>
     </style>
 
+    <style name="InfoButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlHighlight">#f9e990</item>
+        <item name="colorButtonNormal">#fffb29</item>
+    </style>
+
     <style name="MyAction" parent="Theme.AppCompat.Light">
         <item name="android:colorControlNormal">#FFEBEE</item>
     </style>

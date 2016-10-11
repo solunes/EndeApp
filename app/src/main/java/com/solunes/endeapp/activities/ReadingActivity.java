@@ -139,7 +139,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     public void onPrinting(String srcToPrint) {
         Log.e(TAG, "onPrinting: " + srcToPrint);
-        Log.e(TAG, "onPrinting: connection " + connection.isConnected());
         sendLabelToPrint(srcToPrint);
     }
 
@@ -233,27 +232,36 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private void sendLabelToPrint(String label) {
-        try {
-            ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);
-            PrinterStatus printerStatus = (linkOsPrinter != null) ? linkOsPrinter.getCurrentStatus() : printer.getCurrentStatus();
-            if (printerStatus.isReadyToPrint) {
-                connection.write(label.getBytes());
-                Log.e(TAG, "sending data");
-            } else if (printerStatus.isHeadOpen) {
-                Log.e(TAG, "printer head open");
-            } else if (printerStatus.isPaused) {
-                Log.e(TAG, "printer is paused");
-            } else if (printerStatus.isPaperOut) {
-                Log.e(TAG, "printer media out");
+        DataFragment fragment = (DataFragment) adapter.getItem(viewPager.getCurrentItem());
+        if (connection.isConnected()) {
+            try {
+                ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);
+                PrinterStatus printerStatus = (linkOsPrinter != null) ? linkOsPrinter.getCurrentStatus() : printer.getCurrentStatus();
+                if (printerStatus.isReadyToPrint) {
+                    connection.write(label.getBytes());
+                    Log.e(TAG, "sending data");
+                    fragment.printResponse("Imprimiendo");
+                } else if (printerStatus.isHeadOpen) {
+                    Log.e(TAG, "printer head open");
+                    fragment.printResponse("Cabezal abierto");
+                } else if (printerStatus.isPaused) {
+                    Log.e(TAG, "printer is paused");
+                    fragment.printResponse("Impresora pausada");
+                } else if (printerStatus.isPaperOut) {
+                    Log.e(TAG, "printer media out");
+                    fragment.printResponse("Impresora sin papel");
+                }
+                sleeper(1500);
+                if (connection instanceof BluetoothConnection) {
+                    String friendlyName = ((BluetoothConnection) connection).getFriendlyName();
+                    Log.e(TAG, friendlyName);
+                    sleeper(500);
+                }
+            } catch (ConnectionException e) {
+                Log.e(TAG, e.getMessage());
             }
-            sleeper(1500);
-            if (connection instanceof BluetoothConnection) {
-                String friendlyName = ((BluetoothConnection) connection).getFriendlyName();
-                Log.e(TAG, friendlyName);
-                sleeper(500);
-            }
-        } catch (ConnectionException e) {
-            Log.e(TAG, e.getMessage());
+        } else {
+            fragment.printResponse("Impresora apagada");
         }
     }
 

@@ -8,13 +8,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
@@ -513,5 +516,28 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_POSTPONED));
+    }
+
+    public void analytics(View view) {
+        startActivity(new Intent(MainActivity.this, AnalyticsActivity.class));
+    }
+
+    public void newMedidor(final View view) {
+        AlertDialog.Builder newMedidor = new AlertDialog.Builder(this);
+        newMedidor.setTitle("Nuevo Medidor");
+        View viewInside = LayoutInflater.from(this).inflate(R.layout.layout_new_medidor, null);
+        final EditText nroMed = (EditText) viewInside.findViewById(R.id.new_med_number);
+        final EditText lecMed = (EditText) viewInside.findViewById(R.id.new_med_lectura);
+        newMedidor.setView(viewInside);
+        newMedidor.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.e(TAG, "onClick: " + nroMed.getText().toString());
+                Log.e(TAG, "onClick: " + lecMed.getText().toString());
+                Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+        newMedidor.setNegativeButton("Cancelar", null);
+        newMedidor.show();
     }
 }

@@ -10,7 +10,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="false"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,12 +55,17 @@
                             android:id="@+id/label_info"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/label_info_ruta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin"
                         android:onClick="startReading"
                         android:text="Empezar"
                         android:textColor="@android:color/white"
@@ -78,6 +85,30 @@
                 android:textSize="14dp" />
 
             <include layout="@layout/layout_status" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin">
+
+                <Button
+                    android:onClick="newMedidor"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Nuevo Medidor"
+                    android:theme="@style/InfoButton" />
+
+                <Button
+                    android:onClick="analytics"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Estadisticas"
+                    android:theme="@style/InfoButton" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"

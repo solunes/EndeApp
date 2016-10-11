@@ -421,6 +421,10 @@ public class DataFragment extends Fragment {
         }
     }
 
+    public void printResponse(String response) {
+        Snackbar.make(inputRemenber, response, Snackbar.LENGTH_LONG);
+    }
+
     public interface OnFragmentListener {
         void onTabListener();
 

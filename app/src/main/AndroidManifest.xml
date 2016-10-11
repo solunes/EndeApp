@@ -39,6 +39,7 @@
             android:name=".activities.AdminActivity"
             android:label="@string/admin_activity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activities.AnalyticsActivity"></activity>
     </application>
 
 </manifest>
