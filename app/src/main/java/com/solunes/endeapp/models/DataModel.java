@@ -28,6 +28,8 @@ public class DataModel {
     private String TlxDir;
     private String TlxCtaAnt;
     private int TlxCtg;
+    private int TlxCtgTap;
+    private int TlxCtgAseo;
     private String TlxNroMed;
     private int TlxNroDig;
     private double TlxFacMul;
@@ -39,6 +41,7 @@ public class DataModel {
     private int TlxNvaLec;
     private int TlxTipLec;
     private String TlxSgl;
+    private int TlxTipDem;
     private int TlxOrdSeq;
     private double TlxImpFac;
     private double TlxImpTap;
@@ -60,6 +63,7 @@ public class DataModel {
     private String TlxFecproMed;
     private int TlxTope;
     private int TlxLeyTag;
+    private int TlxDignidad;
     private int TlxTpoTap;
     private double TlxImpTot;
     private int TlxKwhAdi;
@@ -85,6 +89,29 @@ public class DataModel {
     private int TlxEntEne;
     private int TlxEntPot;
     private int TlxPotFacM;
+    private int TlxPotTag;
+    private String TlxPreAnt1;
+    private String TlxPreAnt2;
+    private String TlxPreAnt3;
+    private String TlxPreAnt4;
+    private String TlxPreNue1;
+    private String TlxPreNue2;
+    private String TlxPreNue3;
+    private String TlxPreNue4;
+    private int TlxKwInst;
+    private int TlxReactiva;
+    private int TlxKwhBajo;
+    private int TlxKwhMedio;
+    private int TlxKwhAlto;
+    private int TlxDemBajo;
+    private int TlxFechaBajo;
+    private int TlxHoraBajo;
+    private int TlxDemMedio;
+    private int TlxFechaMedio;
+    private int TlxHoraMedio;
+    private int TlxDemAlto;
+    private int TlxFechaAlto;
+    private int TlxHoraAlto;
     private double TlxPerCo3;
     private double TlxPerHr3;
     private double TlxPerCo2;
@@ -117,6 +144,8 @@ public class DataModel {
         TlxDir,
         TlxCtaAnt,
         TlxCtg,
+        TlxCtgTap,
+        TlxCtgAseo,
         TlxNroMed,
         TlxNroDig,
         TlxFacMul,
@@ -128,6 +157,7 @@ public class DataModel {
         TlxNvaLec,
         TlxTipLec,
         TlxSgl,
+        TlxTipDem,
         TlxOrdSeq,
         TlxImpFac,
         TlxImpTap,
@@ -150,6 +180,7 @@ public class DataModel {
         TlxFecproMed,
         TlxTope,
         TlxLeyTag,
+        TlxDignidad,
         TlxTpoTap,
         TlxImpTot,
         TlxKwhAdi,
@@ -177,6 +208,29 @@ public class DataModel {
         TlxEntPot,
         TlxDecPot,
         TlxPotFacM,
+        TlxPotTag,
+        TlxPreAnt1,
+        TlxPreAnt2,
+        TlxPreAnt3,
+        TlxPreAnt4,
+        TlxPreNue1,
+        TlxPreNue2,
+        TlxPreNue3,
+        TlxPreNue4,
+        TlxKwInst,
+        TlxReactiva,
+        TlxKwhBajo,
+        TlxKwhMedio,
+        TlxKwhAlto,
+        TlxDemBajo,
+        TlxFechaBajo,
+        TlxHoraBajo,
+        TlxDemMedio,
+        TlxFechaMedio,
+        TlxHoraMedio,
+        TlxDemAlto,
+        TlxFechaAlto,
+        TlxHoraAlto,
         TlxPerCo3,
         TlxPerHr3,
         TlxPerCo2,
@@ -190,6 +244,163 @@ public class DataModel {
         TlxRecordatorio,
         estado_lectura,
         enviado
+    }
+
+    public static DataModel fromCursor(Cursor cursor) {
+        DataModel dataModel = new DataModel();
+        dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
+        dataModel.setTlxRem(cursor.getInt(Columns.TlxRem.ordinal()));
+        dataModel.setTlxAre(cursor.getInt(Columns.TlxAre.ordinal()));
+        dataModel.setTlxRutO(cursor.getInt(Columns.TlxRutO.ordinal()));
+        dataModel.setTlxRutA(cursor.getInt(Columns.TlxRutA.ordinal()));
+        dataModel.setTlxAno(cursor.getInt(Columns.TlxAno.ordinal()));
+        dataModel.setTlxMes(cursor.getInt(Columns.TlxMes.ordinal()));
+        dataModel.setTlxCli(cursor.getInt(Columns.TlxCli.ordinal()));
+        dataModel.setTlxOrdTpl(cursor.getInt(Columns.TlxOrdTpl.ordinal()));
+        dataModel.setTlxNom(cursor.getString(Columns.TlxNom.ordinal()));
+        dataModel.setTlxDir(cursor.getString(Columns.TlxDir.ordinal()));
+        dataModel.setTlxCtaAnt(cursor.getString(Columns.TlxCtaAnt.ordinal()));
+        dataModel.setTlxCtg(cursor.getInt(Columns.TlxCtg.ordinal()));
+        dataModel.setTlxNroMed(cursor.getString(Columns.TlxNroMed.ordinal()));
+        dataModel.setTlxNroDig(cursor.getInt(Columns.TlxNroDig.ordinal()));
+        dataModel.setTlxFacMul(cursor.getDouble(Columns.TlxFacMul.ordinal()));
+        dataModel.setTlxFecAnt(cursor.getString(Columns.TlxFecAnt.ordinal()));
+        dataModel.setTlxFecLec(cursor.getString(Columns.TlxFecLec.ordinal()));
+        dataModel.setTlxHorLec(cursor.getString(Columns.TlxHorLec.ordinal()));
+        dataModel.setTlxUltInd(cursor.getInt(Columns.TlxUltInd.ordinal()));
+        dataModel.setTlxConPro(cursor.getInt(Columns.TlxConPro.ordinal()));
+        dataModel.setTlxNvaLec(cursor.getInt(Columns.TlxNvaLec.ordinal()));
+        dataModel.setTlxTipLec(cursor.getInt(Columns.TlxTipLec.ordinal()));
+        dataModel.setTlxSgl(cursor.getString(Columns.TlxSgl.ordinal()));
+        dataModel.setTlxOrdSeq(cursor.getInt(Columns.TlxOrdSeq.ordinal()));
+        dataModel.setTlxImpFac(cursor.getDouble(Columns.TlxImpFac.ordinal()));
+        dataModel.setTlxImpTap(cursor.getDouble(Columns.TlxImpTap.ordinal()));
+        dataModel.setTlxImpAse(cursor.getDouble(Columns.TlxImpAse.ordinal()));
+        dataModel.setTlxCarFij(cursor.getDouble(Columns.TlxCarFij.ordinal()));
+        dataModel.setTlxImpEn(cursor.getDouble(Columns.TlxImpEn.ordinal()));
+        dataModel.setTlxImpPot(cursor.getDouble(Columns.TlxImpPot.ordinal()));
+        dataModel.setTlxDesTdi(cursor.getDouble(Columns.TlxDesTdi.ordinal()));
+        dataModel.setTlxLey1886(cursor.getDouble(Columns.TlxLey1886.ordinal()));
+        dataModel.setTlxLeePot(cursor.getInt(Columns.TlxLeePot.ordinal()));
+        dataModel.setTlxCotaseo(cursor.getInt(Columns.TlxCotaseo.ordinal()));
+        dataModel.setTlxTap(cursor.getDouble(Columns.TlxTap.ordinal()));
+        dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
+        dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
+        dataModel.setTlxCliNit(cursor.getDouble(Columns.TlxCliNit.ordinal()));
+        dataModel.setTlxFecCor(cursor.getString(Columns.TlxFecCor.ordinal()));
+        dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
+        dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
+        dataModel.setTlxFecproMed(cursor.getString(Columns.TlxFecproMed.ordinal()));
+        dataModel.setTlxTope(cursor.getInt(Columns.TlxTope.ordinal()));
+        dataModel.setTlxLeyTag(cursor.getInt(Columns.TlxLeyTag.ordinal()));
+        dataModel.setTlxTpoTap(cursor.getInt(Columns.TlxTpoTap.ordinal()));
+        dataModel.setTlxImpTot(cursor.getDouble(Columns.TlxImpTot.ordinal()));
+        dataModel.setTlxKwhAdi(cursor.getInt(Columns.TlxKwhAdi.ordinal()));
+        dataModel.setTlxImpAvi(cursor.getInt(Columns.TlxImpAvi.ordinal()));
+        dataModel.setTlxCarFac(cursor.getInt(Columns.TlxCarFac.ordinal()));
+        dataModel.setTlxDeuEneC(cursor.getInt(Columns.TlxDeuEneC.ordinal()));
+        dataModel.setTlxDeuEneI(cursor.getDouble(Columns.TlxDeuEneI.ordinal()));
+        dataModel.setTlxDeuAseC(cursor.getInt(Columns.TlxDeuAseC.ordinal()));
+        dataModel.setTlxDeuAseI(cursor.getDouble(Columns.TlxDeuAseI.ordinal()));
+        dataModel.setTlxFecEmi(cursor.getString(Columns.TlxFecEmi.ordinal()));
+        dataModel.setTlxUltPag(cursor.getString(Columns.TlxUltPag.ordinal()));
+        dataModel.setTlxEstado(cursor.getInt(Columns.TlxEstado.ordinal()));
+        dataModel.setTlxUltObs(cursor.getString(Columns.TlxUltObs.ordinal()));
+        dataModel.setTlxActivi(cursor.getString(Columns.TlxActivi.ordinal()));
+        dataModel.setTlxCiudad(cursor.getString(Columns.TlxCiudad.ordinal()));
+        dataModel.setTlxFacNro(cursor.getDouble(Columns.TlxFacNro.ordinal()));
+        dataModel.setTlxNroAut(cursor.getDouble(Columns.TlxNroAut.ordinal()));
+        dataModel.setTlxCodCon(cursor.getString(Columns.TlxCodCon.ordinal()));
+        dataModel.setTlxFecLim(cursor.getString(Columns.TlxFecLim.ordinal()));
+        dataModel.setTlxKwhDev(cursor.getInt(Columns.TlxKwhDev.ordinal()));
+        dataModel.setTlxUltTipL(cursor.getInt(Columns.TlxUltTipL.ordinal()));
+        dataModel.setTlxCliNew(cursor.getInt(Columns.TlxCliNew.ordinal()));
+        dataModel.setTlxEntEne(cursor.getInt(Columns.TlxEntEne.ordinal()));
+        dataModel.setTlxEntPot(cursor.getInt(Columns.TlxEntPot.ordinal()));
+        dataModel.setTlxPotFacM(cursor.getInt(Columns.TlxPotFacM.ordinal()));
+        dataModel.setTlxPerCo3(cursor.getDouble(Columns.TlxPerCo3.ordinal()));
+        dataModel.setTlxPerHr3(cursor.getDouble(Columns.TlxPerHr3.ordinal()));
+        dataModel.setTlxPerCo2(cursor.getDouble(Columns.TlxPerCo2.ordinal()));
+        dataModel.setTlxPerHr2(cursor.getDouble(Columns.TlxPerHr2.ordinal()));
+        dataModel.setTlxPerCo1(cursor.getDouble(Columns.TlxPerCo1.ordinal()));
+        dataModel.setTlxPerHr1(cursor.getDouble(Columns.TlxPerHr1.ordinal()));
+        dataModel.setTlxConsumo(cursor.getInt(Columns.TlxConsumo.ordinal()));
+        dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
+        dataModel.setTlxConsFacturado(cursor.getInt(Columns.TlxConsFacturado.ordinal()));
+        dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
+        dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
+        dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));
+        dataModel.setTlxPotLei(cursor.getInt(Columns.TlxPotLei.ordinal()));
+        dataModel.setTlxDecPot(cursor.getInt(Columns.TlxDecPot.ordinal()));
+        dataModel.setTlxDecEne(cursor.getInt(Columns.TlxDecEne.ordinal()));
+        dataModel.setTlxRecordatorio(cursor.getString(Columns.TlxRecordatorio.ordinal()));
+
+        dataModel.setTlxCtgTap(cursor.getInt(Columns.TlxCtgTap.ordinal()));
+        dataModel.setTlxCtgAseo(cursor.getInt(Columns.TlxCtgAseo.ordinal()));
+        dataModel.setTlxTipDem(cursor.getInt(Columns.TlxTipDem.ordinal()));
+        dataModel.setTlxDignidad(cursor.getInt(Columns.TlxDignidad.ordinal()));
+        dataModel.setTlxPotTag(cursor.getInt(Columns.TlxPotTag.ordinal()));
+        dataModel.setTlxPreAnt1(cursor.getString(Columns.TlxPreAnt1.ordinal()));
+        dataModel.setTlxPreAnt2(cursor.getString(Columns.TlxPreAnt2.ordinal()));
+        dataModel.setTlxPreAnt3(cursor.getString(Columns.TlxPreAnt3.ordinal()));
+        dataModel.setTlxPreAnt4(cursor.getString(Columns.TlxPreAnt4.ordinal()));
+        dataModel.setTlxPreNue1(cursor.getString(Columns.TlxPreNue1.ordinal()));
+        dataModel.setTlxPreNue2(cursor.getString(Columns.TlxPreNue2.ordinal()));
+        dataModel.setTlxPreNue3(cursor.getString(Columns.TlxPreNue3.ordinal()));
+        dataModel.setTlxPreNue4(cursor.getString(Columns.TlxPreNue4.ordinal()));
+        dataModel.setTlxKwInst(cursor.getInt(Columns.TlxKwInst.ordinal()));
+        dataModel.setTlxReactiva(cursor.getInt(Columns.TlxReactiva.ordinal()));
+        dataModel.setTlxKwhBajo(cursor.getInt(Columns.TlxKwhBajo.ordinal()));
+        dataModel.setTlxKwhBajo(cursor.getInt(Columns.TlxKwhBajo.ordinal()));
+        dataModel.setTlxKwhMedio(cursor.getInt(Columns.TlxKwhMedio.ordinal()));
+        dataModel.setTlxKwhAlto(cursor.getInt(Columns.TlxKwhAlto.ordinal()));
+        dataModel.setTlxDemBajo(cursor.getInt(Columns.TlxDemBajo.ordinal()));
+        dataModel.setTlxDemMedio(cursor.getInt(Columns.TlxDemMedio.ordinal()));
+        dataModel.setTlxDemAlto(cursor.getInt(Columns.TlxDemAlto.ordinal()));
+        dataModel.setTlxHoraBajo(cursor.getInt(Columns.TlxHoraBajo.ordinal()));
+        dataModel.setTlxHoraMedio(cursor.getInt(Columns.TlxHoraMedio.ordinal()));
+        dataModel.setTlxHoraAlto(cursor.getInt(Columns.TlxHoraAlto.ordinal()));
+        dataModel.setTlxFechaAlto(cursor.getInt(Columns.TlxFechaAlto.ordinal()));
+        dataModel.setTlxFechaMedio(cursor.getInt(Columns.TlxFechaMedio.ordinal()));
+        dataModel.setTlxFechaBajo(cursor.getInt(Columns.TlxFechaBajo.ordinal()));
+        return dataModel;
+    }
+
+    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
+            jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
+            jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
+            jsonObject.put(Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
+            jsonObject.put(Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
+            jsonObject.put(Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
+            jsonObject.put(Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
+            jsonObject.put(Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
+            jsonObject.put(Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
+            jsonObject.put(Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
+            jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
+            jsonObject.put(Columns.TlxPotLei.name(), dataModel.getTlxPotLei());
+            jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
+            jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
+            jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
+            jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+            jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
+            jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+            jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < obsArray.size(); i++) {
+                DataObs dataObs = obsArray.get(i);
+                Log.e(TAG, "getJsonToSend: "+dataObs.toJson());
+                jsonArray.put(i, dataObs.toJson());
+            }
+            jsonObject.put("observaciones", jsonArray);
+
+            // TODO: 11-10-16 agregar las observaciones print como arriba
+        } catch (JSONException e) {
+            Log.e(TAG, "getJsonToSend: ", e);
+        }
+        return jsonObject.toString();
     }
 
     public int get_id() {
@@ -230,6 +441,222 @@ public class DataModel {
 
     public void setTlxRutA(int tlxRutA) {
         TlxRutA = tlxRutA;
+    }
+
+    public int getTlxCtgTap() {
+        return TlxCtgTap;
+    }
+
+    public void setTlxCtgTap(int tlxCtgTap) {
+        TlxCtgTap = tlxCtgTap;
+    }
+
+    public int getTlxCtgAseo() {
+        return TlxCtgAseo;
+    }
+
+    public void setTlxCtgAseo(int tlxCtgAseo) {
+        TlxCtgAseo = tlxCtgAseo;
+    }
+
+    public int getTlxTipDem() {
+        return TlxTipDem;
+    }
+
+    public void setTlxTipDem(int tlxTipDem) {
+        TlxTipDem = tlxTipDem;
+    }
+
+    public int getTlxDignidad() {
+        return TlxDignidad;
+    }
+
+    public void setTlxDignidad(int tlxDignidad) {
+        TlxDignidad = tlxDignidad;
+    }
+
+    public int getTlxPotTag() {
+        return TlxPotTag;
+    }
+
+    public void setTlxPotTag(int tlxPotTag) {
+        TlxPotTag = tlxPotTag;
+    }
+
+    public String getTlxPreAnt1() {
+        return TlxPreAnt1;
+    }
+
+    public void setTlxPreAnt1(String tlxPreAnt1) {
+        TlxPreAnt1 = tlxPreAnt1;
+    }
+
+    public String getTlxPreAnt2() {
+        return TlxPreAnt2;
+    }
+
+    public void setTlxPreAnt2(String tlxPreAnt2) {
+        TlxPreAnt2 = tlxPreAnt2;
+    }
+
+    public String getTlxPreAnt3() {
+        return TlxPreAnt3;
+    }
+
+    public void setTlxPreAnt3(String tlxPreAnt3) {
+        TlxPreAnt3 = tlxPreAnt3;
+    }
+
+    public String getTlxPreAnt4() {
+        return TlxPreAnt4;
+    }
+
+    public void setTlxPreAnt4(String tlxPreAnt4) {
+        TlxPreAnt4 = tlxPreAnt4;
+    }
+
+    public String getTlxPreNue1() {
+        return TlxPreNue1;
+    }
+
+    public void setTlxPreNue1(String tlxPreNue1) {
+        TlxPreNue1 = tlxPreNue1;
+    }
+
+    public String getTlxPreNue2() {
+        return TlxPreNue2;
+    }
+
+    public void setTlxPreNue2(String tlxPreNue2) {
+        TlxPreNue2 = tlxPreNue2;
+    }
+
+    public String getTlxPreNue3() {
+        return TlxPreNue3;
+    }
+
+    public void setTlxPreNue3(String tlxPreNue3) {
+        TlxPreNue3 = tlxPreNue3;
+    }
+
+    public String getTlxPreNue4() {
+        return TlxPreNue4;
+    }
+
+    public void setTlxPreNue4(String tlxPreNue4) {
+        TlxPreNue4 = tlxPreNue4;
+    }
+
+    public int getTlxKwInst() {
+        return TlxKwInst;
+    }
+
+    public void setTlxKwInst(int tlxKwInst) {
+        TlxKwInst = tlxKwInst;
+    }
+
+    public int getTlxReactiva() {
+        return TlxReactiva;
+    }
+
+    public void setTlxReactiva(int tlxReactiva) {
+        TlxReactiva = tlxReactiva;
+    }
+
+    public int getTlxKwhBajo() {
+        return TlxKwhBajo;
+    }
+
+    public void setTlxKwhBajo(int tlxKwhBajo) {
+        TlxKwhBajo = tlxKwhBajo;
+    }
+
+    public int getTlxKwhMedio() {
+        return TlxKwhMedio;
+    }
+
+    public void setTlxKwhMedio(int tlxKwhMedio) {
+        TlxKwhMedio = tlxKwhMedio;
+    }
+
+    public int getTlxKwhAlto() {
+        return TlxKwhAlto;
+    }
+
+    public void setTlxKwhAlto(int tlxKwhAlto) {
+        TlxKwhAlto = tlxKwhAlto;
+    }
+
+    public int getTlxDemBajo() {
+        return TlxDemBajo;
+    }
+
+    public void setTlxDemBajo(int tlxDemBajo) {
+        TlxDemBajo = tlxDemBajo;
+    }
+
+    public int getTlxFechaBajo() {
+        return TlxFechaBajo;
+    }
+
+    public void setTlxFechaBajo(int tlxFechaBajo) {
+        TlxFechaBajo = tlxFechaBajo;
+    }
+
+    public int getTlxHoraBajo() {
+        return TlxHoraBajo;
+    }
+
+    public void setTlxHoraBajo(int tlxHoraBajo) {
+        TlxHoraBajo = tlxHoraBajo;
+    }
+
+    public int getTlxDemMedio() {
+        return TlxDemMedio;
+    }
+
+    public void setTlxDemMedio(int tlxDemMedio) {
+        TlxDemMedio = tlxDemMedio;
+    }
+
+    public int getTlxFechaMedio() {
+        return TlxFechaMedio;
+    }
+
+    public void setTlxFechaMedio(int tlxFechaMedio) {
+        TlxFechaMedio = tlxFechaMedio;
+    }
+
+    public int getTlxHoraMedio() {
+        return TlxHoraMedio;
+    }
+
+    public void setTlxHoraMedio(int tlxHoraMedio) {
+        TlxHoraMedio = tlxHoraMedio;
+    }
+
+    public int getTlxDemAlto() {
+        return TlxDemAlto;
+    }
+
+    public void setTlxDemAlto(int tlxDemAlto) {
+        TlxDemAlto = tlxDemAlto;
+    }
+
+    public int getTlxFechaAlto() {
+        return TlxFechaAlto;
+    }
+
+    public void setTlxFechaAlto(int tlxFechaAlto) {
+        TlxFechaAlto = tlxFechaAlto;
+    }
+
+    public int getTlxHoraAlto() {
+        return TlxHoraAlto;
+    }
+
+    public void setTlxHoraAlto(int tlxHoraAlto) {
+        TlxHoraAlto = tlxHoraAlto;
     }
 
     public int getTlxAno() {
@@ -878,133 +1305,5 @@ public class DataModel {
 
     public void setEnviado(int enviado) {
         this.enviado = enviado;
-    }
-
-    public static DataModel fromCursor(Cursor cursor) {
-        DataModel dataModel = new DataModel();
-        dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
-        dataModel.setTlxRem(cursor.getInt(Columns.TlxRem.ordinal()));
-        dataModel.setTlxAre(cursor.getInt(Columns.TlxAre.ordinal()));
-        dataModel.setTlxRutO(cursor.getInt(Columns.TlxRutO.ordinal()));
-        dataModel.setTlxRutA(cursor.getInt(Columns.TlxRutA.ordinal()));
-        dataModel.setTlxAno(cursor.getInt(Columns.TlxAno.ordinal()));
-        dataModel.setTlxMes(cursor.getInt(Columns.TlxMes.ordinal()));
-        dataModel.setTlxCli(cursor.getInt(Columns.TlxCli.ordinal()));
-        dataModel.setTlxOrdTpl(cursor.getInt(Columns.TlxOrdTpl.ordinal()));
-        dataModel.setTlxNom(cursor.getString(Columns.TlxNom.ordinal()));
-        dataModel.setTlxDir(cursor.getString(Columns.TlxDir.ordinal()));
-        dataModel.setTlxCtaAnt(cursor.getString(Columns.TlxCtaAnt.ordinal()));
-        dataModel.setTlxCtg(cursor.getInt(Columns.TlxCtg.ordinal()));
-        dataModel.setTlxNroMed(cursor.getString(Columns.TlxNroMed.ordinal()));
-        dataModel.setTlxNroDig(cursor.getInt(Columns.TlxNroDig.ordinal()));
-        dataModel.setTlxFacMul(cursor.getDouble(Columns.TlxFacMul.ordinal()));
-        dataModel.setTlxFecAnt(cursor.getString(Columns.TlxFecAnt.ordinal()));
-        dataModel.setTlxFecLec(cursor.getString(Columns.TlxFecLec.ordinal()));
-        dataModel.setTlxHorLec(cursor.getString(Columns.TlxHorLec.ordinal()));
-        dataModel.setTlxUltInd(cursor.getInt(Columns.TlxUltInd.ordinal()));
-        dataModel.setTlxConPro(cursor.getInt(Columns.TlxConPro.ordinal()));
-        dataModel.setTlxNvaLec(cursor.getInt(Columns.TlxNvaLec.ordinal()));
-        dataModel.setTlxTipLec(cursor.getInt(Columns.TlxTipLec.ordinal()));
-        dataModel.setTlxSgl(cursor.getString(Columns.TlxSgl.ordinal()));
-        dataModel.setTlxOrdSeq(cursor.getInt(Columns.TlxOrdSeq.ordinal()));
-        dataModel.setTlxImpFac(cursor.getDouble(Columns.TlxImpFac.ordinal()));
-        dataModel.setTlxImpTap(cursor.getDouble(Columns.TlxImpTap.ordinal()));
-        dataModel.setTlxImpAse(cursor.getDouble(Columns.TlxImpAse.ordinal()));
-        dataModel.setTlxCarFij(cursor.getDouble(Columns.TlxCarFij.ordinal()));
-        dataModel.setTlxImpEn(cursor.getDouble(Columns.TlxImpEn.ordinal()));
-        dataModel.setTlxImpPot(cursor.getDouble(Columns.TlxImpPot.ordinal()));
-        dataModel.setTlxDesTdi(cursor.getDouble(Columns.TlxDesTdi.ordinal()));
-        dataModel.setTlxLey1886(cursor.getDouble(Columns.TlxLey1886.ordinal()));
-        dataModel.setTlxLeePot(cursor.getInt(Columns.TlxLeePot.ordinal()));
-        dataModel.setTlxCotaseo(cursor.getInt(Columns.TlxCotaseo.ordinal()));
-        dataModel.setTlxTap(cursor.getDouble(Columns.TlxTap.ordinal()));
-        dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
-        dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
-        dataModel.setTlxCliNit(cursor.getDouble(Columns.TlxCliNit.ordinal()));
-        dataModel.setTlxFecCor(cursor.getString(Columns.TlxFecCor.ordinal()));
-        dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
-        dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
-        dataModel.setTlxFecproMed(cursor.getString(Columns.TlxFecproMed.ordinal()));
-        dataModel.setTlxTope(cursor.getInt(Columns.TlxTope.ordinal()));
-        dataModel.setTlxLeyTag(cursor.getInt(Columns.TlxLeyTag.ordinal()));
-        dataModel.setTlxTpoTap(cursor.getInt(Columns.TlxTpoTap.ordinal()));
-        dataModel.setTlxImpTot(cursor.getDouble(Columns.TlxImpTot.ordinal()));
-        dataModel.setTlxKwhAdi(cursor.getInt(Columns.TlxKwhAdi.ordinal()));
-        dataModel.setTlxImpAvi(cursor.getInt(Columns.TlxImpAvi.ordinal()));
-        dataModel.setTlxCarFac(cursor.getInt(Columns.TlxCarFac.ordinal()));
-        dataModel.setTlxDeuEneC(cursor.getInt(Columns.TlxDeuEneC.ordinal()));
-        dataModel.setTlxDeuEneI(cursor.getDouble(Columns.TlxDeuEneI.ordinal()));
-        dataModel.setTlxDeuAseC(cursor.getInt(Columns.TlxDeuAseC.ordinal()));
-        dataModel.setTlxDeuAseI(cursor.getDouble(Columns.TlxDeuAseI.ordinal()));
-        dataModel.setTlxFecEmi(cursor.getString(Columns.TlxFecEmi.ordinal()));
-        dataModel.setTlxUltPag(cursor.getString(Columns.TlxUltPag.ordinal()));
-        dataModel.setTlxEstado(cursor.getInt(Columns.TlxEstado.ordinal()));
-        dataModel.setTlxUltObs(cursor.getString(Columns.TlxUltObs.ordinal()));
-        dataModel.setTlxActivi(cursor.getString(Columns.TlxActivi.ordinal()));
-        dataModel.setTlxCiudad(cursor.getString(Columns.TlxCiudad.ordinal()));
-        dataModel.setTlxFacNro(cursor.getDouble(Columns.TlxFacNro.ordinal()));
-        dataModel.setTlxNroAut(cursor.getDouble(Columns.TlxNroAut.ordinal()));
-        dataModel.setTlxCodCon(cursor.getString(Columns.TlxCodCon.ordinal()));
-        dataModel.setTlxFecLim(cursor.getString(Columns.TlxFecLim.ordinal()));
-        dataModel.setTlxKwhDev(cursor.getInt(Columns.TlxKwhDev.ordinal()));
-        dataModel.setTlxUltTipL(cursor.getInt(Columns.TlxUltTipL.ordinal()));
-        dataModel.setTlxCliNew(cursor.getInt(Columns.TlxCliNew.ordinal()));
-        dataModel.setTlxEntEne(cursor.getInt(Columns.TlxEntEne.ordinal()));
-        dataModel.setTlxEntPot(cursor.getInt(Columns.TlxEntPot.ordinal()));
-        dataModel.setTlxPotFacM(cursor.getInt(Columns.TlxPotFacM.ordinal()));
-        dataModel.setTlxPerCo3(cursor.getDouble(Columns.TlxPerCo3.ordinal()));
-        dataModel.setTlxPerHr3(cursor.getDouble(Columns.TlxPerHr3.ordinal()));
-        dataModel.setTlxPerCo2(cursor.getDouble(Columns.TlxPerCo2.ordinal()));
-        dataModel.setTlxPerHr2(cursor.getDouble(Columns.TlxPerHr2.ordinal()));
-        dataModel.setTlxPerCo1(cursor.getDouble(Columns.TlxPerCo1.ordinal()));
-        dataModel.setTlxPerHr1(cursor.getDouble(Columns.TlxPerHr1.ordinal()));
-        dataModel.setTlxConsumo(cursor.getInt(Columns.TlxConsumo.ordinal()));
-        dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
-        dataModel.setTlxConsFacturado(cursor.getInt(Columns.TlxConsFacturado.ordinal()));
-        dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
-        dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
-        dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));
-        dataModel.setTlxPotLei(cursor.getInt(Columns.TlxPotLei.ordinal()));
-        dataModel.setTlxDecPot(cursor.getInt(Columns.TlxDecPot.ordinal()));
-        dataModel.setTlxDecEne(cursor.getInt(Columns.TlxDecEne.ordinal()));
-        dataModel.setTlxRecordatorio(cursor.getString(Columns.TlxRecordatorio.ordinal()));
-        return dataModel;
-    }
-
-    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
-            jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
-            jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
-            jsonObject.put(Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
-            jsonObject.put(Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
-            jsonObject.put(Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
-            jsonObject.put(Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
-            jsonObject.put(Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
-            jsonObject.put(Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
-            jsonObject.put(Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
-            jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
-            jsonObject.put(Columns.TlxPotLei.name(), dataModel.getTlxPotLei());
-            jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
-            jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
-            jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
-            jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
-            jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
-            jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
-            jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
-            JSONArray jsonArray = new JSONArray();
-            for (int i = 0; i < obsArray.size(); i++) {
-                DataObs dataObs = obsArray.get(i);
-                Log.e(TAG, "getJsonToSend: "+dataObs.toJson());
-                jsonArray.put(i, dataObs.toJson());
-            }
-            jsonObject.put("observaciones", jsonArray);
-
-            // TODO: 11-10-16 agregar las observaciones print como arriba
-        } catch (JSONException e) {
-            Log.e(TAG, "getJsonToSend: ", e);
-        }
-        return jsonObject.toString();
     }
 }

@@ -67,11 +67,11 @@ public class LoginActivity extends AppCompatActivity {
                         User user = User.fromCursor(cursor);
                         if (user.getLecNiv() == 1){
                             Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
-                            intent.putExtra("id_user", user.getId());
+                            intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("id_user", user.getId());
+                            intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                             UserPreferences.putBoolean(LoginActivity.this, KEY_LOGIN, true);
                         }

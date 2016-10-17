@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 10;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -33,15 +33,14 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE " + USER_TABLE + " (" +
-                "id integer, " +
-                "lecNro integer, " +
-                "lecNom text, " +
-                "lecCod text, " +
-                "lecPas text, " +
-                "lecNiv integer, " +
+                "LecId integer, " +
+                "LecNom text, " +
+                "LecCod text, " +
+                "LecPas text, " +
+                "LecNiv integer, " +
                 "lecAsi integer, " +
                 "lecAct integer, " +
-                "areaCod integer)");
+                "AreaCod integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TARIFA_TABLE + " (" +
                 "id integer, " +
@@ -52,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "importe numeric)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + OBS_TABLE + " (" +
-                "ObsCod integer, " +
+                "id integer, " +
                 "ObsDes text, " +
                 "ObsTip integer, " +
                 "ObsLec integer, " +
@@ -72,6 +71,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxDir text, " +
                 "TlxCtaAnt text, " +
                 "TlxCtg integer, " +
+                "TlxCtgTap integer, " +
+                "TlxCtgAseo integer, " +
                 "TlxNroMed text, " +
                 "TlxNroDig integer, " +
                 "TlxFacMul decimal(15, 2), " +
@@ -83,6 +84,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxNvaLec integer, " +
                 "TlxTipLec integer, " +
                 "TlxSgl text, " +
+                "TlxTipDem integer, " +
                 "TlxOrdSeq integer, " +
                 "TlxImpFac decimal(15, 2), " +
                 "TlxImpTap decimal(15, 2), " +
@@ -105,6 +107,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxFecproMed numeric, " +
                 "TlxTope integer, " +
                 "TlxLeyTag integer, " +
+                "TlxDignidad integer, " +
                 "TlxTpoTap integer, " +
                 "TlxImpTot decimal(15, 2), " +
                 "TlxKwhAdi integer, " +
@@ -132,6 +135,29 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxEntPot integer, " +
                 "TlxDecPot integer, " +
                 "TlxPotFacM integer, " +
+                "TlxPotTag integer, " +
+                "TlxPreAnt1 text, " +
+                "TlxPreAnt2 text, " +
+                "TlxPreAnt3 text, " +
+                "TlxPreAnt4 text, " +
+                "TlxPreNue1 text, " +
+                "TlxPreNue2 text, " +
+                "TlxPreNue3 text, " +
+                "TlxPreNue4 text, " +
+                "TlxKwInst integer, " +
+                "TlxReactiva integer, " +
+                "TlxKwhBajo integer, " +
+                "TlxKwhMedio integer, " +
+                "TlxKwhAlto integer, " +
+                "TlxDemBajo integer, " +
+                "TlxFechaBajo integer, " +
+                "TlxHoraBajo integer, " +
+                "TlxDemMedio integer, " +
+                "TlxFechaMedio integer, " +
+                "TlxHoraMedio integer, " +
+                "TlxDemAlto integer, " +
+                "TlxFechaAlto integer, " +
+                "TlxHoraAlto integer, " +
                 "TlxPerCo3 numeric, " +
                 "TlxPerHr3 numeric, " +
                 "TlxPerCo2 numeric, " +
@@ -177,10 +203,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 "ConKwh12 integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
-                "ObsRem integer," +
-                "ObsAre integer," +
-                "ObsCli integer," +
-                "ObsCod integer)");
+                "id integer," +
+                "ObgRem integer," +
+                "ObgAre integer," +
+                "ObgCli integer," +
+                "ObgObs integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PARAMETRO_TABLE + " (" +
                 "id integer," +
@@ -197,14 +224,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_DATA_TABLE + " (" +
-                "OigId integer," +
+                "id integer," +
                 "OigRem integer," +
                 "OigAre integer," +
                 "OigCli integer," +
                 "OigObs integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
-                "ObiId integer," +
+                "id integer," +
                 "ObiDes text)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + MED_ENTRE_LINEAS_TABLE + " (" +
@@ -217,7 +244,6 @@ public class DBHelper extends SQLiteOpenHelper {
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
-                "null, " +
                 "'Administrador', " +
                 "'admin', " +
                 "'1234', " +

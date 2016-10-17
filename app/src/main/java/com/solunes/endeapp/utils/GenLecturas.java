@@ -53,8 +53,8 @@ public class GenLecturas {
         return 0;
     }
 
-    public static double importeConsumo(Context context, int kWhConsumo, int categoria) {
-        return round(subTotal(context, kWhConsumo, categoria) + Constants.CARGO_MINIMO);
+    public static double importeEnergia(Context context, int kWhConsumo, int categoria) {
+        return round(subTotal(context, kWhConsumo, categoria));
     }
 
     public static double tarifaDignidad(int kWhConsumo, double importeConsumo) {
@@ -66,12 +66,12 @@ public class GenLecturas {
     }
 
     public static double ley1886(Context context, int kWhConsumo, int categoria) {
-        if (kWhConsumo <= 100) {
-            return round(-0.2 * (Constants.CARGO_MINIMO + subTotal(context, kWhConsumo, categoria)));
-        } else {
             DBAdapter dbAdapter = new DBAdapter(context);
+        if (kWhConsumo <= 100) {
+            return round(-0.2 * (dbAdapter.getCargoFijo(categoria) + subTotal(context, kWhConsumo, categoria)));
+        } else {
             ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
-            return round(-0.2 * (Constants.CARGO_MINIMO + (cargoEnergia.get(0).getImporte() * 30) + (cargoEnergia.get(1).getImporte() * 50)));
+            return round(-0.2 * (dbAdapter.getCargoFijo(categoria) + (cargoEnergia.get(0).getImporte() * 30) + (cargoEnergia.get(1).getImporte() * 50)));
         }
     }
 
@@ -95,7 +95,7 @@ public class GenLecturas {
         return round(importeConsumo - tarifaDignidad);
     }
 
-    private static double round(double value) {
+    public static double round(double value) {
         long factor = (long) Math.pow(10, 2);
         value = value * factor;
         long tmp = Math.round(value);

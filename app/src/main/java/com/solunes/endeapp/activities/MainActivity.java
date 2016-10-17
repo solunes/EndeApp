@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         long ini = System.currentTimeMillis();
-        Log.e(TAG, "onCreate: ini");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -317,32 +316,18 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxHorLec.name(), object.getString(DataModel.Columns.TlxHorLec.name()));
             values.put(DataModel.Columns.TlxUltInd.name(), object.getInt(DataModel.Columns.TlxUltInd.name()));
             values.put(DataModel.Columns.TlxConPro.name(), object.getInt(DataModel.Columns.TlxConPro.name()));
-//            values.put(DataModel.Columns.TlxNvaLec.name(), object.getInt(DataModel.Columns.TlxNvaLec.name()));
             values.put(DataModel.Columns.TlxTipLec.name(), object.getInt(DataModel.Columns.TlxTipLec.name()));
             values.put(DataModel.Columns.TlxSgl.name(), object.getString(DataModel.Columns.TlxSgl.name()));
             values.put(DataModel.Columns.TlxOrdSeq.name(), object.getInt(DataModel.Columns.TlxOrdSeq.name()));
-//            values.put(DataModel.Columns.TlxImpFac.name(), object.getInt(DataModel.Columns.TlxImpFac.name()));
-//            values.put(DataModel.Columns.TlxImpTap.name(), object.getDouble(DataModel.Columns.TlxImpTap.name()));
-//            values.put(DataModel.Columns.TlxImpAse.name(), object.getDouble(DataModel.Columns.TlxImpAse.name()));
-//            values.put(DataModel.Columns.TlxCarFij.name(), object.getDouble(DataModel.Columns.TlxCarFij.name()));
-//            values.put(DataModel.Columns.TlxImpEn.name(), object.getDouble(DataModel.Columns.TlxImpEn.name()));
-//            values.put(DataModel.Columns.TlxImpPot.name(), object.getDouble(DataModel.Columns.TlxImpPot.name()));
-//            values.put(DataModel.Columns.TlxDesTdi.name(), object.getDouble(DataModel.Columns.TlxDesTdi.name()));
-//            values.put(DataModel.Columns.TlxLey1886.name(), object.getDouble(DataModel.Columns.TlxLey1886.name()));
             values.put(DataModel.Columns.TlxLeePot.name(), object.getInt(DataModel.Columns.TlxLeePot.name()));
             values.put(DataModel.Columns.TlxCotaseo.name(), object.getInt(DataModel.Columns.TlxCotaseo.name()));
             values.put(DataModel.Columns.TlxTap.name(), object.getDouble(DataModel.Columns.TlxTap.name()));
             values.put(DataModel.Columns.TlxPotCon.name(), object.getInt(DataModel.Columns.TlxPotCon.name()));
             values.put(DataModel.Columns.TlxPotFac.name(), object.getInt(DataModel.Columns.TlxPotFac.name()));
             values.put(DataModel.Columns.TlxCliNit.name(), object.getDouble(DataModel.Columns.TlxCliNit.name()));
-//            values.put(DataModel.Columns.TlxFecCor.name(), object.getDouble(DataModel.Columns.TlxFecCor.name()));
-//            values.put(DataModel.Columns.TlxFecVto.name(), object.getDouble(DataModel.Columns.TlxFecVto.name()));
-//            values.put(DataModel.Columns.TlxFecproEmi.name(), object.getDouble(DataModel.Columns.TlxFecproEmi.name()));
-//            values.put(DataModel.Columns.TlxFecproMed.name(), object.getDouble(DataModel.Columns.TlxFecproMed.name()));
             values.put(DataModel.Columns.TlxTope.name(), object.getInt(DataModel.Columns.TlxTope.name()));
             values.put(DataModel.Columns.TlxLeyTag.name(), object.getInt(DataModel.Columns.TlxLeyTag.name()));
             values.put(DataModel.Columns.TlxTpoTap.name(), object.getInt(DataModel.Columns.TlxTpoTap.name()));
-//            values.put(DataModel.Columns.TlxImpTot.name(), object.getDouble(DataModel.Columns.TlxImpTot.name()));
             values.put(DataModel.Columns.TlxKwhAdi.name(), object.getInt(DataModel.Columns.TlxKwhAdi.name()));
             values.put(DataModel.Columns.TlxImpAvi.name(), object.getInt(DataModel.Columns.TlxImpAvi.name()));
             values.put(DataModel.Columns.TlxCarFac.name(), object.getInt(DataModel.Columns.TlxCarFac.name()));
@@ -350,7 +335,6 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDeuEneI.name(), object.getDouble(DataModel.Columns.TlxDeuEneI.name()));
             values.put(DataModel.Columns.TlxDeuAseC.name(), object.getInt(DataModel.Columns.TlxDeuAseC.name()));
             values.put(DataModel.Columns.TlxDeuAseI.name(), object.getDouble(DataModel.Columns.TlxDeuAseI.name()));
-//            values.put(DataModel.Columns.TlxFecEmi.name(), object.getDouble(DataModel.Columns.TlxFecEmi.name()));
             values.put(DataModel.Columns.TlxUltPag.name(), object.getString(DataModel.Columns.TlxUltPag.name()));
             values.put(DataModel.Columns.TlxEstado.name(), object.getInt(DataModel.Columns.TlxEstado.name()));
             values.put(DataModel.Columns.TlxUltObs.name(), object.getString(DataModel.Columns.TlxUltObs.name()));
@@ -363,22 +347,19 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxKwhDev.name(), object.getInt(DataModel.Columns.TlxKwhDev.name()));
             values.put(DataModel.Columns.TlxUltTipL.name(), object.getInt(DataModel.Columns.TlxUltTipL.name()));
             values.put(DataModel.Columns.TlxCliNew.name(), object.getInt(DataModel.Columns.TlxCliNew.name()));
-//            values.put(DataModel.Columns.TlxEntEne.name(), object.getInt(DataModel.Columns.TlxEntEne.name()));
-//            values.put(DataModel.Columns.TlxEntPot.name(), object.getInt(DataModel.Columns.TlxEntPot.name()));
-//            values.put(DataModel.Columns.TlxPotFacM.name(), object.getInt(DataModel.Columns.TlxPotFacM.name()));
-//            values.put(DataModel.Columns.TlxPerCo3.name(), object.getDouble(DataModel.Columns.TlxPerCo3.name()));
-//            values.put(DataModel.Columns.TlxPerHr3.name(), object.getDouble(DataModel.Columns.TlxPerHr3.name()));
-//            values.put(DataModel.Columns.TlxPerCo2.name(), object.getDouble(DataModel.Columns.TlxPerCo2.name()));
-//            values.put(DataModel.Columns.TlxPerHr2.name(), object.getDouble(DataModel.Columns.TlxPerHr2.name()));
-//            values.put(DataModel.Columns.TlxPerCo1.name(), object.getDouble(DataModel.Columns.TlxPerCo1.name()));
-//            values.put(DataModel.Columns.TlxPerHr1.name(), object.getDouble(DataModel.Columns.TlxPerHr1.name()));
-//            values.put(DataModel.Columns.TlxConsumo.name(), object.getDouble(DataModel.Columns.TlxConsumo.name()));
-//            values.put(DataModel.Columns.TlxPerdidas.name(), object.getDouble(DataModel.Columns.TlxPerdidas.name()));
-//            values.put(DataModel.Columns.TlxConsFacturado.name(), object.getDouble(DataModel.Columns.TlxConsFacturado.name()));
             values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
             values.put(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()));
             values.put(DataModel.Columns.estado_lectura.name(), 0);
             values.put(DataModel.Columns.enviado.name(), 0);
+//            values.put(DataModel.Columns.TlxCtgTap.name(), object.getInt(DataModel.Columns.TlxCtgTap.name()));
+//            values.put(DataModel.Columns.TlxCtgAseo.name(), object.getInt(DataModel.Columns.TlxCtgAseo.name()));
+            values.put(DataModel.Columns.TlxTipDem.name(), object.getInt(DataModel.Columns.TlxTipDem.name()));
+//            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
+            values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
+            values.put(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name()));
+            values.put(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name()));
+            values.put(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name()));
+            values.put(DataModel.Columns.TlxPreAnt4.name(), object.getString(DataModel.Columns.TlxPreAnt4.name()));
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
             JSONObject historico = object.getJSONObject("historico");
@@ -411,7 +392,6 @@ public class MainActivity extends AppCompatActivity {
             valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
             valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
             valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
-
         }
         dbAdapter.close();
     }

@@ -138,8 +138,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     @Override
-    public void onPrinting(String srcToPrint) {
-        sendLabelToPrint(srcToPrint);
+    public void onPrinting(final String srcToPrint) {
+        new Thread(new Runnable() {
+            public void run() {
+                Looper.prepare();
+                sendLabelToPrint(srcToPrint);
+                Looper.loop();
+                Looper.myLooper().quit();
+            }
+        }).start();
     }
 
     @Override
@@ -165,7 +172,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private String getMacAddress() {
-        DataFragment fragment = (DataFragment) adapter.getItem(viewPager.getCurrentItem());
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Log.e(TAG, "getMacAddress: " + bluetoothAdapter);
         if (bluetoothAdapter != null) {
@@ -178,8 +184,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                     }
                 }
             }
-        } else {
-            fragment.printResponse("Bluetooth apagado");
         }
         return null;
     }
@@ -236,7 +240,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private void sendLabelToPrint(String label) {
-        Log.e(TAG, "sendLabelToPrint: " + viewPager.getCurrentItem());
         DataFragment fragment = adapter.getFragment(viewPager.getCurrentItem());
         if (connection.isConnected()) {
             try {

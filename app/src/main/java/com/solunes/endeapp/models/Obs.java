@@ -9,23 +9,23 @@ import org.json.JSONObject;
  * Created by jhonlimaster on 07-09-16.
  */
 public class Obs {
-    private int obsCod;
+    private int id;
     private String obsDes;
     private int obsTip;
     private int obsLec;
     private int obsFac;
 
-    public enum Columns{
-        ObsCod,
+    public enum Columns {
+        id,
         ObsDes,
         ObsTip,
         ObsLec,
         ObsFac
     }
 
-    public static Obs fromCursor(Cursor cursor){
+    public static Obs fromCursor(Cursor cursor) {
         Obs obs = new Obs();
-        obs.setObsCod(cursor.getInt(Columns.ObsCod.ordinal()));
+        obs.setId(cursor.getInt(Columns.id.ordinal()));
         obs.setObsDes(cursor.getString(Columns.ObsDes.ordinal()));
         obs.setObsTip(cursor.getInt(Columns.ObsTip.ordinal()));
         obs.setObsLec(cursor.getInt(Columns.ObsLec.ordinal()));
@@ -33,10 +33,10 @@ public class Obs {
         return obs;
     }
 
-    public JSONObject toJson(){
+    public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(Columns.ObsCod.name(), getObsCod());
+            jsonObject.put(Columns.id.name(), getId());
             jsonObject.put(Columns.ObsDes.name(), getObsDes());
             jsonObject.put(Columns.ObsTip.name(), getObsTip());
             jsonObject.put(Columns.ObsLec.name(), getObsLec());
@@ -47,12 +47,12 @@ public class Obs {
         return jsonObject;
     }
 
-    public int getObsCod() {
-        return obsCod;
+    public int getId() {
+        return id;
     }
 
-    public void setObsCod(int obsCod) {
-        this.obsCod = obsCod;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getObsDes() {

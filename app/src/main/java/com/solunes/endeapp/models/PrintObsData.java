@@ -7,14 +7,14 @@ import android.database.Cursor;
  */
 
 public class PrintObsData {
-    private int oigId;
+    private int id;
     private int oigRem;
     private int oigAre;
     private int oigCli;
     private int oigObs;
 
     public enum Columns {
-        OigId,
+        id,
         OigRem,
         OigAre,
         OigCli,
@@ -23,7 +23,7 @@ public class PrintObsData {
 
     public static PrintObsData fromCursor(Cursor cursor) {
         PrintObsData obsData = new PrintObsData();
-        obsData.setOigId(cursor.getInt(Columns.OigId.ordinal()));
+        obsData.setId(cursor.getInt(Columns.id.ordinal()));
         obsData.setOigRem(cursor.getInt(Columns.OigRem.ordinal()));
         obsData.setOigAre(cursor.getInt(Columns.OigAre.ordinal()));
         obsData.setOigCli(cursor.getInt(Columns.OigCli.ordinal()));
@@ -31,12 +31,12 @@ public class PrintObsData {
         return obsData;
     }
 
-    public int getOigId() {
-        return oigId;
+    public int getId() {
+        return id;
     }
 
-    public void setOigId(int oigId) {
-        this.oigId = oigId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getOigRem() {

@@ -6,8 +6,7 @@ import android.database.Cursor;
  * Created by jhonlimaster on 11-08-16.
  */
 public class User {
-    private int id;
-    private int lecNro;
+    private int lecId;
     private String lecNom;
     private String lecCod;
     private String lecPas;
@@ -17,23 +16,15 @@ public class User {
     private int areaCod;
 
     public enum Columns {
-        id, LecNro, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod
+        LecId, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod
     }
 
-    public int getId() {
-        return id;
+    public int getLecId() {
+        return lecId;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getLecNro() {
-        return lecNro;
-    }
-
-    public void setLecNro(int lecNro) {
-        this.lecNro = lecNro;
+    public void setLecId(int lecId) {
+        this.lecId = lecId;
     }
 
     public String getLecNom() {
@@ -94,8 +85,7 @@ public class User {
 
     public static User fromCursor(Cursor cursor){
         User user = new User();
-        user.setId(cursor.getInt(Columns.id.ordinal()));
-        user.setLecNro(cursor.getInt(Columns.LecNro.ordinal()));
+        user.setLecId(cursor.getInt(Columns.LecId.ordinal()));
         user.setLecNom(cursor.getString(Columns.LecNom.ordinal()));
         user.setLecCod(cursor.getString(Columns.LecCod.ordinal()));
         user.setLecPas(cursor.getString(Columns.LecPas.ordinal()));

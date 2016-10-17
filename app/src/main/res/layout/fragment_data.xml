@@ -181,6 +181,14 @@
 
                     </LinearLayout>
 
+                    <EditText
+                        android:id="@+id/input_potencia_reading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:hint="Lectura Potencia"
+                        android:inputType="number" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -191,7 +199,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:hint="Nueva Lectura"
+                            android:hint="Lectura Energia"
                             android:inputType="number" />
 
                         <Button

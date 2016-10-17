@@ -6,10 +6,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.solunes.endeapp.activities.MainActivity;
-import com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
@@ -23,8 +21,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter.*;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -52,7 +48,7 @@ public class DBAdapter {
 
     public User getUser(int id) {
         open();
-        Cursor query = db.query(DBHelper.USER_TABLE, null, User.Columns.id.name() + " = " + id, null, null, null, null);
+        Cursor query = db.query(DBHelper.USER_TABLE, null, User.Columns.LecId.name() + " = " + id, null, null, null, null);
         query.moveToFirst();
         User user = User.fromCursor(query);
         query.close();
@@ -207,7 +203,7 @@ public class DBAdapter {
 
     public Cursor getObs(int obsCod) {
         open();
-        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsCod.name() + " = " + obsCod, null, null, null, null);
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.id.name() + " = " + obsCod, null, null, null, null);
         query.moveToNext();
         return query;
     }
@@ -222,7 +218,7 @@ public class DBAdapter {
     public ArrayList<DataObs> getObsByCli(int cli) {
         open();
         ArrayList<DataObs> objects = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObsCli.name() + " = " + cli, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObgCli.name() + " = " + cli, null, null, null, null);
         while (cursor.moveToNext()) {
             objects.add(DataObs.fromCursor(cursor));
         }

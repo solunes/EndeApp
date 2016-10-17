@@ -41,6 +41,7 @@ public class DataFragment extends Fragment {
 
     private View rootView;
     private EditText inputReading;
+    private EditText inputPotenciaReading;
     private EditText inputObsCode;
     private Button buttonConfirm;
     private Button buttonObs;
@@ -48,9 +49,17 @@ public class DataFragment extends Fragment {
     private TextView estadoMedidor;
     private EditText inputRemenber;
 
+    private ArrayList<String> printTitles;
+    private ArrayList<Double> printValues;
+
+    private double importeTotalFactura;
+    private double importeMesCancelar;
+
     private DataModel dataModel;
 
     public DataFragment() {
+        printTitles = new ArrayList<>();
+        printValues = new ArrayList<>();
     }
 
     @Override
@@ -122,12 +131,27 @@ public class DataFragment extends Fragment {
                 dbAdapter.close();
             }
         });
+
+        inputPotenciaReading = (EditText) view.findViewById(R.id.input_potencia_reading);
+        if (dataModel.getTlxTipDem() == 2) {
+            inputPotenciaReading.setVisibility(View.VISIBLE);
+        }
+        if (dataModel.getTlxTipDem() == 3) {
+
+        }
     }
 
     private void actionButtons() {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+
+                if (dataModel.getTlxTipDem() == 3) {
+                    // TODO: 17-10-16 funcion de gran demanda
+                    return;
+                }
+
+
                 if (dataModel.getEstadoLectura() == estados_lectura.Impreso.ordinal()) {
                     AlertDialog.Builder reprintDialog = new AlertDialog.Builder(getContext());
                     reprintDialog.setTitle("Selecionar una observacion");
@@ -145,7 +169,7 @@ public class DataFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // enviarlo a imprimir
-                            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel));
+                            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel, printTitles, printValues, importeTotalFactura, importeMesCancelar));
                         }
                     });
                     reprintDialog.show();
@@ -158,6 +182,9 @@ public class DataFragment extends Fragment {
                     final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
                     String input = inputReading.getText().toString();
+                    if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
+                        Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+                    }
 
                     int lecturaKwh;
                     boolean giro = false;
@@ -189,7 +216,7 @@ public class DataFragment extends Fragment {
                         if (lecturaKwh > 0) {
                             dataModel.setTlxKwhDev(0);
                         } else {
-                            dataModel.setTlxKwhDev(lecturaKwh);
+                            dataModel.setTlxKwhDev(Math.abs(lecturaKwh));
                             lecturaKwh = 0;
                         }
                     }
@@ -203,13 +230,14 @@ public class DataFragment extends Fragment {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Alerta!");
                     String message = "Se ha detectado:";
-                    if (dataModel.getTlxNvaLec() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
+                    if (dataModel.getTlxConsumo() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
                         message = message + "\n- Consumo elevado";
                         isAlert = true;
-                    } else if (dataModel.getTlxNvaLec() < (conPro * dbAdapter.getBajoElevado())) {
+                    } else if (dataModel.getTlxConsumo() < (conPro * dbAdapter.getBajoElevado())) {
                         message = message + "\n- Consumo bajo";
                         isAlert = true;
-                    } else if (giro) {
+                    }
+                    if (giro) {
                         message = message + "\n- Giro de medidor";
                         isAlert = true;
                     }
@@ -255,7 +283,7 @@ public class DataFragment extends Fragment {
                         dialogInterface.dismiss();
                         Obs obs = Obs.fromCursor(dbAdapter.getObs(stringObs[position]));
                         labelObs.setText(obs.getObsDes());
-                        inputObsCode.setText(String.valueOf(obs.getObsCod()));
+                        inputObsCode.setText(String.valueOf(obs.getId()));
                     }
                 });
                 alertDialog.show();
@@ -307,7 +335,8 @@ public class DataFragment extends Fragment {
 
     private void printFactura(View view, Obs obs) {
         if (obs.getObsFac() == 1) {
-            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel));
+
+            onFragmentListener.onPrinting(PrintGenerator.creator(dataModel, printTitles, printValues, importeTotalFactura,importeMesCancelar));
         } else {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
         }
@@ -315,7 +344,6 @@ public class DataFragment extends Fragment {
 
     private void saveLectura(Obs obs) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
-        dataModel.setTlxCarFij(dbAdapter.getCargoFijo(dataModel.getTlxCtg()));
 
         ContentValues cv = new ContentValues();
         Calendar calendar = Calendar.getInstance();
@@ -339,28 +367,28 @@ public class DataFragment extends Fragment {
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
 
         cv = new ContentValues();
-        cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
-        cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
-        cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
-        cv.put(DataObs.Columns.ObsCod.name(), obs.getObsCod());
+        cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
+        cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
+        cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
+        cv.put(DataObs.Columns.ObgObs.name(), obs.getId());
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        Log.e(TAG, "saveLectura: save obs " + obs.getObsCod());
+        Log.e(TAG, "saveLectura: save obs " + obs.getId());
 
         int conPro = dataModel.getTlxConPro();
         if (dataModel.getTlxNvaLec() > (conPro + conPro * 0.2)) {
             cv = new ContentValues();
-            cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
-            cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
-            cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
-            cv.put(DataObs.Columns.ObsCod.name(), 80);
+            cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
+            cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
+            cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
+            cv.put(DataObs.Columns.ObgObs.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
             Log.e(TAG, "saveLectura: consumo elevado");
         } else if (dataModel.getTlxNvaLec() < (conPro * 0.8)) {
             cv = new ContentValues();
-            cv.put(DataObs.Columns.ObsRem.name(), dataModel.getTlxRem());
-            cv.put(DataObs.Columns.ObsAre.name(), dataModel.getTlxAre());
-            cv.put(DataObs.Columns.ObsCli.name(), dataModel.getTlxCli());
-            cv.put(DataObs.Columns.ObsCod.name(), 81);
+            cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
+            cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
+            cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
+            cv.put(DataObs.Columns.ObgObs.name(), 81);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
             Log.e(TAG, "saveLectura: consumo bajo");
         }
@@ -374,33 +402,73 @@ public class DataFragment extends Fragment {
         // multiplicador de energia
         lectura = (int) (lectura * dataModel.getTlxFacMul());
 
-        double importeEnergia = GenLecturas.importeConsumo(getContext(), lectura, dataModel.getTlxCtg());
-        dataModel.setTlxImpEn(importeEnergia);
-//        labelImporteConsumo.setText("importe por consumo: " + importeEnergia);
-        double importeConsumo = importeEnergia;
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+        dataModel.setTlxCarFij(dbAdapter.getCargoFijo(dataModel.getTlxCtg()));
+        // TODO: 17-10-16 array cargo fijo
+        printTitles.add("Importe por cargo fijo");
+        printValues.add(dataModel.getTlxCarFij());
+        dbAdapter.close();
 
-        double tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
-        dataModel.setTlxDesTdi(tarifaDignidad);
+        double importeEnergia = GenLecturas.importeEnergia(getContext(), lectura, dataModel.getTlxCtg());
+        // TODO: 17-10-16 array energia
+        dataModel.setTlxImpEn(importeEnergia);
+        printTitles.add("Importe por energía");
+        printValues.add(dataModel.getTlxImpEn());
+//        labelImporteConsumo.setText("importe por consumo: " + importeEnergia);
+        double importePotencia = 0;
+        if (dataModel.getTlxTipDem() == 2) {
+            importePotencia = Double.valueOf(inputPotenciaReading.getText().toString());
+            dataModel.setTlxImpPot(importePotencia);
+            // TODO: 17-10-16 array importePotencia
+            printTitles.add("Importe por potencia");
+            printValues.add(dataModel.getTlxImpPot());
+        }
+        double importeConsumo = GenLecturas.round(dbAdapter.getCargoFijo(dataModel.getTlxCtg()) + importeEnergia + importePotencia);
+        // TODO: 17-10-16 array importe consumo
+        printTitles.add("Importe por consumo");
+        printValues.add(importeConsumo);
+
+        double tarifaDignidad = 0;
+        if (dataModel.getTlxDignidad() == 1) {
+            tarifaDignidad = GenLecturas.tarifaDignidad(lectura, importeConsumo);
+            dataModel.setTlxDesTdi(tarifaDignidad);
+            // TODO: 17-10-16 array tarifa
+            printTitles.add("Beneficiado por tarifa dignidad con");
+            printValues.add(dataModel.getTlxDesTdi());
+        }
+
+        double ley1886 = 0;
+        if (dataModel.getTlxLey1886() == 1) {
+            ley1886 = GenLecturas.ley1886(getContext(), lectura, dataModel.getTlxCtg());
+            dataModel.setTlxLey1886(ley1886);
+            // TODO: 17-10-16 array ley1886
+            printTitles.add("Menos descuento Ley 1886");
+            printValues.add(dataModel.getTlxLey1886());
+        }
 
         double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad);
-
-        double ley1886 = GenLecturas.ley1886(getContext(), lectura, dataModel.getTlxCtg());
-        dataModel.setTlxLey1886(ley1886);
+        // TODO: 17-10-16 array totalConsumo
+        printTitles.add("Importe total por consumo");
+        printValues.add(totalConsumo);
 //        labelTotalConsumo.setText("Importe total por consumo: " + totalConsumo);
 
         double totalSuministro = GenLecturas.totalSuministro(totalConsumo, ley1886);
 //        labelTotalSuministro.setText("Importe total por el suminstro: " + totalSuministro);
         dataModel.setTlxImpFac(totalSuministro);
-
+        // TODO: 17-10-16  array totalSuministro
+        printTitles.add("Importe total por el suministro");
+        printValues.add(dataModel.getTlxImpFac());
 
         double totalSuministroTap = GenLecturas.totalSuministroTap(lectura);
-        dataModel.setTlxImpTap(totalSuministro + totalSuministroTap);
+        dataModel.setTlxImpTap(totalSuministroTap);
 
         double totalSuministroAseo = GenLecturas.totalSuministroAseo(lectura);
         dataModel.setTlxImpAse(totalSuministroAseo);
 
-        dataModel.setTlxImpTot(GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo));
-//        labelTotalFacturar.setText("Importe total a facturar: " + dataModel.getTlxImpTot());
+        importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo);
+//        dataModel.setTlxImpTot(GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo));
+        importeMesCancelar = importeTotalFactura + 0;
+        dataModel.setTlxImpTot(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI());
     }
 
     private void validSaved() {

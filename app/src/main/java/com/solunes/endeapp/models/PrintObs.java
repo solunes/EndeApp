@@ -7,7 +7,7 @@ import android.database.Cursor;
  */
 
 public class PrintObs {
-    private int obiId;
+    private int id;
     private String obiDes;
 
     public enum Columns {
@@ -16,17 +16,17 @@ public class PrintObs {
 
     public static PrintObs fromCursor(Cursor cursor) {
         PrintObs printObs = new PrintObs();
-        printObs.setObiId(cursor.getInt(Columns.id.ordinal()));
+        printObs.setId(cursor.getInt(Columns.id.ordinal()));
         printObs.setObiDes(cursor.getString(Columns.ObiDes.ordinal()));
         return printObs;
     }
 
-    public int getObiId() {
-        return obiId;
+    public int getId() {
+        return id;
     }
 
-    public void setObiId(int obiId) {
-        this.obiId = obiId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getObiDes() {

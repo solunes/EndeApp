@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -146,7 +145,11 @@ public class AdminActivity extends AppCompatActivity {
             values.put(Tarifa.Columns.id.name(), object.getInt(Tarifa.Columns.id.name()));
             values.put(Tarifa.Columns.categoria_tarifa_id.name(), object.getInt(Tarifa.Columns.categoria_tarifa_id.name()));
             values.put(Tarifa.Columns.item_facturacion_id.name(), object.getInt(Tarifa.Columns.item_facturacion_id.name()));
-            values.put(Tarifa.Columns.kwh_desde.name(), object.getInt(Tarifa.Columns.kwh_desde.name()));
+            try {
+                values.put(Tarifa.Columns.kwh_desde.name(), object.getInt(Tarifa.Columns.kwh_desde.name()));
+            } catch (JSONException e) {
+                values.put(Tarifa.Columns.kwh_desde.name(), 0);
+            }
             try {
                 values.put(Tarifa.Columns.kwh_hasta.name(), object.getInt(Tarifa.Columns.kwh_hasta.name()));
             } catch (JSONException e) {
@@ -161,7 +164,7 @@ public class AdminActivity extends AppCompatActivity {
         for (int i = 0; i < usuarios.length(); i++) {
             JSONObject object = usuarios.getJSONObject(i);
             ContentValues values = new ContentValues();
-            values.put(User.Columns.id.name(), object.getInt(User.Columns.id.name()));
+            values.put(User.Columns.LecId.name(), object.getInt(User.Columns.LecId.name()));
 //            values.put(User.Columns.LecNro.name(), object.getInt(User.Columns.LecNro.name()));
             values.put(User.Columns.LecNom.name(), object.getString(User.Columns.LecNom.name()));
             values.put(User.Columns.LecCod.name(), object.getString(User.Columns.LecCod.name()));
@@ -178,7 +181,7 @@ public class AdminActivity extends AppCompatActivity {
         for (int i = 0; i < observaciones.length(); i++) {
             JSONObject object = observaciones.getJSONObject(i);
             ContentValues values = new ContentValues();
-            values.put(Obs.Columns.ObsCod.name(), object.getInt(Obs.Columns.ObsCod.name()));
+            values.put(Obs.Columns.id.name(), object.getInt(Obs.Columns.id.name()));
             values.put(Obs.Columns.ObsDes.name(), object.getString(Obs.Columns.ObsDes.name()));
             values.put(Obs.Columns.ObsTip.name(), object.getInt(Obs.Columns.ObsTip.name()));
             values.put(Obs.Columns.ObsLec.name(), object.getInt(Obs.Columns.ObsLec.name()));
