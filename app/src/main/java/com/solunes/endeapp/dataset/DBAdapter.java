@@ -12,6 +12,8 @@ import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.PrintObs;
+import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.StatisticsItem;
@@ -280,7 +282,7 @@ public class DBAdapter {
         return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
     }
 
-    public double getBajoElevado() {
+    public double getConsumoBajo() {
         open();
         Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + CONSUMO_BAJO, null, null, null, null);
         query.moveToNext();
@@ -313,5 +315,37 @@ public class DBAdapter {
         }
         items.add(new StatisticsItem("Casa cerrada", 22));
         return items;
+    }
+
+    public Cursor getPrintObs() {
+        open();
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_TABLE, null, null, null, null, null, null);
+        return cursor;
+    }
+
+    public ArrayList<PrintObsData> getPrintObsData() {
+        open();
+        ArrayList<PrintObsData> printObsDatas = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, null, null, null, null, null);
+        while (cursor.moveToNext()){
+            printObsDatas.add(PrintObsData.fromCursor(cursor));
+        }
+        return printObsDatas;
+    }
+
+    public String[] getLeyenda() {
+        open();
+        String[] leyenda = new String[3];
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 3, null, null, null, null);
+        query.moveToNext();
+        leyenda[0] = Parametro.fromCursor(query).getTexto();
+        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 4, null, null, null, null);
+        query.moveToNext();
+        leyenda[1] = Parametro.fromCursor(query).getTexto();
+        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 5, null, null, null, null);
+        query.moveToNext();
+        leyenda[2] = Parametro.fromCursor(query).getTexto();
+//        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
+        return leyenda;
     }
 }

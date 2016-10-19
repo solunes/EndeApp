@@ -137,6 +137,8 @@
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
+            <include layout="@layout/layout_precintos"/>
+
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -150,6 +152,34 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="@dimen/activity_horizontal_margin">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/input_reading"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:hint="Lectura Energia"
+                            android:inputType="number" />
+
+                        <EditText
+                            android:id="@+id/input_potencia_reading"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:hint="Lectura Potencia"
+                            android:inputType="number"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <include layout="@layout/layout_gran_demanda" />
 
                     <TextView
                         android:id="@+id/label_obs"
@@ -165,9 +195,9 @@
 
                         <EditText
                             android:id="@+id/obs_code"
-                            android:layout_width="64dp"
+                            android:layout_width="54dp"
                             android:layout_height="wrap_content"
-                            android:backgroundTint="@color/colorAccent"
+                            android:backgroundTint="@color/colorPrimary"
                             android:hint="Obs"
                             android:inputType="number"
                             android:lines="1" />
@@ -178,29 +208,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Observaciones" />
-
-                    </LinearLayout>
-
-                    <EditText
-                        android:id="@+id/input_potencia_reading"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:hint="Lectura Potencia"
-                        android:inputType="number" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/input_reading"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="Lectura Energia"
-                            android:inputType="number" />
 
                         <Button
                             android:id="@+id/button_confirm"

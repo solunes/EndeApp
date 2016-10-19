@@ -40,9 +40,13 @@ public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
     public static final String KEY_TPL = "key_tpl";
+    public static final String KEY_PRINT_MANE = "key_print_name";
 
     private EditText editTpl;
     private TextView nroTpl;
+
+    private EditText editPrintName;
+    private TextView printName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,25 @@ public class AdminActivity extends AppCompatActivity {
                     }
                 }).execute();
                 progressDialog.show();
+            }
+        });
+
+        printName = (TextView) findViewById(R.id.label_print_name);
+        String string = UserPreferences.getString(getApplicationContext(), KEY_PRINT_MANE);
+        if (string != null) {
+            printName.setText("Impresora: " + string);
+        }
+        editPrintName = (EditText) findViewById(R.id.edit_print_name);
+        Button buttonPrintName = (Button) findViewById(R.id.btn_print_name);
+        buttonPrintName.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                String printname = editPrintName.getText().toString();
+                if (!printname.isEmpty()) {
+                    UserPreferences.putString(getApplicationContext(), KEY_PRINT_MANE, printname);
+                    printName.setText("Impresora: " + printname);
+                }
             }
         });
     }

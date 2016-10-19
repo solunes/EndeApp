@@ -2,6 +2,9 @@ package com.solunes.endeapp.models;
 
 import android.database.Cursor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by jhonlimaster on 11-10-16.
  */
@@ -12,6 +15,20 @@ public class PrintObsData {
     private int oigAre;
     private int oigCli;
     private int oigObs;
+
+    public String toJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Columns.id.name(), getId());
+            jsonObject.put(Columns.OigRem.name(), getOigRem());
+            jsonObject.put(Columns.OigAre.name(), getOigAre());
+            jsonObject.put(Columns.OigCli.name(), getOigCli());
+            jsonObject.put(Columns.OigObs.name(), getOigObs());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+    }
 
     public enum Columns {
         id,

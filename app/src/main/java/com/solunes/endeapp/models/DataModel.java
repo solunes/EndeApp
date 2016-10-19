@@ -366,7 +366,7 @@ public class DataModel {
         return dataModel;
     }
 
-    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray) {
+    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
@@ -385,18 +385,42 @@ public class DataModel {
             jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
             jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+
+            jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
+            jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
+            jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
+            jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
+            jsonObject.put(Columns.TlxKwInst.name(), dataModel.getTlxKwInst());
+            jsonObject.put(Columns.TlxReactiva.name(), dataModel.getTlxReactiva());
+            jsonObject.put(Columns.TlxKwhBajo.name(), dataModel.getTlxKwhBajo());
+            jsonObject.put(Columns.TlxKwhMedio.name(), dataModel.getTlxKwhMedio());
+            jsonObject.put(Columns.TlxKwhAlto.name(), dataModel.getTlxKwhAlto());
+            jsonObject.put(Columns.TlxDemBajo.name(), dataModel.getTlxDemBajo());
+            jsonObject.put(Columns.TlxDemMedio.name(), dataModel.getTlxDemMedio());
+            jsonObject.put(Columns.TlxDemAlto.name(), dataModel.getTlxDemAlto());
+            jsonObject.put(Columns.TlxFechaBajo.name(), dataModel.getTlxFechaBajo());
+            jsonObject.put(Columns.TlxFechaMedio.name(), dataModel.getTlxFechaMedio());
+            jsonObject.put(Columns.TlxFechaAlto.name(), dataModel.getTlxFechaAlto());
+            jsonObject.put(Columns.TlxHoraBajo.name(), dataModel.getTlxHoraBajo());
+            jsonObject.put(Columns.TlxHoraMedio.name(), dataModel.getTlxHoraMedio());
+            jsonObject.put(Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+
             jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < obsArray.size(); i++) {
                 DataObs dataObs = obsArray.get(i);
-                Log.e(TAG, "getJsonToSend: "+dataObs.toJson());
                 jsonArray.put(i, dataObs.toJson());
             }
             jsonObject.put("observaciones", jsonArray);
 
-            // TODO: 11-10-16 agregar las observaciones print como arriba
+            JSONArray jsonArrayPrintObs = new JSONArray();
+            for (int i = 0; i < printObsDataArrayList.size(); i++) {
+                PrintObsData printObsData = printObsDataArrayList.get(i);
+                jsonArrayPrintObs.put(printObsData.toJson());
+            }
+            jsonObject.put("observaciones_imp", jsonArrayPrintObs.toString());
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }

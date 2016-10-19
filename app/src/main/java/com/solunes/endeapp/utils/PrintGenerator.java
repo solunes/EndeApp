@@ -14,7 +14,7 @@ public class PrintGenerator {
 
     private static final String TAG = "PrintGenerator";
 
-    public static String creator(DataModel dataModel, ArrayList<String> printTitles, ArrayList<Double> printValues, double importeTotalFactura, double importeMesCancelar) {
+    public static String creator(DataModel dataModel, ArrayList<String> printTitles, ArrayList<Double> printValues, double importeTotalFactura, double importeMesCancelar, String[] leyenda) {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
 //        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
         String deudasEnergia = "";
@@ -100,39 +100,6 @@ public class PrintGenerator {
                 "RIGHT 782\r\n" +
                 "T CONSO2.CPF 0 720 360 " + dataModel.getTlxConsFacturado() + " kWh\r\n" +
 
-//
-//                // BLOQUE 3: DETALLE DE FACTURACION
-//                "LEFT\r\n" +
-//                "T CONSO3.CPF 0 575 480 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 500 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 520 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 540 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 560 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 620 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 640 Bs\r\n" +
-//                "T CONSO3.CPF 0 575 680 Bs\r\n" +
-//
-//                "T CONSO3.CPF 0 40 480 Cargo Fijo\r\n" +
-//                "T CONSO3.CPF 0 40 500 Importe por energia\r\n" +
-//                "T CONSO3.CPF 0 40 520 Importe por consumo\r\n" +
-//                "T CONSO3.CPF 0 40 540 Importe total por consumo\r\n" +
-//                "T CONSO3.CPF 0 40 560 Importe totla por el suministro\r\n" +
-//                "T CONSO3.CPF 0 40 600 Tasas para el Gobierno Municipal\r\n" +
-//                "T CONSO3.CPF 0 40 620 Por alumbrado publico\r\n" +
-//                "T CONSO3.CPF 0 40 640 Por aseo urbano\r\n" +
-//                "T CONSO3.CPF 0 40 680 Importe total factura\r\n" +
-//
-//                "RIGHT 782\r\n" +
-//                "T CONSO3.CPF 0 720 480 " + dataModel.getTlxCarFij() + "\r\n" +
-//                "T CONSO3.CPF 0 720 500 " + dataModel.getTlxImpEn() + "\r\n" +
-//                "T CONSO3.CPF 0 720 520 " + dataModel.getTlxImpEn() + "\r\n" +
-//                "T CONSO3.CPF 0 720 540 " + dataModel.getTlxImpEn() + "\r\n" +
-//                "T CONSO3.CPF 0 720 560 " + dataModel.getTlxImpFac() + "\r\n" +
-//                "T CONSO3.CPF 0 720 620 " + dataModel.getTlxTap() + "\r\n" +
-//                "T CONSO3.CPF 0 720 640 " + dataModel.getTlxImpAse() + "\r\n" +
-//                "T CONSO3.CPF 0 720 680 " + impTotFac + "\r\n" +
-//                // + deposito de garantia (opcional)
-
                 "LEFT\r\n" +
 //                "T CONSO3.CPF 0 40 775 Son: " + NumberToLetterConverter.convertNumberToLetter(impTotFac) + "\r\n" +
                 "T CONSO3.CPF 0 40 1004 Son: " + NumberToLetterConverter.convertNumberToLetter(dataModel.getTlxImpTot()) + "\r\n" +
@@ -164,9 +131,9 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 270 1130 21/02/12 \r\n" +
 
                 "CENTER\r\n" +
-                "T CONSO4.CPF 0 0 1230 'ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAÍS. EL USO ILÍCITO DE ÉSTA SERÁ SANCIONADO DE ACUERDO A LA LEY'\n\r\n" +
-                "T CONSO4.CPF 0 0 1244 Ley Nº 453: El proveedor debe exhibir certificaciones de habilitación o documentos que acrediten las capacidades\n\r\n" +
-                "T CONSO4.CPF 0 0 1258 u ofertas de servicios especializados.\n\r\n" +
+                "T CONSO4.CPF 0 0 1230 " + leyenda[0] + "\n\r\n" +
+                "T CONSO4.CPF 0 0 1244 " + leyenda[1] + "\n\r\n" +
+                "T CONSO4.CPF 0 0 1258 " + leyenda[2] + "\n\r\n" +
 
                 "LEFT\r\n" +
                 //BLOQUE FINAL: historico y talon
@@ -180,44 +147,45 @@ public class PrintGenerator {
                 "T CONSO0.CPF 0 435 1308 Mes/Año  Consumo kWh\r\n" +
                 "T CONSO0.CPF 0 635 1308 Mes/Año  Consumo kWh\r\n" +
 
+                // TODO: 18-10-16 hacer el gemerador del historia
                 "T CONSO1.CPF 0 40 1328 09/1015\r\n" +
-                "T CONSO1.CPF 0 160 1328 123\r\n" +
-                "T CONSO1.CPF 0 235 1328 09/1015\r\n" +
-                "T CONSO1.CPF 0 360 1328 123\r\n" +
-                "T CONSO1.CPF 0 435 1328 09/1015\r\n" +
-                "T CONSO1.CPF 0 560 1328 123\r\n" +
-                "T CONSO1.CPF 0 635 1328 09/1015\r\n" +
-                "T CONSO1.CPF 0 755 1328 123\r\n" +
+                "T CONSO1.CPF 0 160 1328 156\r\n" +
+                "T CONSO1.CPF 0 235 1328 12/1015\r\n" +
+                "T CONSO1.CPF 0 360 1328 101\r\n" +
+                "T CONSO1.CPF 0 435 1328 03/1016\r\n" +
+                "T CONSO1.CPF 0 560 1328 158\r\n" +
+                "T CONSO1.CPF 0 635 1328 06/1016\r\n" +
+                "T CONSO1.CPF 0 755 1328 161\r\n" +
 
-                "T CONSO1.CPF 0 40 1343 09/1015\r\n" +
-                "T CONSO1.CPF 0 160 1343 123\r\n" +
-                "T CONSO1.CPF 0 235 1343 09/1015\r\n" +
-                "T CONSO1.CPF 0 360 1343 123\r\n" +
-                "T CONSO1.CPF 0 435 1343 09/1015\r\n" +
-                "T CONSO1.CPF 0 560 1343 123\r\n" +
-                "T CONSO1.CPF 0 635 1343 09/1015\r\n" +
-                "T CONSO1.CPF 0 755 1343 123\r\n" +
+                "T CONSO1.CPF 0 40 1343 10/1015\r\n" +
+                "T CONSO1.CPF 0 160 1343 174\r\n" +
+                "T CONSO1.CPF 0 235 1343 01/1016\r\n" +
+                "T CONSO1.CPF 0 360 1343 121\r\n" +
+                "T CONSO1.CPF 0 435 1343 04/1016\r\n" +
+                "T CONSO1.CPF 0 560 1343 164\r\n" +
+                "T CONSO1.CPF 0 635 1343 07/1016\r\n" +
+                "T CONSO1.CPF 0 755 1343 115\r\n" +
 
-                "T CONSO1.CPF 0 40 1358 09/1015\r\n" +
-                "T CONSO1.CPF 0 160 1358 123\r\n" +
-                "T CONSO1.CPF 0 235 1358 09/1015\r\n" +
+                "T CONSO1.CPF 0 40 1358 11/1015\r\n" +
+                "T CONSO1.CPF 0 160 1358 184\r\n" +
+                "T CONSO1.CPF 0 235 1358 02/1016\r\n" +
                 "T CONSO1.CPF 0 360 1358 123\r\n" +
-                "T CONSO1.CPF 0 435 1358 09/1015\r\n" +
-                "T CONSO1.CPF 0 560 1358 123\r\n" +
-                "T CONSO1.CPF 0 635 1358 09/1015\r\n" +
-                "T CONSO1.CPF 0 755 1358 123\r\n" +
+                "T CONSO1.CPF 0 435 1358 05/1016\r\n" +
+                "T CONSO1.CPF 0 560 1358 141\r\n" +
+                "T CONSO1.CPF 0 635 1358 08/1016\r\n" +
+                "T CONSO1.CPF 0 755 1358 133\r\n" +
 
                 "T CONSO0.CPF 0 55 1378 Fecha Vencimiento: \r\n" +
-                "T CONSO1.CPF 0 210 1378 24/10/16\r\n" +
+                "T CONSO1.CPF 0 210 1378 " + dataModel.getTlxFecVto() + "\r\n" +
                 "T CONSO0.CPF 0 300 1378 Fecha Est.Prox.Med: \r\n" +
-                "T CONSO1.CPF 0 460 1378 25/10/16\r\n" +
+                "T CONSO1.CPF 0 460 1378 " + dataModel.getTlxFecproMed() + "\r\n" +
                 "T CONSO0.CPF 0 560 1378 Fecha Est.Prox.Emi: \r\n" +
-                "T CONSO1.CPF 0 710 1378 25/10/16\r\n" +
+                "T CONSO1.CPF 0 710 1378 " + dataModel.getTlxFecproEmi() + "\r\n" +
 
-                "T CONSO1.CPF 0 135 1430 SEP-2016\r\n" +
-                "T CONSO1.CPF 0 300 1430 123123-1-1\r\n" +
-                "T CONSO1.CPF 0 510 1430 999000\r\n" +
-                "T CONSO1.CPF 0 720 1430 123.32\r\n";
+                "T CONSO1.CPF 0 135 1430 " + formatedDateSinDia(dataModel.getTlxFecLec()) + "\r\n" +
+                "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "\r\n" +
+                "T CONSO1.CPF 0 510 1430 " + dataModel.getTlxFacNro() + "\r\n" +
+                "T CONSO1.CPF 0 720 1430 " + dataModel.getTlxImpTot() + "\r\n";
 
         cpclConfigLabel += detalleFacturacion(printTitles, printValues, null, importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
         cpclConfigLabel += "" +
@@ -279,6 +247,13 @@ public class PrintGenerator {
         return day + "-" + mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
     }
 
+    private static String formatedDateSinDia(String fecha) {
+        String[] split = fecha.split("-");
+        String year = split[0];
+        String month = split[1];
+        return mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
+    }
+
     /**
      * Esta funcion se encarga de generar el bloque de detalle de facturacion
      *
@@ -292,7 +267,6 @@ public class PrintGenerator {
         int yValue = 480;
 //        String[] values = new String[]{"123.2", "123.4", "123.1", "123.3", "123.5"};
         for (int i = 0; i < titles.size(); i++) {
-            Log.e(TAG, "detalleFacturacion: " + yValue);
             res += "LEFT\r\n";
             res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
             res += "T CONSO3.CPF 0 40 " + yValue + " " + titles.get(i) + "\r\n";

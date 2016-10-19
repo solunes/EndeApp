@@ -25,6 +25,7 @@ import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.Historico;
+import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean wasDownload;
 
     private TextView labelReady;
+    private TextView labelReadyRuta;
 
     private TextView textDownload;
     private TextView textSend;
@@ -73,11 +75,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        long ini = System.currentTimeMillis();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         labelReady = (TextView) findViewById(R.id.label_info);
+        labelReadyRuta = (TextView) findViewById(R.id.label_info_ruta);
 
         textDownload = (TextView) findViewById(R.id.text_date_download);
         textSend = (TextView) findViewById(R.id.text_date_send);
@@ -110,17 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
         validDay();
         updateStates();
-        Log.e(TAG, "onCreate: fin " + (ini - System.currentTimeMillis()));
-
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null) {
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
-                    Log.e(TAG, "onBluetooth: " + device.getName() + " - " + device.getAddress());
-                }
-            }
-        }
     }
 
     @Override
@@ -407,10 +398,13 @@ public class MainActivity extends AppCompatActivity {
         params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
         params.put("tpl", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_TPL));
 
+        ArrayList<PrintObsData> printObsDataArrayList = dbAdapter.getPrintObsData();
+
         for (DataModel dataModel : allData) {
-            String json = dataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getTlxCli()));
+            String json = DataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getTlxCli()), printObsDataArrayList);
             params.put("" + (dataModel.getTlxCli()), json);
         }
+
         // TODO: 11-10-16 subir los datos de medidor entre lineas
         // obtener los medidores entre lineas y volverlos un string array json
         // params.put("med_entre_lineas", new jsonArray);
@@ -442,6 +436,8 @@ public class MainActivity extends AppCompatActivity {
             stateMissing.setText(String.valueOf(sizeData - countSave));
             statePrinted.setText(String.valueOf(countPrinted));
             statePostponed.setText(String.valueOf(countPostponed));
+            DataModel data = dbAdapter.getData(1);
+            labelReadyRuta.setText(String.valueOf(data.getTlxRutA()));
         }
         dbAdapter.close();
 
