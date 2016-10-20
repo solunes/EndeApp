@@ -246,6 +246,21 @@ public class DataModel {
         enviado
     }
 
+    public static String getTipoLectura(int idTipo){
+        if (idTipo == 0){
+            return "Lectura Normal";
+        } else if (idTipo == 3){
+            return "Lectura Promedio";
+        } else if (idTipo == 4){
+            return "Ultimo indice";
+        } else if (idTipo == 5){
+            return "No existe";
+        } else if (idTipo == 6){
+            return "Lectura ajustada";
+        }
+        return null;
+    }
+
     public static DataModel fromCursor(Cursor cursor) {
         DataModel dataModel = new DataModel();
         dataModel.set_id(cursor.getInt(Columns._id.ordinal()));

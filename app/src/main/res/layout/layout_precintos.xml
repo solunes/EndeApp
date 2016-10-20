@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 1"
-                android:inputType="text"
+                android:inputType="text|number"
                 android:lines="1" />
 
             <EditText
@@ -57,7 +57,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 2"
-                android:inputType="text"
+                android:inputType="text|number"
                 android:lines="1" />
         </LinearLayout>
 
@@ -71,18 +71,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:inputType="text"
-                android:lines="1" />
+                android:backgroundTint="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/label_pre_ant4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:inputType="text"
-                android:lines="1" />
+                android:backgroundTint="@color/colorPrimary" />
         </LinearLayout>
 
         <LinearLayout
@@ -97,7 +93,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 3"
-                android:inputType="text"
+                android:inputType="text|number"
                 android:lines="1" />
 
             <EditText
@@ -107,7 +103,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 4"
-                android:inputType="text"
+                android:inputType="text|number"
                 android:lines="1" />
         </LinearLayout>
     </LinearLayout>

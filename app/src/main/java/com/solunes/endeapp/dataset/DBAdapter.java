@@ -10,6 +10,8 @@ import android.util.Log;
 import com.solunes.endeapp.activities.MainActivity;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
+import com.solunes.endeapp.models.Historico;
+import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
@@ -305,15 +307,26 @@ public class DBAdapter {
         return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
     }
 
-    // TODO: 11-10-16 hacer el group by para obtener una lista de lecturas/observaciones y sus cantidades
     public List<StatisticsItem> getSt(int param) {
         open();
         ArrayList<StatisticsItem> items = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.OBS_TABLE, null, "", null, "", "", null);
-        while (cursor.moveToNext()) {
-            items.add(new StatisticsItem("Casa cerrada", 22));
+        if (param == 1) {
+            Cursor cursor = db.query(DBHelper.DATA_TABLE, new String[]{"TlxTipLec", "count(TlxTipLec)"}, DataModel.Columns.estado_lectura.name() + " = 1 " +
+                    "OR " + DataModel.Columns.estado_lectura.name() + " = 2", null, "TlxTipLec", null, null);
+            while (cursor.moveToNext()) {
+                items.add(new StatisticsItem(DataModel.getTipoLectura(cursor.getInt(0)), cursor.getInt(1)));
+            }
+            cursor.close();
         }
-        items.add(new StatisticsItem("Casa cerrada", 22));
+        if (param == 2) {
+            Cursor cursor = db.rawQuery("select ot.ObsDes, count(ot.id)as cantidad from data_obs_table as dot join obs_table as ot " +
+                    "where dot.ObgObs = ot.id " +
+                    "group by ot.ObsDes, ot.id", null);
+            while (cursor.moveToNext()) {
+                items.add(new StatisticsItem(cursor.getString(0), cursor.getInt(1)));
+            }
+            cursor.close();
+        }
         return items;
     }
 
@@ -327,7 +340,7 @@ public class DBAdapter {
         open();
         ArrayList<PrintObsData> printObsDatas = new ArrayList<>();
         Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, null, null, null, null, null);
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             printObsDatas.add(PrintObsData.fromCursor(cursor));
         }
         return printObsDatas;
@@ -347,5 +360,36 @@ public class DBAdapter {
         leyenda[2] = Parametro.fromCursor(query).getTexto();
 //        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
         return leyenda;
+    }
+
+    public boolean validNewMedidor(int nroMed) {
+        open();
+        Cursor cursor1 = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.TlxNroMed.name() + " = " + nroMed, null, null, null, null);
+        if (cursor1.getCount() > 0) {
+            return false;
+        }
+        Cursor cursor2 = db.query(DBHelper.MED_ENTRE_LINEAS_TABLE, null, MedEntreLineas.Columns.MelMed.name() + " = " + nroMed, null, null, null, null);
+        if (cursor2.getCount() > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public ArrayList<MedEntreLineas> getMedEntreLineas() {
+        open();
+        ArrayList<MedEntreLineas> entreLineases = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            entreLineases.add(MedEntreLineas.fromCursor(cursor));
+        }
+        cursor.close();
+        return entreLineases;
+    }
+
+    public Historico getHistorico(int cli) {
+        open();
+        Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.ConCli.name() + " = " + cli, null, null, null, null);
+        cursor.moveToNext();
+        return Historico.fromCursor(cursor);
     }
 }

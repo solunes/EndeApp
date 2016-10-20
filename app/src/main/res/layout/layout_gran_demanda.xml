@@ -13,23 +13,13 @@
 
         <EditText
             android:id="@+id/input_gd_kwinst"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Kw Instantaneo"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="KwH Instantaneo" />
 
         <EditText
             android:id="@+id/input_gd_reactiva"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Energia Reactiva"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Energia Reactiva" />
     </LinearLayout>
 
     <LinearLayout
@@ -39,23 +29,13 @@
 
         <EditText
             android:id="@+id/input_gd_kwhbajo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Kwh Bloque bajo"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Kwh Bloque bajo" />
 
         <EditText
             android:id="@+id/input_gd_kwhmedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Kwh Bloque Medio"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Kwh Bloque Medio" />
     </LinearLayout>
 
     <LinearLayout
@@ -65,49 +45,13 @@
 
         <EditText
             android:id="@+id/input_gd_kwhalto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Kwh Bloque Alto"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Kwh Bloque Alto" />
 
         <EditText
             android:id="@+id/input_gd_dembajo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Demanda maxima A"
-            android:inputType="number"
-            android:lines="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/input_gd_fechabajo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Fecha de la demanda A"
-            android:inputType="date"
-            android:lines="1" />
-
-        <EditText
-            android:id="@+id/input_gd_horabajo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Hora de la Demanda A"
-            android:inputType="time"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Demanda maxima A" />
     </LinearLayout>
 
     <LinearLayout
@@ -117,49 +61,60 @@
 
         <EditText
             android:id="@+id/input_gd_demmedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Demanda maxima B"
-            android:inputType="number"
-            android:lines="1" />
-
-        <EditText
-            android:id="@+id/input_gd_fechamedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Fecha de la demanda B"
-            android:inputType="number"
-            android:lines="1" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/input_gd_horamedio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Hora de la Demanda B"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Demanda maxima B" />
 
         <EditText
             android:id="@+id/input_gd_demalto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Demanda maxima C"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/EditTextGranDemanda"
+            android:hint="Demanda Maxima C" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:paddingTop="@dimen/activity_horizontal_margin_half"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/input_gd_fechabajo"
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha Demanda A"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_fechabajo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/input_gd_horabajo"
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="Hora Demanda A"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_horabajo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -167,24 +122,87 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/input_gd_fechaalto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Fecha de la demanda C"
-            android:inputType="number"
-            android:lines="1" />
+        <LinearLayout
+            android:id="@+id/input_gd_fechamedio"
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
 
-        <EditText
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="Fecha Demanda B"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_fechamedio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/input_gd_horamedio"
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="Hora Demanda B"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_horamedio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/input_gd_fechaalto"
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha Demanda C"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_fechaalto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/input_gd_horaalto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:hint="Hora de la Demanda C"
-            android:inputType="number"
-            android:lines="1" />
+            style="@style/LinearGranDemanda"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="Hora Demanda C"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/label_gd_horaalto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

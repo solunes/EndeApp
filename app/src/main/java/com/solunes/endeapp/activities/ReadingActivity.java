@@ -240,7 +240,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private void sendLabelToPrint(String label) {
-        DataFragment fragment = adapter.getFragment(viewPager.getCurrentItem());
+        DataFragment fragment = adapter.getFragment(viewPager.getCurrentItem() + 1);
         if (connection.isConnected()) {
             try {
                 ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);

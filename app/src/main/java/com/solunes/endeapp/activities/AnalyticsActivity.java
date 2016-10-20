@@ -69,10 +69,8 @@ public class AnalyticsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    Log.e(TAG, "getItem: 1");
                     return StatisticFragment.newInstance(1);
                 case 1:
-                    Log.e(TAG, "getItem: 2");
                     return StatisticFragment.newInstance(2);
             }
             return null;

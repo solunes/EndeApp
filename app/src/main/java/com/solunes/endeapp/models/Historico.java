@@ -1,5 +1,7 @@
 package com.solunes.endeapp.models;
 
+import android.database.Cursor;
+
 /**
  * Created by jhonlimaster on 12-09-16.
  */
@@ -35,34 +37,42 @@ public class Historico {
     private int ConKwh12;
 
     public enum Columns {
-        id,
-        ConRem,
-        ConAre,
-        ConCli,
-        ConMes01,
-        ConKwh01,
-        ConMes02,
-        ConKwh02,
-        ConMes03,
-        ConKwh03,
-        ConMes04,
-        ConKwh04,
-        ConMes05,
-        ConKwh05,
-        ConMes06,
-        ConKwh06,
-        ConMes07,
-        ConKwh07,
-        ConMes08,
-        ConKwh08,
-        ConMes09,
-        ConKwh09,
-        ConMes10,
-        ConKwh10,
-        ConMes11,
-        ConKwh11,
-        ConMes12,
-        ConKwh12
+        id, ConRem, ConAre, ConCli,
+        ConMes01, ConKwh01, ConMes02, ConKwh02, ConMes03, ConKwh03, ConMes04, ConKwh04, ConMes05, ConKwh05, ConMes06, ConKwh06,
+        ConMes07, ConKwh07, ConMes08, ConKwh08, ConMes09, ConKwh09, ConMes10, ConKwh10, ConMes11, ConKwh11, ConMes12, ConKwh12
+    }
+
+    public static Historico fromCursor(Cursor cursor) {
+        Historico historico = new Historico();
+        historico.setId(cursor.getInt(Columns.id.ordinal()));
+        historico.setConRem(cursor.getInt(Columns.ConRem.ordinal()));
+        historico.setConAre(cursor.getInt(Columns.ConAre.ordinal()));
+        historico.setConCli(cursor.getInt(Columns.ConCli.ordinal()));
+        historico.setConMes01(cursor.getString(Columns.ConMes01.ordinal()));
+        historico.setConMes02(cursor.getString(Columns.ConMes02.ordinal()));
+        historico.setConMes03(cursor.getString(Columns.ConMes03.ordinal()));
+        historico.setConMes04(cursor.getString(Columns.ConMes04.ordinal()));
+        historico.setConMes05(cursor.getString(Columns.ConMes05.ordinal()));
+        historico.setConMes06(cursor.getString(Columns.ConMes06.ordinal()));
+        historico.setConMes07(cursor.getString(Columns.ConMes07.ordinal()));
+        historico.setConMes08(cursor.getString(Columns.ConMes08.ordinal()));
+        historico.setConMes09(cursor.getString(Columns.ConMes09.ordinal()));
+        historico.setConMes10(cursor.getString(Columns.ConMes10.ordinal()));
+        historico.setConMes11(cursor.getString(Columns.ConMes11.ordinal()));
+        historico.setConMes12(cursor.getString(Columns.ConMes12.ordinal()));
+        historico.setConKwh01(cursor.getInt(Columns.ConKwh01.ordinal()));
+        historico.setConKwh02(cursor.getInt(Columns.ConKwh02.ordinal()));
+        historico.setConKwh03(cursor.getInt(Columns.ConKwh03.ordinal()));
+        historico.setConKwh04(cursor.getInt(Columns.ConKwh04.ordinal()));
+        historico.setConKwh05(cursor.getInt(Columns.ConKwh05.ordinal()));
+        historico.setConKwh06(cursor.getInt(Columns.ConKwh06.ordinal()));
+        historico.setConKwh07(cursor.getInt(Columns.ConKwh07.ordinal()));
+        historico.setConKwh08(cursor.getInt(Columns.ConKwh08.ordinal()));
+        historico.setConKwh09(cursor.getInt(Columns.ConKwh09.ordinal()));
+        historico.setConKwh10(cursor.getInt(Columns.ConKwh10.ordinal()));
+        historico.setConKwh11(cursor.getInt(Columns.ConKwh11.ordinal()));
+        historico.setConKwh12(cursor.getInt(Columns.ConKwh12.ordinal()));
+        return historico;
     }
 
     public int getId() {

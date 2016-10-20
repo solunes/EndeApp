@@ -1,5 +1,7 @@
 package com.solunes.endeapp.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,14 +17,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
+import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
@@ -36,7 +41,7 @@ import java.util.Calendar;
 /**
  * Created by jhonlimaster on 01-12-15.
  */
-public class DataFragment extends Fragment {
+public class DataFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private static final String TAG = "DataFragment";
     public static final String KEY_POSITION = "position";
     private OnFragmentListener onFragmentListener;
@@ -50,6 +55,12 @@ public class DataFragment extends Fragment {
     private TextView labelObs;
     private TextView estadoMedidor;
     private EditText inputRemenber;
+    private TextView labelFechaAlto;
+    private TextView labelFechaMedio;
+    private TextView labelFechaBajo;
+    private TextView labelHoraAlto;
+    private TextView labelHoraMedio;
+    private TextView labelHoraBajo;
 
     private View layoutPrecinto;
     private View layoutGranDemanda;
@@ -64,6 +75,8 @@ public class DataFragment extends Fragment {
     private DataModel dataModel;
 
     private int positionPrintObs;
+    private int positionFecha;
+    private int positionHora;
 
     public DataFragment() {
         printTitles = new ArrayList<>();
@@ -165,6 +178,83 @@ public class DataFragment extends Fragment {
         if (dataModel.getTlxTipDem() == 3) {
             layoutGranDemanda.setVisibility(View.VISIBLE);
         }
+
+        View.OnClickListener dateClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                DatePickerDialog dialog = new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            }
+        };
+        View.OnClickListener timeClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+            }
+        };
+
+        View fechaAlto = view.findViewById(R.id.input_gd_fechaalto);
+        View fechaMedio = view.findViewById(R.id.input_gd_fechamedio);
+        View fechaBajo = view.findViewById(R.id.input_gd_fechabajo);
+        View horaAlto = view.findViewById(R.id.input_gd_horaalto);
+        View horaMedio = view.findViewById(R.id.input_gd_horamedio);
+        View horaBajo = view.findViewById(R.id.input_gd_horabajo);
+        fechaAlto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                positionFecha = 3;
+                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        fechaMedio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                positionFecha = 2;
+                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        fechaBajo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                positionFecha = 1;
+                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        horaAlto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                positionHora = 3;
+            }
+        });
+        horaMedio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                positionHora = 2;
+            }
+        });
+        horaBajo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                positionHora = 1;
+            }
+        });
+
+        labelFechaAlto = (TextView) view.findViewById(R.id.label_gd_fechaalto);
+        labelFechaMedio = (TextView) view.findViewById(R.id.label_gd_fechamedio);
+        labelFechaBajo = (TextView) view.findViewById(R.id.label_gd_fechabajo);
+        labelHoraAlto = (TextView) view.findViewById(R.id.label_gd_horaalto);
+        labelHoraMedio = (TextView) view.findViewById(R.id.label_gd_horamedio);
+        labelHoraBajo = (TextView) view.findViewById(R.id.label_gd_horabajo);
     }
 
     private void actionButtons(final View viewRoot) {
@@ -287,28 +377,22 @@ public class DataFragment extends Fragment {
         if (demAlto.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText fechaAlto = (EditText) view.findViewById(R.id.input_gd_fechaalto);
-        if (fechaAlto.getText().toString().isEmpty()) {
+        if (labelFechaAlto.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText fechaMedio = (EditText) view.findViewById(R.id.input_gd_fechamedio);
-        if (fechaMedio.getText().toString().isEmpty()) {
+        if (labelFechaMedio.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText fechaBajo = (EditText) view.findViewById(R.id.input_gd_fechabajo);
-        if (fechaBajo.getText().toString().isEmpty()) {
+        if (labelFechaBajo.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText horaAlto = (EditText) view.findViewById(R.id.input_gd_horaalto);
-        if (horaAlto.getText().toString().isEmpty()) {
+        if (labelHoraAlto.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText horaMedio = (EditText) view.findViewById(R.id.input_gd_horamedio);
-        if (horaMedio.getText().toString().isEmpty()) {
+        if (labelHoraMedio.getText().toString().isEmpty()) {
             valid = false;
         }
-        EditText horaBajo = (EditText) view.findViewById(R.id.input_gd_horabajo);
-        if (horaBajo.getText().toString().isEmpty()) {
+        if (labelHoraBajo.getText().toString().isEmpty()) {
             valid = false;
         }
 
@@ -321,12 +405,12 @@ public class DataFragment extends Fragment {
             dataModel.setTlxDemBajo(Integer.parseInt(demBajo.getText().toString()));
             dataModel.setTlxDemMedio(Integer.parseInt(demMedio.getText().toString()));
             dataModel.setTlxDemAlto(Integer.parseInt(demAlto.getText().toString()));
-            dataModel.setTlxFechaAlto(Integer.parseInt(fechaAlto.getText().toString()));
-            dataModel.setTlxFechaMedio(Integer.parseInt(fechaMedio.getText().toString()));
-            dataModel.setTlxFechaBajo(Integer.parseInt(fechaBajo.getText().toString()));
-            dataModel.setTlxHoraAlto(Integer.parseInt(horaAlto.getText().toString()));
-            dataModel.setTlxHoraMedio(Integer.parseInt(horaMedio.getText().toString()));
-            dataModel.setTlxHoraBajo(Integer.parseInt(horaBajo.getText().toString()));
+            dataModel.setTlxFechaAlto(Integer.parseInt(labelFechaAlto.getText().toString()));
+            dataModel.setTlxFechaMedio(Integer.parseInt(labelFechaMedio.getText().toString()));
+            dataModel.setTlxFechaBajo(Integer.parseInt(labelFechaBajo.getText().toString()));
+            dataModel.setTlxHoraAlto(Integer.parseInt(labelHoraAlto.getText().toString()));
+            dataModel.setTlxHoraMedio(Integer.parseInt(labelHoraMedio.getText().toString()));
+            dataModel.setTlxHoraBajo(Integer.parseInt(labelHoraBajo.getText().toString()));
         } else {
             Snackbar.make(view, "Todos los campos de gran demanda son requeridos", Snackbar.LENGTH_SHORT).show();
         }
@@ -344,6 +428,13 @@ public class DataFragment extends Fragment {
         String input = inputReading.getText().toString();
         if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
             Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+        }
+
+        if (dataModel.getTlxTipDem() == 2) {
+            if (inputPotenciaReading.getText().toString().isEmpty()) {
+                Snackbar.make(view, "Ingresar indice de potencia", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         int lecturaKwh;
@@ -481,7 +572,15 @@ public class DataFragment extends Fragment {
     private void sendPrint() {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         String[] leyenda = dbAdapter.getLeyenda();
-        onFragmentListener.onPrinting(PrintGenerator.creator(dataModel, printTitles, printValues, importeTotalFactura, importeMesCancelar, leyenda));
+        Historico historico = dbAdapter.getHistorico(dataModel.getTlxCli());
+        onFragmentListener.onPrinting(PrintGenerator.creator(
+                dataModel,
+                printTitles,
+                printValues,
+                historico,
+                importeTotalFactura,
+                importeMesCancelar,
+                leyenda));
     }
 
     private void saveLectura(Obs obs) {
@@ -624,6 +723,36 @@ public class DataFragment extends Fragment {
 
     public void printResponse(String response) {
         Snackbar.make(rootView, response, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+        switch (positionFecha) {
+            case 1:
+                labelFechaBajo.setText(year+"/"+month+"/"+day);
+                break;
+            case 2:
+                labelFechaMedio.setText(year+"/"+month+"/"+day);
+                break;
+            case 3:
+                labelFechaAlto.setText(year+"/"+month+"/"+day);
+                break;
+        }
+    }
+
+    @Override
+    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+        switch (positionHora) {
+            case 1:
+                labelHoraBajo.setText(hour+":"+minute);
+                break;
+            case 2:
+                labelHoraMedio.setText(hour+":"+minute);
+                break;
+            case 3:
+                labelHoraAlto.setText(hour+":"+minute);
+                break;
+        }
     }
 
     public interface OnFragmentListener {

@@ -19,12 +19,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.Historico;
+import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
@@ -70,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView statePostponed;
 
     private CardView cardRate;
+
+    private int nroRemesa;
+    private int nroArea;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -405,9 +410,13 @@ public class MainActivity extends AppCompatActivity {
             params.put("" + (dataModel.getTlxCli()), json);
         }
 
-        // TODO: 11-10-16 subir los datos de medidor entre lineas
-        // obtener los medidores entre lineas y volverlos un string array json
-        // params.put("med_entre_lineas", new jsonArray);
+        ArrayList<MedEntreLineas> entreLineasList = dbAdapter.getMedEntreLineas();
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i < entreLineasList.size(); i++) {
+            MedEntreLineas entreLineas = entreLineasList.get(i);
+            jsonArray.put(entreLineas.toJson());
+        }
+         params.put("med_entre_lineas", jsonArray.toString());
         dbAdapter.close();
         return params;
     }
@@ -437,7 +446,10 @@ public class MainActivity extends AppCompatActivity {
             statePrinted.setText(String.valueOf(countPrinted));
             statePostponed.setText(String.valueOf(countPostponed));
             DataModel data = dbAdapter.getData(1);
+            nroRemesa = data.getTlxRem();
+            nroArea = data.getTlxAre();
             labelReadyRuta.setText(String.valueOf(data.getTlxRutA()));
+
         }
         dbAdapter.close();
 
@@ -502,6 +514,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void newMedidor(final View view) {
+        if (!wasDownload) {
+            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
         AlertDialog.Builder newMedidor = new AlertDialog.Builder(this);
         newMedidor.setTitle("Nuevo Medidor");
         View viewInside = LayoutInflater.from(this).inflate(R.layout.layout_new_medidor, null);
@@ -511,9 +527,28 @@ public class MainActivity extends AppCompatActivity {
         newMedidor.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.e(TAG, "onClick: " + nroMed.getText().toString());
-                Log.e(TAG, "onClick: " + lecMed.getText().toString());
-                Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
+                if (nroMed.getText().toString().isEmpty() || lecMed.getText().toString().isEmpty()) {
+                    Snackbar.make(view, "Ambos campos son necesarios", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
+                    boolean valid = dbAdapter.validNewMedidor(Integer.parseInt(nroMed.getText().toString()));
+                    if (valid) {
+                        ContentValues cv = new ContentValues();
+                        cv.put(MedEntreLineas.Columns.MelAre.name(), nroArea);
+                        cv.put(MedEntreLineas.Columns.MelRem.name(), nroRemesa);
+                        cv.put(MedEntreLineas.Columns.MelMed.name(), Integer.parseInt(nroMed.getText().toString()));
+                        cv.put(MedEntreLineas.Columns.MelLec.name(), Integer.parseInt(lecMed.getText().toString()));
+                        dbAdapter.saveObject(DBHelper.MED_ENTRE_LINEAS_TABLE, cv);
+                        dbAdapter.close();
+                        Log.e(TAG, "onClick: " + nroMed.getText().toString());
+                        Log.e(TAG, "onClick: " + lecMed.getText().toString());
+                        Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "El número de medidor ya existe", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
             }
         });
         newMedidor.setNegativeButton("Cancelar", null);
