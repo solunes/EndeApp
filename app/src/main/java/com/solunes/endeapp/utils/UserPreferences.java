@@ -21,7 +21,6 @@ public class UserPreferences {
         editor.commit();
     }
 
-
     public static void putInt(Context context, String tag, int value) {
         SharedPreferences.Editor editor = getEditor(context);
         editor.putInt(tag, value);

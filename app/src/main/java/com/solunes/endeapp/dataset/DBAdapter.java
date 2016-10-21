@@ -127,7 +127,7 @@ public class DBAdapter {
 
     public DataModel getData(int id) {
         open();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns._id.name() + " = " + id, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.id.name() + " = " + id, null, null, null, null);
         query.moveToNext();
         DataModel dataModel = DataModel.fromCursor(query);
         query.close();
@@ -219,10 +219,10 @@ public class DBAdapter {
         return query;
     }
 
-    public ArrayList<DataObs> getObsByCli(int cli) {
+    public ArrayList<DataObs> getObsByCli(int data) {
         open();
         ArrayList<DataObs> objects = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.ObgCli.name() + " = " + cli, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.general_id.name() + " = " + data, null, null, null, null);
         while (cursor.moveToNext()) {
             objects.add(DataObs.fromCursor(cursor));
         }
@@ -320,7 +320,7 @@ public class DBAdapter {
         }
         if (param == 2) {
             Cursor cursor = db.rawQuery("select ot.ObsDes, count(ot.id)as cantidad from data_obs_table as dot join obs_table as ot " +
-                    "where dot.ObgObs = ot.id " +
+                    "where dot.observacion_id = ot.id " +
                     "group by ot.ObsDes, ot.id", null);
             while (cursor.moveToNext()) {
                 items.add(new StatisticsItem(cursor.getString(0), cursor.getInt(1)));
@@ -386,10 +386,18 @@ public class DBAdapter {
         return entreLineases;
     }
 
-    public Historico getHistorico(int cli) {
+    public Historico getHistorico(int idData) {
         open();
-        Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.ConCli.name() + " = " + cli, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.general_id.name() + " = " + idData, null, null, null, null);
         cursor.moveToNext();
         return Historico.fromCursor(cursor);
+    }
+
+    public double getCargoPotencia(int categoria) {
+        open();
+        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
+                + " AND " + Tarifa.Columns.item_facturacion_id + " = 41", null, null, null, null);
+        cursor.moveToNext();
+        return cursor.getDouble(Tarifa.Columns.importe.ordinal());
     }
 }

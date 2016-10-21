@@ -1,6 +1,7 @@
 package com.solunes.endeapp.models;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,40 +12,33 @@ import org.json.JSONObject;
 
 public class PrintObsData {
     private int id;
-    private int oigRem;
-    private int oigAre;
-    private int oigCli;
+    private int idData;
     private int oigObs;
 
     public String toJson() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.id.name(), getId());
-            jsonObject.put(Columns.OigRem.name(), getOigRem());
-            jsonObject.put(Columns.OigAre.name(), getOigAre());
-            jsonObject.put(Columns.OigCli.name(), getOigCli());
-            jsonObject.put(Columns.OigObs.name(), getOigObs());
+            jsonObject.put(Columns.general_id.name(), getIdData());
+            jsonObject.put(Columns.observacion_imp_id.name(), getOigObs());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.e("TAG", "toJson: " + jsonObject.toString());
         return jsonObject.toString();
     }
 
     public enum Columns {
         id,
-        OigRem,
-        OigAre,
-        OigCli,
-        OigObs
+        general_id,
+        observacion_imp_id
     }
 
     public static PrintObsData fromCursor(Cursor cursor) {
         PrintObsData obsData = new PrintObsData();
         obsData.setId(cursor.getInt(Columns.id.ordinal()));
-        obsData.setOigRem(cursor.getInt(Columns.OigRem.ordinal()));
-        obsData.setOigAre(cursor.getInt(Columns.OigAre.ordinal()));
-        obsData.setOigCli(cursor.getInt(Columns.OigCli.ordinal()));
-        obsData.setOigObs(cursor.getInt(Columns.OigObs.ordinal()));
+        obsData.setIdData(cursor.getInt(Columns.general_id.ordinal()));
+        obsData.setOigObs(cursor.getInt(Columns.observacion_imp_id.ordinal()));
         return obsData;
     }
 
@@ -56,28 +50,12 @@ public class PrintObsData {
         this.id = id;
     }
 
-    public int getOigRem() {
-        return oigRem;
+    public int getIdData() {
+        return idData;
     }
 
-    public void setOigRem(int oigRem) {
-        this.oigRem = oigRem;
-    }
-
-    public int getOigAre() {
-        return oigAre;
-    }
-
-    public void setOigAre(int oigAre) {
-        this.oigAre = oigAre;
-    }
-
-    public int getOigCli() {
-        return oigCli;
-    }
-
-    public void setOigCli(int oigCli) {
-        this.oigCli = oigCli;
+    public void setIdData(int idData) {
+        this.idData = idData;
     }
 
     public int getOigObs() {

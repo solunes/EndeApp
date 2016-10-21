@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -38,9 +38,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 "LecCod text, " +
                 "LecPas text, " +
                 "LecNiv integer, " +
-                "lecAsi integer, " +
-                "lecAct integer, " +
-                "AreaCod integer)");
+                "LecAsi integer, " +
+                "LecAct integer, " +
+                "AreaCod integer, " +
+                "RutaCod integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TARIFA_TABLE + " (" +
                 "id integer, " +
@@ -58,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "ObsFac integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_TABLE + " (" +
-                "_id INTEGER PRIMARY KEY, " +
+                "id INTEGER, " +
                 "TlxRem integer, " +
                 "TlxAre integer, " +
                 "TlxRutO integer, " +
@@ -174,9 +175,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + HISTORICO_TABLE + " (" +
                 "id integer," +
-                "ConRem integer," +
-                "ConAre integer," +
-                "ConCli integer," +
+                "general_id integer," +
                 "ConMes01 text," +
                 "ConKwh01 integer," +
                 "ConMes02 text," +
@@ -204,10 +203,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
                 "id integer," +
-                "ObgRem integer," +
-                "ObgAre integer," +
-                "ObgCli integer," +
-                "ObgObs integer)");
+                "general_id integer," +
+                "observacion_id integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PARAMETRO_TABLE + " (" +
                 "id integer," +
@@ -225,10 +222,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_DATA_TABLE + " (" +
                 "_id integer PRIMARY KEY," +
-                "OigRem integer," +
-                "OigAre integer," +
-                "OigCli integer," +
-                "OigObs integer)");
+                "general_id integer," +
+                "observacion_imp_id integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
                 "id integer," +
@@ -244,13 +239,14 @@ public class DBHelper extends SQLiteOpenHelper {
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
-                "'Administrador', " +
+                "'admin', " +
                 "'admin', " +
                 "'1234', " +
                 "1, " +
-                "null, " +
-                "null, " +
-                "null)");
+                "1, " +
+                "1, " +
+                "1, " +
+                "12345)");
     }
 
     @Override

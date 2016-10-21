@@ -61,6 +61,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private RadioGroup radioGroup;
     private RadioButton radioCli;
 
+    private Snackbar snackbar;
+
     private int currentState = -1;
 
     @Override
@@ -105,7 +107,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             TabLayout.Tab tabAt = tabLayout.getTabAt(i);
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
-            tabText.setText(String.valueOf(datas.get(i).get_id()));
+            tabText.setText(String.valueOf(datas.get(i).getId()));
             if (datas.get(i).getTlxNvaLec() > 0) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
@@ -131,7 +133,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     @Override
     public void onTabListener() {
-        Log.e(TAG, "onTabListener: " + viewPager.getCurrentItem());
         View customView = tabLayout.getTabAt(viewPager.getCurrentItem()).getCustomView();
         TextView textTab = (TextView) customView.findViewById(R.id.textview_custom_tab);
         textTab.setTextColor(getResources().getColor(android.R.color.white));
@@ -184,12 +185,16 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                     }
                 }
             }
+        } else {
+            snackbar.setText("Bluetooth apagado");
         }
         return null;
     }
 
     public ZebraPrinter connect() {
         Log.e(TAG, "Connecting... ");
+        snackbar = Snackbar.make(viewPager, "Conectando con la impresora", Snackbar.LENGTH_LONG);
+        snackbar.show();
         connection = null;
         String macAddress = getMacAddress();
         connection = new BluetoothConnection(macAddress);
@@ -240,7 +245,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     private void sendLabelToPrint(String label) {
-        DataFragment fragment = adapter.getFragment(viewPager.getCurrentItem() + 1);
         if (connection.isConnected()) {
             try {
                 ZebraPrinterLinkOs linkOsPrinter = ZebraPrinterFactory.createLinkOsPrinter(printer);
@@ -248,16 +252,16 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 if (printerStatus.isReadyToPrint) {
                     connection.write(label.getBytes("ISO-8859-1"));
                     Log.e(TAG, "sending data");
-                    fragment.printResponse("Imprimiendo");
+                    Snackbar.make(viewPager, "Imprimiendo", Snackbar.LENGTH_LONG).show();
                 } else if (printerStatus.isHeadOpen) {
                     Log.e(TAG, "printer head open");
-                    fragment.printResponse("Cabezal abierto");
+                    Snackbar.make(viewPager, "Cabezal abierto", Snackbar.LENGTH_LONG).show();
                 } else if (printerStatus.isPaused) {
                     Log.e(TAG, "printer is paused");
-                    fragment.printResponse("Impresora pausada");
+                    Snackbar.make(viewPager, "Impresora pausada", Snackbar.LENGTH_LONG).show();
                 } else if (printerStatus.isPaperOut) {
                     Log.e(TAG, "printer media out");
-                    fragment.printResponse("Impresora sin papel");
+                    Snackbar.make(viewPager, "Impresora sin papel", Snackbar.LENGTH_LONG).show();
                 }
                 sleeper(1500);
                 if (connection instanceof BluetoothConnection) {
@@ -271,7 +275,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 Log.e(TAG, "sendLabelToPrint: ", e);
             }
         } else {
-            fragment.printResponse("Impresora desconectada");
+            Snackbar.make(viewPager, "Impresora desconectada", Snackbar.LENGTH_LONG).show();
         }
     }
 

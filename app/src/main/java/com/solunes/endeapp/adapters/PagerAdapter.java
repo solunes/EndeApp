@@ -36,13 +36,14 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return DataFragment.newInstance(dataModels.get(position).get_id());
+        return DataFragment.newInstance(dataModels.get(position).getId());
     }
 
     public DataFragment getFragment(int position) {
         ArrayList<Fragment> fragments = (ArrayList<Fragment>) fragmentManager.getFragments();
         for (int i = 0; i < fragments.size(); i++) {
             DataFragment dataFragment = (DataFragment) fragments.get(i);
+            Log.e(TAG, "getFragment: " + dataFragment + " - " + position);
             if (dataFragment != null) {
                 if (dataFragment.getArguments().getInt(DataFragment.KEY_POSITION) == position) {
                     return dataFragment;
@@ -59,14 +60,14 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return String.valueOf(dataModels.get(position).get_id());
+        return String.valueOf(dataModels.get(position).getId());
     }
 
     @Override
     public int getItemPosition(Object object) {
         DataModel dataModel = (DataModel) object;
         for (int i = 0; i < dataModels.size(); i++) {
-            if (dataModel.get_id() == dataModels.get(i).get_id()) {
+            if (dataModel.getId() == dataModels.get(i).getId()) {
                 return i;
             }
         }

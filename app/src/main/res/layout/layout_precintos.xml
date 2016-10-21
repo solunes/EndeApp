@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 1"
-                android:inputType="text|number"
+                android:inputType="text"
                 android:lines="1" />
 
             <EditText
@@ -57,7 +57,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/colorPrimary"
                 android:hint="Precinto Nuevo 2"
-                android:inputType="text|number"
+                android:inputType="text"
                 android:lines="1" />
         </LinearLayout>
 
@@ -81,30 +81,5 @@
                 android:backgroundTint="@color/colorPrimary" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/input_pre_nue3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:hint="Precinto Nuevo 3"
-                android:inputType="text|number"
-                android:lines="1" />
-
-            <EditText
-                android:id="@+id/input_pre_nue4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:hint="Precinto Nuevo 4"
-                android:inputType="text|number"
-                android:lines="1" />
-        </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.CardView>

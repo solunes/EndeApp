@@ -8,9 +8,7 @@ import android.database.Cursor;
 public class Historico {
 
     private int id;
-    private int ConRem;
-    private int ConAre;
-    private int ConCli;
+    private int idData;
     private String ConMes01;
     private int ConKwh01;
     private String ConMes02;
@@ -37,7 +35,7 @@ public class Historico {
     private int ConKwh12;
 
     public enum Columns {
-        id, ConRem, ConAre, ConCli,
+        id, general_id,
         ConMes01, ConKwh01, ConMes02, ConKwh02, ConMes03, ConKwh03, ConMes04, ConKwh04, ConMes05, ConKwh05, ConMes06, ConKwh06,
         ConMes07, ConKwh07, ConMes08, ConKwh08, ConMes09, ConKwh09, ConMes10, ConKwh10, ConMes11, ConKwh11, ConMes12, ConKwh12
     }
@@ -45,9 +43,7 @@ public class Historico {
     public static Historico fromCursor(Cursor cursor) {
         Historico historico = new Historico();
         historico.setId(cursor.getInt(Columns.id.ordinal()));
-        historico.setConRem(cursor.getInt(Columns.ConRem.ordinal()));
-        historico.setConAre(cursor.getInt(Columns.ConAre.ordinal()));
-        historico.setConCli(cursor.getInt(Columns.ConCli.ordinal()));
+        historico.setIdData(cursor.getInt(Columns.general_id.ordinal()));
         historico.setConMes01(cursor.getString(Columns.ConMes01.ordinal()));
         historico.setConMes02(cursor.getString(Columns.ConMes02.ordinal()));
         historico.setConMes03(cursor.getString(Columns.ConMes03.ordinal()));
@@ -75,36 +71,20 @@ public class Historico {
         return historico;
     }
 
+    public int getIdData() {
+        return idData;
+    }
+
+    public void setIdData(int idData) {
+        this.idData = idData;
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getConRem() {
-        return ConRem;
-    }
-
-    public void setConRem(int conRem) {
-        ConRem = conRem;
-    }
-
-    public int getConAre() {
-        return ConAre;
-    }
-
-    public void setConAre(int conAre) {
-        ConAre = conAre;
-    }
-
-    public int getConCli() {
-        return ConCli;
-    }
-
-    public void setConCli(int conCli) {
-        ConCli = conCli;
     }
 
     public String getConMes01() {

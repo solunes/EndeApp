@@ -188,14 +188,14 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = usuarios.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(User.Columns.LecId.name(), object.getInt(User.Columns.LecId.name()));
-//            values.put(User.Columns.LecNro.name(), object.getInt(User.Columns.LecNro.name()));
             values.put(User.Columns.LecNom.name(), object.getString(User.Columns.LecNom.name()));
             values.put(User.Columns.LecCod.name(), object.getString(User.Columns.LecCod.name()));
             values.put(User.Columns.LecPas.name(), object.getString(User.Columns.LecPas.name()));
             values.put(User.Columns.LecNiv.name(), object.getInt(User.Columns.LecNiv.name()));
-//            values.put(User.Columns.LecAsi.name(), object.getInt(User.Columns.LecAsi.name()));
-//            values.put(User.Columns.LecAct.name(), object.getInt(User.Columns.LecAct.name()));
-//            values.put(User.Columns.AreaCod.name(), object.getInt(User.Columns.AreaCod.name()));
+            values.put(User.Columns.LecAsi.name(), object.getInt(User.Columns.LecAsi.name()));
+            values.put(User.Columns.LecAct.name(), object.getInt(User.Columns.LecAct.name()));
+            values.put(User.Columns.AreaCod.name(), object.getInt(User.Columns.AreaCod.name()));
+            values.put(User.Columns.RutaCod.name(), object.getInt(User.Columns.RutaCod.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.USER_TABLE, values);
         }

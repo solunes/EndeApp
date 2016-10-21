@@ -40,6 +40,7 @@ public abstract class NumberToLetterConverter {
     public static String convertNumberToLetter(double doubleNumber)
             throws NumberFormatException {
 
+
         StringBuilder converted = new StringBuilder();
 
         String patternThreeDecimalPoints = "#.###";

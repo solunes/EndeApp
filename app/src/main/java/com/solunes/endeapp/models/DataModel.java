@@ -8,14 +8,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by jhonlimaster on 26-08-16.
  */
 public class DataModel {
     private static final String TAG = "DataModel";
-    private int _id;
+    private int id;
     private int TlxRem;
     private int TlxAre;
     private int TlxRutO;
@@ -56,7 +55,7 @@ public class DataModel {
     private double TlxTap;
     private int TlxPotCon;
     private int TlxPotFac;
-    private double TlxCliNit;
+    private int TlxCliNit;
     private String TlxFecCor;
     private String TlxFecVto;
     private String TlxFecproEmi;
@@ -131,7 +130,7 @@ public class DataModel {
     private String TlxRecordatorio;
 
     public enum Columns {
-        _id,
+        id,
         TlxRem,
         TlxAre,
         TlxRutO,
@@ -246,16 +245,16 @@ public class DataModel {
         enviado
     }
 
-    public static String getTipoLectura(int idTipo){
-        if (idTipo == 0){
+    public static String getTipoLectura(int idTipo) {
+        if (idTipo == 0) {
             return "Lectura Normal";
-        } else if (idTipo == 3){
+        } else if (idTipo == 3) {
             return "Lectura Promedio";
-        } else if (idTipo == 4){
+        } else if (idTipo == 4) {
             return "Ultimo indice";
-        } else if (idTipo == 5){
+        } else if (idTipo == 5) {
             return "No existe";
-        } else if (idTipo == 6){
+        } else if (idTipo == 6) {
             return "Lectura ajustada";
         }
         return null;
@@ -263,7 +262,7 @@ public class DataModel {
 
     public static DataModel fromCursor(Cursor cursor) {
         DataModel dataModel = new DataModel();
-        dataModel.set_id(cursor.getInt(Columns._id.ordinal()));
+        dataModel.setId(cursor.getInt(Columns.id.ordinal()));
         dataModel.setTlxRem(cursor.getInt(Columns.TlxRem.ordinal()));
         dataModel.setTlxAre(cursor.getInt(Columns.TlxAre.ordinal()));
         dataModel.setTlxRutO(cursor.getInt(Columns.TlxRutO.ordinal()));
@@ -301,7 +300,7 @@ public class DataModel {
         dataModel.setTlxTap(cursor.getDouble(Columns.TlxTap.ordinal()));
         dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
         dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
-        dataModel.setTlxCliNit(cursor.getDouble(Columns.TlxCliNit.ordinal()));
+        dataModel.setTlxCliNit(cursor.getInt(Columns.TlxCliNit.ordinal()));
         dataModel.setTlxFecCor(cursor.getString(Columns.TlxFecCor.ordinal()));
         dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
         dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
@@ -384,7 +383,11 @@ public class DataModel {
     public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList) {
         JSONObject jsonObject = new JSONObject();
         try {
+            if (dataModel.getTlxHorLec() == null){
+                jsonObject.put(Columns.TlxHorLec.name(), "");
+            } else {
             jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
+            }
             jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
             jsonObject.put(Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
@@ -401,10 +404,6 @@ public class DataModel {
             jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
 
-            jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
-            jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
-            jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
-            jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
             jsonObject.put(Columns.TlxKwInst.name(), dataModel.getTlxKwInst());
             jsonObject.put(Columns.TlxReactiva.name(), dataModel.getTlxReactiva());
             jsonObject.put(Columns.TlxKwhBajo.name(), dataModel.getTlxKwhBajo());
@@ -421,6 +420,10 @@ public class DataModel {
             jsonObject.put(Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
+            jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
+            jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
+            jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
+            jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
 
             jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
             JSONArray jsonArray = new JSONArray();
@@ -433,21 +436,21 @@ public class DataModel {
             JSONArray jsonArrayPrintObs = new JSONArray();
             for (int i = 0; i < printObsDataArrayList.size(); i++) {
                 PrintObsData printObsData = printObsDataArrayList.get(i);
-                jsonArrayPrintObs.put(printObsData.toJson());
+                jsonArrayPrintObs.put(i, printObsData.toJson());
             }
-            jsonObject.put("observaciones_imp", jsonArrayPrintObs.toString());
+            jsonObject.put("observaciones_imp", jsonArrayPrintObs);
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }
         return jsonObject.toString();
     }
 
-    public int get_id() {
-        return _id;
+    public int getId() {
+        return id;
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getTlxRem() {
@@ -994,11 +997,11 @@ public class DataModel {
         TlxPotFac = tlxPotFac;
     }
 
-    public double getTlxCliNit() {
+    public int getTlxCliNit() {
         return TlxCliNit;
     }
 
-    public void setTlxCliNit(double tlxCliNit) {
+    public void setTlxCliNit(int tlxCliNit) {
         TlxCliNit = tlxCliNit;
     }
 

@@ -10,37 +10,39 @@ import org.json.JSONObject;
  */
 public class DataObs {
     private int id;
-    private int obgRem;
-    private int obgAre;
-    private int obgCli;
+    private int idData;
     private int obgCod;
 
     public enum Columns {
-        id, ObgRem, ObgCli, ObgAre, ObgObs
+        id, general_id, observacion_id
     }
 
-    public int getObgRem() {
-        return obgRem;
+    public static DataObs fromCursor(Cursor cursor) {
+        DataObs dataObs = new DataObs();
+        dataObs.setId(cursor.getInt(Columns.id.ordinal()));
+        dataObs.setIdData(cursor.getInt(Columns.general_id.ordinal()));
+        dataObs.setObgCod(cursor.getInt(Columns.observacion_id.ordinal()));
+        return dataObs;
     }
 
-    public void setObgRem(int obgRem) {
-        this.obgRem = obgRem;
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(Columns.id.name(), getId());
+            jsonObject.put(Columns.general_id.name(), getIdData());
+            jsonObject.put(Columns.observacion_id.name(), getObgCod());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
-    public int getObgAre() {
-        return obgAre;
+    public int getIdData() {
+        return idData;
     }
 
-    public void setObgAre(int obgAre) {
-        this.obgAre = obgAre;
-    }
-
-    public int getObgCli() {
-        return obgCli;
-    }
-
-    public void setObgCli(int obgCli) {
-        this.obgCli = obgCli;
+    public void setIdData(int idData) {
+        this.idData = idData;
     }
 
     public int getObgCod() {
@@ -57,29 +59,5 @@ public class DataObs {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public static DataObs fromCursor(Cursor cursor) {
-        DataObs dataObs = new DataObs();
-        dataObs.setId(cursor.getInt(Columns.id.ordinal()));
-        dataObs.setObgRem(cursor.getInt(Columns.ObgRem.ordinal()));
-        dataObs.setObgAre(cursor.getInt(Columns.ObgAre.ordinal()));
-        dataObs.setObgCli(cursor.getInt(Columns.ObgCli.ordinal()));
-        dataObs.setObgCod(cursor.getInt(Columns.ObgObs.ordinal()));
-        return dataObs;
-    }
-
-    public JSONObject toJson() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(Columns.id.name(), getId());
-            jsonObject.put(Columns.ObgRem.name(), getObgRem());
-            jsonObject.put(Columns.ObgAre.name(), getObgAre());
-            jsonObject.put(Columns.ObgCli.name(), getObgCli());
-            jsonObject.put(Columns.ObgObs.name(), getObgCod());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 }

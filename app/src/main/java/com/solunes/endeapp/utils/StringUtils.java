@@ -1,5 +1,7 @@
 package com.solunes.endeapp.utils;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,5 +40,19 @@ public class StringUtils {
 
     public static String getHumanHour(Date inputDate) {
         return formateDateFromstring(HUMAN_HOUR_FORMAT, inputDate);
+    }
+
+    public static String roundTwoDigits(double importe) {
+        String res = String.valueOf(importe);
+        res = res.replace(".","#");
+        String[] strings = res.split("#");
+        if (strings.length > 1) {
+            if (strings[1].length() == 1) {
+                res = res.replace("#",".");
+                return res + "0";
+            }
+        }
+        res = res.replace("#",".");
+        return res;
     }
 }

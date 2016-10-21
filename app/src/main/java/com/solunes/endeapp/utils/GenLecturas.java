@@ -88,7 +88,17 @@ public class GenLecturas {
     }
 
     public static double totalFacturar(double totalSuministro, double tap, double aseo) {
+
         return round(totalSuministro + tap + aseo);
+    }
+
+    public static double totalFacturar(int lectura, double ley1886, double tarifaDignidad, double importeConsumo) {
+
+        GenLecturas.totalSuministro(GenLecturas.totalConsumo(importeConsumo, tarifaDignidad), ley1886);
+
+        return round(GenLecturas.totalSuministro(GenLecturas.totalConsumo(importeConsumo, tarifaDignidad), ley1886)
+                + GenLecturas.totalSuministroTap(lectura)
+                + GenLecturas.totalSuministroAseo(lectura));
     }
 
     public static double totalConsumo(double importeConsumo, double tarifaDignidad) {

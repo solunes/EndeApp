@@ -25,7 +25,7 @@ public class MedEntreLineas {
         return entreLineas;
     }
 
-    public String toJson() {
+    public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.MelRem.name(), getMelRem());
@@ -35,7 +35,7 @@ public class MedEntreLineas {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return jsonObject.toString();
+        return jsonObject;
     }
 
 

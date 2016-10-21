@@ -21,6 +21,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
     public static final String KEY_LOGIN = "login";
+    public static final String KEY_LOGIN_ID = "user_id";
 
     private EditText user;
     private EditText pass;
@@ -74,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                             UserPreferences.putBoolean(LoginActivity.this, KEY_LOGIN, true);
+                            UserPreferences.putInt(LoginActivity.this, KEY_LOGIN_ID, user.getLecId());
                         }
                         finish();
                     } else {

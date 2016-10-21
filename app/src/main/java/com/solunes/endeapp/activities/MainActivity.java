@@ -1,8 +1,6 @@
 package com.solunes.endeapp.activities;
 
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +26,7 @@ import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.PrintObsData;
+import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
@@ -41,7 +40,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     private int nroRemesa;
     private int nroArea;
 
+    private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        DBAdapter adapter = new DBAdapter(this);
+        user = adapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
         labelReady = (TextView) findViewById(R.id.label_info);
         labelReadyRuta = (TextView) findViewById(R.id.label_info_ruta);
 
@@ -130,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);
+                UserPreferences.putInt(this, LoginActivity.KEY_LOGIN_ID, 0);
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
@@ -153,11 +156,10 @@ public class MainActivity extends AppCompatActivity {
         final String gestion = calendar.get(Calendar.YEAR) + "";
         final String month = (calendar.get(Calendar.MONTH) + 1) + "";
         String remesa = calendar.get(Calendar.DAY_OF_MONTH) + "";
-        final String tpl = UserPreferences.getInt(this, AdminActivity.KEY_TPL) + "";
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
         }
-        String url = "http://ende.solunes.com/api/descarga/" + gestion + "/" + month + "/" + remesa + "/" + tpl;
+        String url = "http://ende.solunes.com/api/descarga/" + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
         final String finalRemesa = remesa;
         new GetRequest(url, new CallbackAPI() {
             @Override
@@ -180,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
-                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_TPL, tpl);
                     }
                 };
                 new Thread(runSaveData).start();
@@ -292,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
             JSONObject object = results.getJSONObject(i);
             ContentValues values = new ContentValues();
 
+            values.put(DataModel.Columns.id.name(), object.getInt(DataModel.Columns.id.name()));
             values.put(DataModel.Columns.TlxRem.name(), object.getInt(DataModel.Columns.TlxRem.name()));
             values.put(DataModel.Columns.TlxAre.name(), object.getInt(DataModel.Columns.TlxAre.name()));
             values.put(DataModel.Columns.TlxRutO.name(), object.getInt(DataModel.Columns.TlxRutO.name()));
@@ -304,16 +306,19 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDir.name(), object.getString(DataModel.Columns.TlxDir.name()));
             values.put(DataModel.Columns.TlxCtaAnt.name(), object.getString(DataModel.Columns.TlxCtaAnt.name()));
             values.put(DataModel.Columns.TlxCtg.name(), object.getString(DataModel.Columns.TlxCtg.name()));
+            values.put(DataModel.Columns.TlxCtgTap.name(), object.getInt(DataModel.Columns.TlxCtgTap.name()));
+            values.put(DataModel.Columns.TlxCtgAseo.name(), object.getInt(DataModel.Columns.TlxCtgAseo.name()));
             values.put(DataModel.Columns.TlxNroMed.name(), object.getString(DataModel.Columns.TlxNroMed.name()));
             values.put(DataModel.Columns.TlxNroDig.name(), object.getInt(DataModel.Columns.TlxNroDig.name()));
             values.put(DataModel.Columns.TlxFacMul.name(), object.getDouble(DataModel.Columns.TlxFacMul.name()));
             values.put(DataModel.Columns.TlxFecAnt.name(), object.getString(DataModel.Columns.TlxFecAnt.name()));
             values.put(DataModel.Columns.TlxFecLec.name(), object.getString(DataModel.Columns.TlxFecLec.name()));
-            values.put(DataModel.Columns.TlxHorLec.name(), object.getString(DataModel.Columns.TlxHorLec.name()));
+//            values.put(DataModel.Columns.TlxHorLec.name(), object.getString(DataModel.Columns.TlxHorLec.name()));
             values.put(DataModel.Columns.TlxUltInd.name(), object.getInt(DataModel.Columns.TlxUltInd.name()));
             values.put(DataModel.Columns.TlxConPro.name(), object.getInt(DataModel.Columns.TlxConPro.name()));
             values.put(DataModel.Columns.TlxTipLec.name(), object.getInt(DataModel.Columns.TlxTipLec.name()));
             values.put(DataModel.Columns.TlxSgl.name(), object.getString(DataModel.Columns.TlxSgl.name()));
+            values.put(DataModel.Columns.TlxTipDem.name(), object.getInt(DataModel.Columns.TlxTipDem.name()));
             values.put(DataModel.Columns.TlxOrdSeq.name(), object.getInt(DataModel.Columns.TlxOrdSeq.name()));
             values.put(DataModel.Columns.TlxLeePot.name(), object.getInt(DataModel.Columns.TlxLeePot.name()));
             values.put(DataModel.Columns.TlxCotaseo.name(), object.getInt(DataModel.Columns.TlxCotaseo.name()));
@@ -321,6 +326,10 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxPotCon.name(), object.getInt(DataModel.Columns.TlxPotCon.name()));
             values.put(DataModel.Columns.TlxPotFac.name(), object.getInt(DataModel.Columns.TlxPotFac.name()));
             values.put(DataModel.Columns.TlxCliNit.name(), object.getDouble(DataModel.Columns.TlxCliNit.name()));
+            values.put(DataModel.Columns.TlxFecCor.name(), object.getString(DataModel.Columns.TlxFecCor.name()));
+            values.put(DataModel.Columns.TlxFecVto.name(), object.getString(DataModel.Columns.TlxFecVto.name()));
+            values.put(DataModel.Columns.TlxFecproEmi.name(), object.getString(DataModel.Columns.TlxFecproEmi.name()));
+            values.put(DataModel.Columns.TlxFecproMed.name(), object.getString(DataModel.Columns.TlxFecproMed.name()));
             values.put(DataModel.Columns.TlxTope.name(), object.getInt(DataModel.Columns.TlxTope.name()));
             values.put(DataModel.Columns.TlxLeyTag.name(), object.getInt(DataModel.Columns.TlxLeyTag.name()));
             values.put(DataModel.Columns.TlxTpoTap.name(), object.getInt(DataModel.Columns.TlxTpoTap.name()));
@@ -331,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDeuEneI.name(), object.getDouble(DataModel.Columns.TlxDeuEneI.name()));
             values.put(DataModel.Columns.TlxDeuAseC.name(), object.getInt(DataModel.Columns.TlxDeuAseC.name()));
             values.put(DataModel.Columns.TlxDeuAseI.name(), object.getDouble(DataModel.Columns.TlxDeuAseI.name()));
+            values.put(DataModel.Columns.TlxFecEmi.name(), object.getString(DataModel.Columns.TlxFecEmi.name()));
             values.put(DataModel.Columns.TlxUltPag.name(), object.getString(DataModel.Columns.TlxUltPag.name()));
             values.put(DataModel.Columns.TlxEstado.name(), object.getInt(DataModel.Columns.TlxEstado.name()));
             values.put(DataModel.Columns.TlxUltObs.name(), object.getString(DataModel.Columns.TlxUltObs.name()));
@@ -343,27 +353,27 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxKwhDev.name(), object.getInt(DataModel.Columns.TlxKwhDev.name()));
             values.put(DataModel.Columns.TlxUltTipL.name(), object.getInt(DataModel.Columns.TlxUltTipL.name()));
             values.put(DataModel.Columns.TlxCliNew.name(), object.getInt(DataModel.Columns.TlxCliNew.name()));
-            values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
-            values.put(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()));
-            values.put(DataModel.Columns.estado_lectura.name(), 0);
-            values.put(DataModel.Columns.enviado.name(), 0);
-//            values.put(DataModel.Columns.TlxCtgTap.name(), object.getInt(DataModel.Columns.TlxCtgTap.name()));
-//            values.put(DataModel.Columns.TlxCtgAseo.name(), object.getInt(DataModel.Columns.TlxCtgAseo.name()));
-            values.put(DataModel.Columns.TlxTipDem.name(), object.getInt(DataModel.Columns.TlxTipDem.name()));
-//            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
+            values.put(DataModel.Columns.TlxEntEne.name(), object.getInt(DataModel.Columns.TlxEntEne.name()));
+            values.put(DataModel.Columns.TlxDecEne.name(), object.getInt(DataModel.Columns.TlxDecEne.name()));
+            values.put(DataModel.Columns.TlxEntPot.name(), object.getInt(DataModel.Columns.TlxEntPot.name()));
+            values.put(DataModel.Columns.TlxDecPot.name(), object.getInt(DataModel.Columns.TlxDecPot.name()));
             values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
             values.put(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name()));
             values.put(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name()));
             values.put(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name()));
             values.put(DataModel.Columns.TlxPreAnt4.name(), object.getString(DataModel.Columns.TlxPreAnt4.name()));
+            values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
+
+            values.put(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()));
+            values.put(DataModel.Columns.estado_lectura.name(), 0);
+            values.put(DataModel.Columns.enviado.name(), 0);
+//            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
             JSONObject historico = object.getJSONObject("historico");
             ContentValues valuesH = new ContentValues();
             valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
-            valuesH.put(Historico.Columns.ConRem.name(), historico.getInt(Historico.Columns.ConRem.name()));
-            valuesH.put(Historico.Columns.ConAre.name(), historico.getInt(Historico.Columns.ConAre.name()));
-            valuesH.put(Historico.Columns.ConCli.name(), historico.getInt(Historico.Columns.ConCli.name()));
+            valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
             valuesH.put(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()));
             valuesH.put(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()));
             valuesH.put(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()));
@@ -388,6 +398,7 @@ public class MainActivity extends AppCompatActivity {
             valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
             valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
             valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
+            dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
         }
         dbAdapter.close();
     }
@@ -401,22 +412,28 @@ public class MainActivity extends AppCompatActivity {
         params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
         params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
         params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
-        params.put("tpl", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_TPL));
+        params.put("RutaCod", String.valueOf(user.getRutaCod()));
 
         ArrayList<PrintObsData> printObsDataArrayList = dbAdapter.getPrintObsData();
 
         for (DataModel dataModel : allData) {
-            String json = DataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getTlxCli()), printObsDataArrayList);
+            String json = DataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getId()), printObsDataArrayList);
+            Log.e(TAG, "prepareDataToPost json: "+json );
             params.put("" + (dataModel.getTlxCli()), json);
         }
 
-        ArrayList<MedEntreLineas> entreLineasList = dbAdapter.getMedEntreLineas();
-        JSONArray jsonArray = new JSONArray();
-        for (int i = 0; i < entreLineasList.size(); i++) {
-            MedEntreLineas entreLineas = entreLineasList.get(i);
-            jsonArray.put(entreLineas.toJson());
+        try {
+            ArrayList<MedEntreLineas> entreLineasList = dbAdapter.getMedEntreLineas();
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < entreLineasList.size(); i++) {
+                MedEntreLineas entreLineas = entreLineasList.get(i);
+                jsonArray.put(i, entreLineas.toJson());
+            }
+            Log.e(TAG, "prepareDataToPost: mel: "+ jsonArray.toString());
+            params.put("med_entre_lineas", jsonArray.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-         params.put("med_entre_lineas", jsonArray.toString());
         dbAdapter.close();
         return params;
     }

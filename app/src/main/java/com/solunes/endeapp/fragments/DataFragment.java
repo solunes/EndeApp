@@ -62,9 +62,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private TextView labelHoraMedio;
     private TextView labelHoraBajo;
 
-    private View layoutPrecinto;
-    private View layoutGranDemanda;
-
     private ArrayList<String> printTitles;
     private ArrayList<Double> printValues;
     private ArrayList<PrintObs> listPrintObs;
@@ -162,7 +159,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getTlxTipDem() == 2) {
             inputPotenciaReading.setVisibility(View.VISIBLE);
         }
-        layoutPrecinto = view.findViewById(R.id.layout_precinto_nuevo);
+        View layoutPrecinto = view.findViewById(R.id.layout_precinto_nuevo);
         if (dataModel.getTlxPotTag() == 1) {
             layoutPrecinto.setVisibility(View.VISIBLE);
             TextView preAnt1 = (TextView) view.findViewById(R.id.label_pre_ant1);
@@ -174,25 +171,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             TextView preAnt4 = (TextView) view.findViewById(R.id.label_pre_ant4);
             preAnt4.setText(dataModel.getTlxPreAnt4());
         }
-        layoutGranDemanda = view.findViewById(R.id.layout_gran_demanda);
+        View layoutGranDemanda = view.findViewById(R.id.layout_gran_demanda);
         if (dataModel.getTlxTipDem() == 3) {
             layoutGranDemanda.setVisibility(View.VISIBLE);
         }
-
-        View.OnClickListener dateClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                DatePickerDialog dialog = new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-            }
-        };
-        View.OnClickListener timeClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
-            }
-        };
 
         View fechaAlto = view.findViewById(R.id.input_gd_fechaalto);
         View fechaMedio = view.findViewById(R.id.input_gd_fechamedio);
@@ -264,15 +246,15 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 if (dataModel.getTlxPotTag() == 1) {
                     String inputPreNue1 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue1)).getText().toString();
                     String inputPreNue2 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue2)).getText().toString();
-                    String inputPreNue3 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue3)).getText().toString();
-                    String inputPreNue4 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue4)).getText().toString();
-                    if (!inputPreNue1.isEmpty() && !inputPreNue2.isEmpty() && !inputPreNue3.isEmpty() && !inputPreNue4.isEmpty()) {
+                    if (!inputPreNue1.isEmpty()) {
+                        Log.e(TAG, "onClick: " + inputPreNue1 + " - " + inputPreNue2);
                         dataModel.setTlxPreNue1(inputPreNue1);
                         dataModel.setTlxPreNue2(inputPreNue2);
-                        dataModel.setTlxPreNue3(inputPreNue3);
-                        dataModel.setTlxPreNue4(inputPreNue4);
+                        Log.e(TAG, "onClick: " + dataModel.getTlxPreNue1() + " - " + dataModel.getTlxPreNue2());
+
                     } else {
-                        Snackbar.make(view, "Todos los campos de precintos son requeridos", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "Ingrese un precinto", Snackbar.LENGTH_SHORT).show();
+                        return;
                     }
                 }
 
@@ -345,76 +327,28 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private void methodGranDemanda(View view) {
         EditText kwInst = (EditText) view.findViewById(R.id.input_gd_kwinst);
-        boolean valid = true;
-        if (kwInst.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText reactiva = (EditText) view.findViewById(R.id.input_gd_reactiva);
-        if (reactiva.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText kwalto = (EditText) view.findViewById(R.id.input_gd_kwhalto);
-        if (kwalto.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText kwmedio = (EditText) view.findViewById(R.id.input_gd_kwhmedio);
-        if (kwmedio.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText kwBajo = (EditText) view.findViewById(R.id.input_gd_kwhbajo);
-        if (kwBajo.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText demBajo = (EditText) view.findViewById(R.id.input_gd_dembajo);
-        if (demBajo.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText demMedio = (EditText) view.findViewById(R.id.input_gd_demmedio);
-        if (demMedio.getText().toString().isEmpty()) {
-            valid = false;
-        }
         EditText demAlto = (EditText) view.findViewById(R.id.input_gd_demalto);
-        if (demAlto.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelFechaAlto.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelFechaMedio.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelFechaBajo.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelHoraAlto.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelHoraMedio.getText().toString().isEmpty()) {
-            valid = false;
-        }
-        if (labelHoraBajo.getText().toString().isEmpty()) {
-            valid = false;
-        }
 
-        if (valid) {
-            dataModel.setTlxKwInst(Integer.parseInt(kwInst.getText().toString()));
-            dataModel.setTlxReactiva(Integer.parseInt(reactiva.getText().toString()));
-            dataModel.setTlxKwhAlto(Integer.parseInt(kwalto.getText().toString()));
-            dataModel.setTlxKwhMedio(Integer.parseInt(kwmedio.getText().toString()));
-            dataModel.setTlxKwhBajo(Integer.parseInt(kwBajo.getText().toString()));
-            dataModel.setTlxDemBajo(Integer.parseInt(demBajo.getText().toString()));
-            dataModel.setTlxDemMedio(Integer.parseInt(demMedio.getText().toString()));
-            dataModel.setTlxDemAlto(Integer.parseInt(demAlto.getText().toString()));
-            dataModel.setTlxFechaAlto(Integer.parseInt(labelFechaAlto.getText().toString()));
-            dataModel.setTlxFechaMedio(Integer.parseInt(labelFechaMedio.getText().toString()));
-            dataModel.setTlxFechaBajo(Integer.parseInt(labelFechaBajo.getText().toString()));
-            dataModel.setTlxHoraAlto(Integer.parseInt(labelHoraAlto.getText().toString()));
-            dataModel.setTlxHoraMedio(Integer.parseInt(labelHoraMedio.getText().toString()));
-            dataModel.setTlxHoraBajo(Integer.parseInt(labelHoraBajo.getText().toString()));
-        } else {
-            Snackbar.make(view, "Todos los campos de gran demanda son requeridos", Snackbar.LENGTH_SHORT).show();
-        }
-
+        dataModel.setTlxKwInst(Integer.parseInt(kwInst.getText().toString()));
+        dataModel.setTlxReactiva(Integer.parseInt(reactiva.getText().toString()));
+        dataModel.setTlxKwhAlto(Integer.parseInt(kwalto.getText().toString()));
+        dataModel.setTlxKwhMedio(Integer.parseInt(kwmedio.getText().toString()));
+        dataModel.setTlxKwhBajo(Integer.parseInt(kwBajo.getText().toString()));
+        dataModel.setTlxDemBajo(Integer.parseInt(demBajo.getText().toString()));
+        dataModel.setTlxDemMedio(Integer.parseInt(demMedio.getText().toString()));
+        dataModel.setTlxDemAlto(Integer.parseInt(demAlto.getText().toString()));
+        dataModel.setTlxFechaAlto(Integer.parseInt(labelFechaAlto.getText().toString()));
+        dataModel.setTlxFechaMedio(Integer.parseInt(labelFechaMedio.getText().toString()));
+        dataModel.setTlxFechaBajo(Integer.parseInt(labelFechaBajo.getText().toString()));
+        dataModel.setTlxHoraAlto(Integer.parseInt(labelHoraAlto.getText().toString()));
+        dataModel.setTlxHoraMedio(Integer.parseInt(labelHoraMedio.getText().toString()));
+        dataModel.setTlxHoraBajo(Integer.parseInt(labelHoraBajo.getText().toString()));
     }
 
     private void methodPequeñaMedianaDemanda(final View view) {
@@ -534,11 +468,43 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             public void onClick(DialogInterface dialogInterface, int i) {
                 PrintObs printObs = listPrintObs.get(positionPrintObs);
                 ContentValues contentValues = new ContentValues();
-                contentValues.put(PrintObsData.Columns.OigRem.name(), dataModel.getTlxRem());
-                contentValues.put(PrintObsData.Columns.OigAre.name(), dataModel.getTlxAre());
-                contentValues.put(PrintObsData.Columns.OigCli.name(), dataModel.getTlxCli());
-                contentValues.put(PrintObsData.Columns.OigObs.name(), printObs.getId());
+                contentValues.put(PrintObsData.Columns.general_id.name(), dataModel.getId());
+                contentValues.put(PrintObsData.Columns.observacion_imp_id.name(), printObs.getId());
                 dbAdapter.saveObject(DBHelper.PRINT_OBS_DATA_TABLE, contentValues);
+
+                printTitles.add("Importe por cargo fijo");
+                printValues.add(dataModel.getTlxCarFij());
+                printTitles.add("Importe por energía");
+                printValues.add(dataModel.getTlxImpEn());
+                double importePotencia = 0;
+                if (dataModel.getTlxTipDem() == 2) {
+                    printTitles.add("Importe por potencia");
+                    printValues.add(dataModel.getTlxImpPot());
+                }
+                double importeConsumo = GenLecturas.round(dataModel.getTlxCarFij() + dataModel.getTlxImpEn() + importePotencia);
+                printTitles.add("Importe por consumo");
+                printValues.add(importeConsumo);
+                if (dataModel.getTlxDignidad() == 1) {
+                    printTitles.add("Beneficiado por tarifa dignidad con");
+                    printValues.add(dataModel.getTlxDesTdi());
+                }
+                if (dataModel.getTlxLey1886() == 1) {
+                    printTitles.add("Menos descuento Ley 1886");
+                    printValues.add(dataModel.getTlxLey1886());
+                }
+                double totalConsumo = GenLecturas.totalConsumo(importeConsumo, dataModel.getTlxDesTdi());
+                printTitles.add("Importe total por consumo");
+                printValues.add(totalConsumo);
+                printTitles.add("Importe total por el suministro");
+                printValues.add(dataModel.getTlxImpFac());
+
+                importeTotalFactura = GenLecturas.totalFacturar(dataModel.getTlxConsFacturado(),
+                        dataModel.getTlxLey1886(),
+                        dataModel.getTlxDesTdi(),
+                        importeConsumo);
+                // TODO: 20-10-16 algo falta aqui
+                importeMesCancelar = importeTotalFactura + 0;
+
                 sendPrint();
             }
         });
@@ -572,7 +538,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private void sendPrint() {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         String[] leyenda = dbAdapter.getLeyenda();
-        Historico historico = dbAdapter.getHistorico(dataModel.getTlxCli());
+        Historico historico = dbAdapter.getHistorico(dataModel.getId());
         onFragmentListener.onPrinting(PrintGenerator.creator(
                 dataModel,
                 printTitles,
@@ -581,6 +547,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 importeTotalFactura,
                 importeMesCancelar,
                 leyenda));
+        printValues = new ArrayList<>();
+        printTitles = new ArrayList<>();
+        importeMesCancelar = 0;
+        importeTotalFactura = 0;
     }
 
     private void saveLectura(Obs obs) {
@@ -590,44 +560,67 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         Calendar calendar = Calendar.getInstance();
 
         cv.put(DataModel.Columns.TlxHorLec.name(), StringUtils.getHumanHour(calendar.getTime()));
-//        cv.put(DataModel.Columns.TlxFecEmi.name(), StringUtils.formateDateFromstring(StringUtils.DATE_FORMAT, calendar.getTime()));
         cv.put(DataModel.Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
         cv.put(DataModel.Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
         cv.put(DataModel.Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
         cv.put(DataModel.Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
         cv.put(DataModel.Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
+        cv.put(DataModel.Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
+
+        cv.put(DataModel.Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
+        cv.put(DataModel.Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
+        cv.put(DataModel.Columns.TlxPotLei.name(), dataModel.getTlxPotLei());
+        cv.put(DataModel.Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
+        cv.put(DataModel.Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
+        cv.put(DataModel.Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
+        cv.put(DataModel.Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
+        cv.put(DataModel.Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
+
+        cv.put(DataModel.Columns.TlxKwInst.name(), dataModel.getTlxKwInst());
+        cv.put(DataModel.Columns.TlxReactiva.name(), dataModel.getTlxReactiva());
+        cv.put(DataModel.Columns.TlxKwhAlto.name(), dataModel.getTlxKwhAlto());
+        cv.put(DataModel.Columns.TlxKwhMedio.name(), dataModel.getTlxKwhMedio());
+        cv.put(DataModel.Columns.TlxKwhBajo.name(), dataModel.getTlxKwhBajo());
+        cv.put(DataModel.Columns.TlxDemAlto.name(), dataModel.getTlxDemAlto());
+        cv.put(DataModel.Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto());
+        cv.put(DataModel.Columns.TlxFechaAlto.name(), dataModel.getTlxFechaAlto());
+        cv.put(DataModel.Columns.TlxDemMedio.name(), dataModel.getTlxDemMedio());
+        cv.put(DataModel.Columns.TlxHoraMedio.name(), dataModel.getTlxHoraMedio());
+        cv.put(DataModel.Columns.TlxFechaMedio.name(), dataModel.getTlxFechaMedio());
+        cv.put(DataModel.Columns.TlxDemBajo.name(), dataModel.getTlxDemBajo());
+        cv.put(DataModel.Columns.TlxHoraBajo.name(), dataModel.getTlxHoraBajo());
+        cv.put(DataModel.Columns.TlxFechaBajo.name(), dataModel.getTlxFechaBajo());
+
         cv.put(DataModel.Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
         cv.put(DataModel.Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
         cv.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
         cv.put(DataModel.Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
         cv.put(DataModel.Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+        cv.put(DataModel.Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
         cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
+
+
+
 
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
 
         cv = new ContentValues();
-        cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
-        cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
-        cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
-        cv.put(DataObs.Columns.ObgObs.name(), obs.getId());
+        cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
+        cv.put(DataObs.Columns.observacion_id.name(), obs.getId());
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
         Log.e(TAG, "saveLectura: save obs " + obs.getId());
 
         int conPro = dataModel.getTlxConPro();
         if (dataModel.getTlxNvaLec() > (conPro + conPro * 0.2)) {
             cv = new ContentValues();
-            cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
-            cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
-            cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
-            cv.put(DataObs.Columns.ObgObs.name(), 80);
+            cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
+            cv.put(DataObs.Columns.observacion_id.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
             Log.e(TAG, "saveLectura: consumo elevado");
         } else if (dataModel.getTlxNvaLec() < (conPro * 0.8)) {
             cv = new ContentValues();
-            cv.put(DataObs.Columns.ObgRem.name(), dataModel.getTlxRem());
-            cv.put(DataObs.Columns.ObgAre.name(), dataModel.getTlxAre());
-            cv.put(DataObs.Columns.ObgCli.name(), dataModel.getTlxCli());
-            cv.put(DataObs.Columns.ObgObs.name(), 81);
+            cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
+            cv.put(DataObs.Columns.observacion_id.name(), 81);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
             Log.e(TAG, "saveLectura: consumo bajo");
         }
@@ -637,24 +630,26 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
     private void calculo(int lectura) {
-//        labelEnergiaFacturada.setText("Energia facturada: " + lectura);
-        // multiplicador de energia
         lectura = (int) (lectura * dataModel.getTlxFacMul());
 
         DBAdapter dbAdapter = new DBAdapter(getContext());
         dataModel.setTlxCarFij(dbAdapter.getCargoFijo(dataModel.getTlxCtg()));
         printTitles.add("Importe por cargo fijo");
         printValues.add(dataModel.getTlxCarFij());
-        dbAdapter.close();
 
         double importeEnergia = GenLecturas.importeEnergia(getContext(), lectura, dataModel.getTlxCtg());
         dataModel.setTlxImpEn(importeEnergia);
         printTitles.add("Importe por energía");
         printValues.add(dataModel.getTlxImpEn());
-//        labelImporteConsumo.setText("importe por consumo: " + importeEnergia);
+
         double importePotencia = 0;
         if (dataModel.getTlxTipDem() == 2) {
-            importePotencia = Double.valueOf(inputPotenciaReading.getText().toString());
+            int potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+            int potMax = Math.max(potenciaLeida, dataModel.getTlxPotFac());
+            dataModel.setTlxPotLei(potMax);
+
+            importePotencia = potMax * dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
+
             dataModel.setTlxImpPot(importePotencia);
             printTitles.add("Importe por potencia");
             printValues.add(dataModel.getTlxImpPot());
@@ -697,9 +692,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel.setTlxImpAse(totalSuministroAseo);
 
         importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo);
-//        dataModel.setTlxImpTot(GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo));
+        // TODO: 20-10-16 algo falta aqui
         importeMesCancelar = importeTotalFactura + 0;
         dataModel.setTlxImpTot(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI());
+
+        dbAdapter.close();
     }
 
     private void validSaved() {
@@ -729,13 +726,13 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
         switch (positionFecha) {
             case 1:
-                labelFechaBajo.setText(year+"/"+month+"/"+day);
+                labelFechaBajo.setText(year + "/" + month + "/" + day);
                 break;
             case 2:
-                labelFechaMedio.setText(year+"/"+month+"/"+day);
+                labelFechaMedio.setText(year + "/" + month + "/" + day);
                 break;
             case 3:
-                labelFechaAlto.setText(year+"/"+month+"/"+day);
+                labelFechaAlto.setText(year + "/" + month + "/" + day);
                 break;
         }
     }
@@ -744,13 +741,13 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
         switch (positionHora) {
             case 1:
-                labelHoraBajo.setText(hour+":"+minute);
+                labelHoraBajo.setText(hour + ":" + minute);
                 break;
             case 2:
-                labelHoraMedio.setText(hour+":"+minute);
+                labelHoraMedio.setText(hour + ":" + minute);
                 break;
             case 3:
-                labelHoraAlto.setText(hour+":"+minute);
+                labelHoraAlto.setText(hour + ":" + minute);
                 break;
         }
     }

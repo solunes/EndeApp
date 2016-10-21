@@ -14,9 +14,32 @@ public class User {
     private int lecAsi;
     private int lecAct;
     private int areaCod;
+    private int rutaCod;
 
     public enum Columns {
-        LecId, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod
+        LecId, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod, RutaCod
+    }
+
+    public static User fromCursor(Cursor cursor){
+        User user = new User();
+        user.setLecId(cursor.getInt(Columns.LecId.ordinal()));
+        user.setLecNom(cursor.getString(Columns.LecNom.ordinal()));
+        user.setLecCod(cursor.getString(Columns.LecCod.ordinal()));
+        user.setLecPas(cursor.getString(Columns.LecPas.ordinal()));
+        user.setLecNiv(cursor.getInt(Columns.LecNiv.ordinal()));
+        user.setLecAsi(cursor.getInt(Columns.LecAsi.ordinal()));
+        user.setLecAct(cursor.getInt(Columns.LecAct.ordinal()));
+        user.setAreaCod(cursor.getInt(Columns.AreaCod.ordinal()));
+        user.setRutaCod(cursor.getInt(Columns.RutaCod.ordinal()));
+        return user;
+    }
+
+    public int getRutaCod() {
+        return rutaCod;
+    }
+
+    public void setRutaCod(int rutaCod) {
+        this.rutaCod = rutaCod;
     }
 
     public int getLecId() {
@@ -81,18 +104,5 @@ public class User {
 
     public void setAreaCod(int areaCod) {
         this.areaCod = areaCod;
-    }
-
-    public static User fromCursor(Cursor cursor){
-        User user = new User();
-        user.setLecId(cursor.getInt(Columns.LecId.ordinal()));
-        user.setLecNom(cursor.getString(Columns.LecNom.ordinal()));
-        user.setLecCod(cursor.getString(Columns.LecCod.ordinal()));
-        user.setLecPas(cursor.getString(Columns.LecPas.ordinal()));
-        user.setLecNiv(cursor.getInt(Columns.LecNiv.ordinal()));
-        user.setLecAsi(cursor.getInt(Columns.LecAsi.ordinal()));
-        user.setLecAct(cursor.getInt(Columns.LecAct.ordinal()));
-        user.setAreaCod(cursor.getInt(Columns.AreaCod.ordinal()));
-        return user;
     }
 }
