@@ -14,7 +14,6 @@ import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
-import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
@@ -72,6 +71,15 @@ public class DBAdapter {
         db.delete(DBHelper.ITEM_FACTURACION_TABLE, null, null);
         db.delete(DBHelper.PARAMETRO_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
+    }
+
+    public void clearTablesNoUser() {
+        open();
+        db.delete(DBHelper.DATA_TABLE, null, null);
+        db.delete(DBHelper.DATA_OBS_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
     }
 
     public void saveObject(String table, ContentValues values) {
@@ -125,10 +133,19 @@ public class DBAdapter {
         return delete;
     }
 
-    public DataModel getData(int id) {
+    public DataModel getData(int idData) {
         open();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.id.name() + " = " + id, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.id.name() + " = " + idData, null, null, null, null);
         query.moveToNext();
+        DataModel dataModel = DataModel.fromCursor(query);
+        query.close();
+        return dataModel;
+    }
+
+    public DataModel getFirstData() {
+        open();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, null);
+        query.moveToFirst();
         DataModel dataModel = DataModel.fromCursor(query);
         query.close();
         return dataModel;
@@ -336,10 +353,10 @@ public class DBAdapter {
         return cursor;
     }
 
-    public ArrayList<PrintObsData> getPrintObsData() {
+    public ArrayList<PrintObsData> getPrintObsData(int idData) {
         open();
         ArrayList<PrintObsData> printObsDatas = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, null, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, PrintObsData.Columns.general_id + " = " + idData, null, null, null, null);
         while (cursor.moveToNext()) {
             printObsDatas.add(PrintObsData.fromCursor(cursor));
         }

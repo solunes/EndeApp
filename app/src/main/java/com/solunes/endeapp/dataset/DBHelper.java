@@ -125,7 +125,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxActivi text, " +
                 "TlxCiudad text, " +
                 "TlxFacNro integer, " +
-                "TlxNroAut numeric, " +
+                "TlxNroAut integer, " +
                 "TlxCodCon text, " +
                 "TlxFecLim numeric, " +
                 "TlxKwhDev integer, " +

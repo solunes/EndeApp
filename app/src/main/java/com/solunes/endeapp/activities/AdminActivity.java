@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +29,7 @@ import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
+import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 
 import org.json.JSONArray;
@@ -39,14 +41,15 @@ import java.util.Calendar;
 public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
-    public static final String KEY_TPL = "key_tpl";
+    public static final String KEY_DOMAIN = "key_domain";
     public static final String KEY_PRINT_MANE = "key_print_name";
 
-    private EditText editTpl;
-    private TextView nroTpl;
+    private EditText editDomain;
+    private TextView nroDomain;
 
     private EditText editPrintName;
     private TextView printName;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +62,15 @@ public class AdminActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
-        editTpl = (EditText) findViewById(R.id.edit_tpl);
+        editDomain = (EditText) findViewById(R.id.edit_domain);
         TextView textUsername = (TextView) findViewById(R.id.text_username);
-        Button btnSaveTpl = (Button) findViewById(R.id.btn_save_tpl);
+        Button btnSaveTpl = (Button) findViewById(R.id.btn_save_domain);
         Button btnFixParams = (Button) findViewById(R.id.btn_fix_params);
-        nroTpl = (TextView) findViewById(R.id.label_nro_tpl);
-        int nro = UserPreferences.getInt(getApplicationContext(), KEY_TPL);
-        if (nro > 0) {
-            nroTpl.setText("Nro. TPL: " + nro);
-            editTpl.setText(nro + "");
+        nroDomain = (TextView) findViewById(R.id.label_nro_domain);
+        url = UserPreferences.getString(getApplicationContext(), KEY_DOMAIN);
+        if (url != null) {
+            nroDomain.setText("Url: " + url);
+            editDomain.setText(url);
         }
 
         int id_user = getIntent().getExtras().getInt("id_user");
@@ -78,9 +81,10 @@ public class AdminActivity extends AppCompatActivity {
         btnSaveTpl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!editTpl.getText().toString().isEmpty()) {
-                    UserPreferences.putInt(getApplicationContext(), KEY_TPL, Integer.parseInt(editTpl.getText().toString()));
-                    nroTpl.setText("Nro. TPL: " + editTpl.getText().toString());
+                if (!editDomain.getText().toString().isEmpty()) {
+                    url = editDomain.getText().toString();
+                    UserPreferences.putString(getApplicationContext(), KEY_DOMAIN, url);
+                    nroDomain.setText("Url: " + url);
                 }
             }
         });
@@ -93,7 +97,11 @@ public class AdminActivity extends AppCompatActivity {
                 builder.setPositiveButton("Aceptar", null);
                 progressDialog.setMessage("Descargando....");
                 progressDialog.setCancelable(false);
-                new GetRequest("http://ende.solunes.com/api/parametros-fijos", new CallbackAPI() {
+                if (url == null){
+                    Snackbar.make(view, "No hay url del servidor", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                new GetRequest(Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
                     @Override
                     public void onSuccess(String result, int statusCode) {
                         try {

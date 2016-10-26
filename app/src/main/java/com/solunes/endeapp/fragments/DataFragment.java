@@ -43,7 +43,7 @@ import java.util.Calendar;
  */
 public class DataFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private static final String TAG = "DataFragment";
-    public static final String KEY_POSITION = "position";
+    public static final String KEY_ID_DATA = "id_data";
     private OnFragmentListener onFragmentListener;
 
     private View rootView;
@@ -87,9 +87,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         onFragmentListener = (OnFragmentListener) context;
     }
 
-    public static DataFragment newInstance(int position) {
+    public static DataFragment newInstance(int idData) {
         Bundle bundle = new Bundle();
-        bundle.putInt(KEY_POSITION, position);
+        bundle.putInt(KEY_ID_DATA, idData);
         DataFragment dataFragment = new DataFragment();
         dataFragment.setArguments(bundle);
         return dataFragment;
@@ -104,8 +104,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         while (cursor.moveToNext()) {
             listPrintObs.add(PrintObs.fromCursor(cursor));
         }
-        dataModel = dbAdapter.getData(arguments.getInt(KEY_POSITION));
-        Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd());
+        dataModel = dbAdapter.getData(arguments.getInt(KEY_ID_DATA));
+        Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd() + " - "+ dataModel.getTlxNom());
         dbAdapter.close();
         setupUI(view, dataModel);
         rootView = view.findViewById(R.id.data_layout);
@@ -387,7 +387,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                 return;
             }
-            nuevaLectura = correcionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
+            nuevaLectura = correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
             if (nuevaLectura < dataModel.getTlxUltInd()) {
                 giro = true;
             }
@@ -528,6 +528,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
     private void printFactura(View view, Obs obs) {
+        if (dataModel.getTlxTipLec() == 4){
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
         if (obs.getObsFac() == 1) {
             sendPrint();
         } else {
@@ -599,9 +603,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataModel.Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
         cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
 
-
-
-
         dbAdapter.updateData(dataModel.getTlxCli(), cv);
 
         cv = new ContentValues();
@@ -645,8 +646,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         double importePotencia = 0;
         if (dataModel.getTlxTipDem() == 2) {
             int potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+            potenciaLeida = correccionDeDigitos(potenciaLeida, dataModel.getTlxDecPot());
+            dataModel.setTlxPotLei(potenciaLeida);
             int potMax = Math.max(potenciaLeida, dataModel.getTlxPotFac());
-            dataModel.setTlxPotLei(potMax);
 
             importePotencia = potMax * dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
 
@@ -762,7 +764,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         Pendiente, Impreso, Postergado
     }
 
-    private int correcionDeDigitos(int nuevaLectura, int decEne) {
+    private int correccionDeDigitos(int nuevaLectura, int decEne) {
         if (decEne == 0) {
             return nuevaLectura;
         }

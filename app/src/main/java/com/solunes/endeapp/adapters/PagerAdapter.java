@@ -39,28 +39,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         return DataFragment.newInstance(dataModels.get(position).getId());
     }
 
-    public DataFragment getFragment(int position) {
-        ArrayList<Fragment> fragments = (ArrayList<Fragment>) fragmentManager.getFragments();
-        for (int i = 0; i < fragments.size(); i++) {
-            DataFragment dataFragment = (DataFragment) fragments.get(i);
-            Log.e(TAG, "getFragment: " + dataFragment + " - " + position);
-            if (dataFragment != null) {
-                if (dataFragment.getArguments().getInt(DataFragment.KEY_POSITION) == position) {
-                    return dataFragment;
-                }
-            }
-        }
-        return null;
-    }
-
     @Override
     public int getCount() {
         return size;
-    }
-
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return String.valueOf(dataModels.get(position).getId());
     }
 
     @Override

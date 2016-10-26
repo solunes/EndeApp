@@ -121,12 +121,12 @@ public class PrintGenerator {
                 "T CONSO3.CPF 0 45 968 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n" +
                 "T CONSO3.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) + "\r\n" +
 
+                "LEFT\r\n" +
                 deudasEnergia +
                 deudasAseo +
 
 
                 // BLOQUE 4: QR, control code
-                "LEFT\r\n" +
                 "B QR 485 1070 M 2 U 4\r\n" +
                 "MA,280048029|2228155|392401600024900|11/10/2016|3.00|3.00|E5-F8-BE-B3|0|0.00|0.00|0.00|0.00\r\n" +
                 "ENDQR\r\n" +
@@ -157,11 +157,11 @@ public class PrintGenerator {
                 createHistorico(historico) +
 
                 "T CONSO0.CPF 0 55 1378 Fecha Vencimiento: \r\n" +
-                "T CONSO1.CPF 0 210 1378 " + dataModel.getTlxFecVto() + "\r\n" +
+                "T CONSO0.CPF 0 210 1378 " + dataModel.getTlxFecVto() + "\r\n" +
                 "T CONSO0.CPF 0 300 1378 Fecha Est.Prox.Med: \r\n" +
-                "T CONSO1.CPF 0 460 1378 " + dataModel.getTlxFecproMed() + "\r\n" +
+                "T CONSO0.CPF 0 460 1378 " + dataModel.getTlxFecproMed() + "\r\n" +
                 "T CONSO0.CPF 0 560 1378 Fecha Est.Prox.Emi: \r\n" +
-                "T CONSO1.CPF 0 710 1378 " + dataModel.getTlxFecproEmi() + "\r\n" +
+                "T CONSO0.CPF 0 710 1378 " + dataModel.getTlxFecproEmi() + "\r\n" +
 
                 "T CONSO1.CPF 0 135 1430 " + formatedDateSinDia(dataModel.getTlxFecLec()) + "\r\n" +
                 "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "\r\n" +

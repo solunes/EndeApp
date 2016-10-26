@@ -31,6 +31,7 @@ import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.utils.StringUtils;
+import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 
 import org.json.JSONArray;
@@ -133,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_logout:
                 UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);
                 UserPreferences.putInt(this, LoginActivity.KEY_LOGIN_ID, 0);
+                DBAdapter dbAdapter = new DBAdapter(this);
+                UserPreferences.putLong(this, KEY_DOWNLOAD, 0);
+                UserPreferences.putBoolean(this, KEY_WAS_UPLOAD, false);
+                dbAdapter.clearTablesNoUser();
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
@@ -155,11 +160,12 @@ public class MainActivity extends AppCompatActivity {
         final Calendar calendar = Calendar.getInstance();
         final String gestion = calendar.get(Calendar.YEAR) + "";
         final String month = (calendar.get(Calendar.MONTH) + 1) + "";
-        String remesa = calendar.get(Calendar.DAY_OF_MONTH) + "";
+        // TODO: 24-10-16 un dia menos. solo para pruebas
+        String remesa = (calendar.get(Calendar.DAY_OF_MONTH) - 1) + "";
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
         }
-        String url = "http://ende.solunes.com/api/descarga/" + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
+        String url = Urls.urlDescarga(getApplicationContext()) + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
         final String finalRemesa = remesa;
         new GetRequest(url, new CallbackAPI() {
             @Override
@@ -224,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Hashtable<String, String> params = prepareDataToPost();
-                new PostRequest(params, null, "http://ende.solunes.com/api/subida", new CallbackAPI() {
+                new PostRequest(params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
                     @Override
                     public void onSuccess(String result, int statusCode) {
                         Log.e(TAG, "onSuccess: " + result);
@@ -256,8 +262,7 @@ public class MainActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        String url = "http://ende.solunes.com/api/parametros-fijos";
-        new GetRequest(url, new CallbackAPI() {
+        new GetRequest(Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
                 try {
@@ -367,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()));
             values.put(DataModel.Columns.estado_lectura.name(), 0);
             values.put(DataModel.Columns.enviado.name(), 0);
-//            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
+            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
             JSONObject historico = object.getJSONObject("historico");
@@ -414,11 +419,11 @@ public class MainActivity extends AppCompatActivity {
         params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
         params.put("RutaCod", String.valueOf(user.getRutaCod()));
 
-        ArrayList<PrintObsData> printObsDataArrayList = dbAdapter.getPrintObsData();
-
         for (DataModel dataModel : allData) {
-            String json = DataModel.getJsonToSend(dataModel, dbAdapter.getObsByCli(dataModel.getId()), printObsDataArrayList);
-            Log.e(TAG, "prepareDataToPost json: "+json );
+            String json = DataModel.getJsonToSend(dataModel,
+                    dbAdapter.getObsByCli(dataModel.getId()),
+                    dbAdapter.getPrintObsData(dataModel.getId()));
+            Log.e(TAG, "prepareDataToPost json: " + json);
             params.put("" + (dataModel.getTlxCli()), json);
         }
 
@@ -429,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
                 MedEntreLineas entreLineas = entreLineasList.get(i);
                 jsonArray.put(i, entreLineas.toJson());
             }
-            Log.e(TAG, "prepareDataToPost: mel: "+ jsonArray.toString());
+            Log.e(TAG, "prepareDataToPost: mel: " + jsonArray.toString());
             params.put("med_entre_lineas", jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -462,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
             stateMissing.setText(String.valueOf(sizeData - countSave));
             statePrinted.setText(String.valueOf(countPrinted));
             statePostponed.setText(String.valueOf(countPostponed));
-            DataModel data = dbAdapter.getData(1);
+            DataModel data = dbAdapter.getFirstData();
             nroRemesa = data.getTlxRem();
             nroArea = data.getTlxAre();
             labelReadyRuta.setText(String.valueOf(data.getTlxRutA()));
@@ -530,6 +535,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, AnalyticsActivity.class));
     }
 
+    private EditText nroMed;
+    private EditText lecMed;
     public void newMedidor(final View view) {
         if (!wasDownload) {
             Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
@@ -538,8 +545,8 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder newMedidor = new AlertDialog.Builder(this);
         newMedidor.setTitle("Nuevo Medidor");
         View viewInside = LayoutInflater.from(this).inflate(R.layout.layout_new_medidor, null);
-        final EditText nroMed = (EditText) viewInside.findViewById(R.id.new_med_number);
-        final EditText lecMed = (EditText) viewInside.findViewById(R.id.new_med_lectura);
+        nroMed = (EditText) viewInside.findViewById(R.id.new_med_number);
+        lecMed = (EditText) viewInside.findViewById(R.id.new_med_lectura);
         newMedidor.setView(viewInside);
         newMedidor.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
