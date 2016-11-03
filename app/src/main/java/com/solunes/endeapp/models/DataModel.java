@@ -78,8 +78,8 @@ public class DataModel {
     private String TlxUltObs;
     private String TlxActivi;
     private String TlxCiudad;
-    private int TlxFacNro;
-    private int TlxNroAut;
+    private String TlxFacNro;
+    private String TlxNroAut;
     private String TlxCodCon;
     private String TlxFecLim;
     private int TlxKwhDev;
@@ -322,8 +322,8 @@ public class DataModel {
         dataModel.setTlxUltObs(cursor.getString(Columns.TlxUltObs.ordinal()));
         dataModel.setTlxActivi(cursor.getString(Columns.TlxActivi.ordinal()));
         dataModel.setTlxCiudad(cursor.getString(Columns.TlxCiudad.ordinal()));
-        dataModel.setTlxFacNro(cursor.getInt(Columns.TlxFacNro.ordinal()));
-        dataModel.setTlxNroAut(cursor.getInt(Columns.TlxNroAut.ordinal()));
+        dataModel.setTlxFacNro(cursor.getString(Columns.TlxFacNro.ordinal()));
+        dataModel.setTlxNroAut(cursor.getString(Columns.TlxNroAut.ordinal()));
         dataModel.setTlxCodCon(cursor.getString(Columns.TlxCodCon.ordinal()));
         dataModel.setTlxFecLim(cursor.getString(Columns.TlxFecLim.ordinal()));
         dataModel.setTlxKwhDev(cursor.getInt(Columns.TlxKwhDev.ordinal()));
@@ -1173,19 +1173,19 @@ public class DataModel {
         TlxCiudad = tlxCiudad;
     }
 
-    public int getTlxFacNro() {
+    public String getTlxFacNro() {
         return TlxFacNro;
     }
 
-    public void setTlxFacNro(int tlxFacNro) {
+    public void setTlxFacNro(String tlxFacNro) {
         TlxFacNro = tlxFacNro;
     }
 
-    public int getTlxNroAut() {
+    public String getTlxNroAut() {
         return TlxNroAut;
     }
 
-    public void setTlxNroAut(int tlxNroAut) {
+    public void setTlxNroAut(String tlxNroAut) {
         TlxNroAut = tlxNroAut;
     }
 

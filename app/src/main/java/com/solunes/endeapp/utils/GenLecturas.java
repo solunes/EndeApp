@@ -28,7 +28,6 @@ public class GenLecturas {
 
     public static double subTotal(Context context, int kWhConsumo, int categoria) {
         DBAdapter dbAdapter = new DBAdapter(context);
-        Log.e(TAG, "subTotal: kwh " + kWhConsumo);
         int descuento = dbAdapter.getCargoFijoDescuento(categoria);
         if (kWhConsumo <= descuento) {
             return 0;
@@ -44,11 +43,8 @@ public class GenLecturas {
                 descuento += tarifa.getKwh_hasta();
             } else {
                 res = res + tarifa.getImporte() * kWhConsumo;
-                Log.e(TAG, "subTotal: " + i + " - " + res);
                 return round(res);
             }
-//            }
-            Log.e(TAG, "subTotal: " + i + " - " + res);
         }
         return 0;
     }

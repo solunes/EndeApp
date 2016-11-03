@@ -25,22 +25,37 @@ public class PrintGenerator {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
 //        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
         String deudasEnergia = "";
+        double deudas = 0;
 
         if (dataModel.getTlxDeuEneC() > 0) {
             deudasEnergia = "T CONSO2.CPF 0 45 925 Mas deuda(s) pendiente(s) de energia  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
             deudasEnergia = deudasEnergia + "T CONSO2.CPF 0 45 925 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuEneI()) + "\r\n";
+            deudas += dataModel.getTlxDeuEneI();
         }
         String deudasAseo = "";
         if (dataModel.getTlxDeuAseC() > 0) {
             deudasAseo = "T CONSO2.CPF 0 45 945 Deuda(s) pendiente(s) de tasa de aseo (" + dataModel.getTlxDeuAseC() + ") Bs\r\n";
             deudasAseo = deudasAseo + "T CONSO2.CPF 0 45 945 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuAseI()) + "\r\n";
+            deudas += dataModel.getTlxDeuAseI();
         }
 
         String tipoLectura = DataModel.getTipoLectura(dataModel.getTlxTipLec());
+        double tasas = dataModel.getTlxImpTap() + dataModel.getTlxImpAse();
+        String qrData = "1020613020" +
+                "|" + dataModel.getTlxFacNro() +
+                "|" + dataModel.getTlxNroAut() +
+                "|" + dataModel.getTlxFecEmi() +
+                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) +
+                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) +
+                // TODO: 02-11-16 code control
+                "|E5-F8-BE-B3" +
+                "|" + dataModel.getTlxCliNit() +
+                "|" + tasas +
+                "|0" +
+                "|" + deudas +
+                "|0";
 
         String cpclConfigLabel = "! 0 200 200 1570 1\r\n" +
-//                "ENCODING UTF-8\r\n" +
-
                 "RIGHT 782\r\n" +
                 "T CONSO2.CPF 0 10 30 " + dataModel.getTlxFacNro() + "\r\n" +
                 "T CONSO2.CPF 0 10 50 " + dataModel.getTlxNroAut() + "\r\n" +
@@ -99,14 +114,12 @@ public class PrintGenerator {
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 320 TIPO LECTURA:  " + tipoLectura + "\r\n" +
 
+                "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 340 Energía consumida en (" + calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec()) + ") dias\r\n" +
                 "RIGHT 782\r\n" +
                 "T CONSO2.CPF 0 720 340 " + dataModel.getTlxConsumo() + " kWh\r\n" +
 
-                "LEFT\r\n" +
-                "T CONSO2.CPF 0 45 360 Total energía a facturar\r\n" +
-                "RIGHT 782\r\n" +
-                "T CONSO2.CPF 0 720 360 " + dataModel.getTlxConsFacturado() + " kWh\r\n" +
+                detalleConsumo(dataModel) +
 
                 "LEFT\r\n" +
                 "T CONSO3.CPF 0 40 1004 Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(dataModel.getTlxImpTot())) + "\r\n" +
@@ -128,14 +141,15 @@ public class PrintGenerator {
 
                 // BLOQUE 4: QR, control code
                 "B QR 485 1070 M 2 U 4\r\n" +
-                "MA,280048029|2228155|392401600024900|11/10/2016|3.00|3.00|E5-F8-BE-B3|0|0.00|0.00|0.00|0.00\r\n" +
+                "MA," + qrData + "\r\n" +
                 "ENDQR\r\n" +
 
                 "T CONSO1.CPF 0 40 1100 CÓDIGO DE CONTROL:\r\n" +
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
+                // TODO: 02-11-16 code control
                 "T CONSO2.CPF 0 270 1100 38-89-FC-GA-DT\r\n" +
-                "T CONSO2.CPF 0 270 1130 21/02/12 \r\n" +
+                "T CONSO2.CPF 0 270 1130 " + dataModel.getTlxFecLim() + "\r\n" +
 
                 "CENTER\r\n" +
                 "T CONSO4.CPF 0 0 1230 " + leyenda[0] + "\n\r\n" +
@@ -236,13 +250,6 @@ public class PrintGenerator {
         return mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
     }
 
-    /**
-     * Esta funcion se encarga de generar el bloque de detalle de facturacion
-     *
-     * @param titles   es la lista que tiene los campos para generar el bloque
-     * @param garantia este parametro tiene el valir del deposito de garantia
-     * @return el String generado para la impresion
-     */
     public static String detalleFacturacion(ArrayList<String> titles, ArrayList<Double> values, String garantia, double impTotFac, double importeMes, double tap, double impAse) {
         String res = "";
 //        String[] strings = (String[]) list.keySet().toArray();
@@ -323,6 +330,41 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 755 1343 " + h.getConKwh11() + "\r\n" +
                 "T CONSO1.CPF 0 635 1358 " + h.getConMes12() + "\r\n" +
                 "T CONSO1.CPF 0 755 1358 " + h.getConKwh12() + "\r\n";
+        return res;
+    }
+
+    private static String detalleConsumo(DataModel dataModel) {
+        String res = "";
+        int offsetX = 340;
+        if (dataModel.getTlxKwhDev() > 0) {
+            offsetX += 20;
+            res += "LEFT\r\n" +
+                    "T CONSO2.CPF 0 45 " + offsetX + " kWh a devolver\r\n" +
+                    "RIGHT 782\r\n" +
+                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhDev() + " kWh\r\n";
+        }
+        if (dataModel.getTlxKwhAdi() > 0) {
+            offsetX += 20;
+            res += "LEFT\r\n" +
+                    "T CONSO2.CPF 0 45 " + offsetX + " kWh a adicionar\r\n" +
+                    "RIGHT 782\r\n" +
+                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi() + " kWh\r\n";
+        }
+        if (dataModel.getTlxTipDem() == 2) {
+            offsetX += 20;
+            res += "LEFT\r\n" +
+                    "T CONSO2.CPF 0 45 " + offsetX + " Potencia Leida\r\n" +
+                    "RIGHT 782\r\n" +
+                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotLei() + " kWh\r\n";
+        }
+        // TODO: 27-10-16 incierto
+        if (dataModel.getTlxPotFac() == 2) {
+            offsetX += 20;
+            res += "LEFT\r\n" +
+                    "T CONSO2.CPF 0 45 " + offsetX + " Potencia Facturada\r\n" +
+                    "RIGHT 782\r\n" +
+                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotFac() + " kWh\r\n";
+        }
         return res;
     }
 }

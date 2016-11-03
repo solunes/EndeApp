@@ -95,7 +95,7 @@ public class DBAdapter {
     public ArrayList<DataModel> getAllData() {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
@@ -106,8 +106,10 @@ public class DBAdapter {
     public ArrayList<DataModel> getReady() {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1 " +
-                "OR " + DataModel.Columns.estado_lectura.name() + " = 2", null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null,
+                DataModel.Columns.estado_lectura.name() + " = 1 " +
+                "OR " + DataModel.Columns.estado_lectura.name() + " = 2",
+                null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
@@ -118,7 +120,9 @@ public class DBAdapter {
     public ArrayList<DataModel> getState(int state) {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = " + state, null, null, null, null);
+        Cursor query = db.query(DBHelper.DATA_TABLE, null,
+                DataModel.Columns.estado_lectura.name() + " = " + state,
+                null, null, null, DataModel.Columns.TlxImpAvi.name() + " ASC");
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
@@ -162,12 +166,9 @@ public class DBAdapter {
 
     public int getCountSave() {
         open();
-        long ini = System.currentTimeMillis();
         Cursor cursor = db.rawQuery("select count(*) from " + DBHelper.DATA_TABLE + " " +
                 "where " + DataModel.Columns.estado_lectura.name() + " = 1 OR " +
                 DataModel.Columns.estado_lectura.name() + " = 2", null);
-        long fin = System.currentTimeMillis();
-        Log.e(TAG, "getCountSave: " + (fin - ini));
         cursor.moveToFirst();
         int count = cursor.getInt(0);
         cursor.close();
@@ -176,19 +177,13 @@ public class DBAdapter {
 
     public int getCountPrinted() {
         open();
-        long ini = System.currentTimeMillis();
         Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 1", null, null, null, null);
-        long fin = System.currentTimeMillis();
-        Log.e(TAG, "getCountPrinted: " + (fin - ini));
         return query.getCount();
     }
 
     public int getCountPostponed() {
         open();
-        long ini = System.currentTimeMillis();
         Cursor query = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = 2", null, null, null, null);
-        long fin = System.currentTimeMillis();
-        Log.e(TAG, "getCountPostponed: " + (fin - ini));
         return query.getCount();
     }
 
@@ -236,7 +231,7 @@ public class DBAdapter {
         return query;
     }
 
-    public ArrayList<DataObs> getObsByCli(int data) {
+    public ArrayList<DataObs> getDataObsByCli(int data) {
         open();
         ArrayList<DataObs> objects = new ArrayList<>();
         Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null, DataObs.Columns.general_id.name() + " = " + data, null, null, null, null);
@@ -244,6 +239,31 @@ public class DBAdapter {
             objects.add(DataObs.fromCursor(cursor));
         }
         return objects;
+    }
+
+    public Obs getObsByCli(int data) {
+        open();
+        Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null,
+                DataObs.Columns.general_id.name() + " = " + data + " AND " +
+                        "NOT " + DataObs.Columns.observacion_id.name() + " = 80 AND " +
+                        "NOT " + DataObs.Columns.observacion_id.name() + " = 81",
+                null, null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            Cursor cursorObs = db.query(DBHelper.OBS_TABLE, null,
+                    Obs.Columns.id.name() + " = " + cursor.getInt(DataObs.Columns.observacion_id.ordinal()),
+                    null, null, null, null);
+            cursorObs.moveToFirst();
+            Obs obs = Obs.fromCursor(cursorObs);
+            Log.e(TAG, "getObsByCli: " + obs.getObsDes());
+            cursor.close();
+            cursorObs.close();
+            return obs;
+        } else {
+            Log.e(TAG, "getObsByCli: " + 0);
+            cursor.close();
+            return null;
+        }
     }
 
     public ArrayList<Tarifa> getCargoEnergia(int categoria) {
@@ -310,16 +330,16 @@ public class DBAdapter {
 
     public double getCargoFijo(int categoria) {
         open();
-        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
-                + " AND " + Tarifa.Columns.item_facturacion_id + " = 1", null, null, null, null);
+        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id.name() + " = " + categoria
+                + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
         cursor.moveToNext();
         return cursor.getDouble(Tarifa.Columns.importe.ordinal());
     }
 
     public int getCargoFijoDescuento(int categoria) {
         open();
-        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
-                + " AND " + Tarifa.Columns.item_facturacion_id + " = 1", null, null, null, null);
+        Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id.name() + " = " + categoria
+                + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
         cursor.moveToNext();
         return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
     }

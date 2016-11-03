@@ -25,7 +25,6 @@ import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.MedEntreLineas;
-import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
@@ -351,8 +350,8 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxUltObs.name(), object.getString(DataModel.Columns.TlxUltObs.name()));
             values.put(DataModel.Columns.TlxActivi.name(), object.getString(DataModel.Columns.TlxActivi.name()));
             values.put(DataModel.Columns.TlxCiudad.name(), object.getString(DataModel.Columns.TlxCiudad.name()));
-            values.put(DataModel.Columns.TlxFacNro.name(), object.getDouble(DataModel.Columns.TlxFacNro.name()));
-            values.put(DataModel.Columns.TlxNroAut.name(), object.getDouble(DataModel.Columns.TlxNroAut.name()));
+            values.put(DataModel.Columns.TlxFacNro.name(), object.getString(DataModel.Columns.TlxFacNro.name()));
+            values.put(DataModel.Columns.TlxNroAut.name(), object.getString(DataModel.Columns.TlxNroAut.name()));
             values.put(DataModel.Columns.TlxCodCon.name(), object.getString(DataModel.Columns.TlxCodCon.name()));
             values.put(DataModel.Columns.TlxFecLim.name(), object.getString(DataModel.Columns.TlxFecLim.name()));
             values.put(DataModel.Columns.TlxKwhDev.name(), object.getInt(DataModel.Columns.TlxKwhDev.name()));
@@ -421,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (DataModel dataModel : allData) {
             String json = DataModel.getJsonToSend(dataModel,
-                    dbAdapter.getObsByCli(dataModel.getId()),
+                    dbAdapter.getDataObsByCli(dataModel.getId()),
                     dbAdapter.getPrintObsData(dataModel.getId()));
             Log.e(TAG, "prepareDataToPost json: " + json);
             params.put("" + (dataModel.getTlxCli()), json);

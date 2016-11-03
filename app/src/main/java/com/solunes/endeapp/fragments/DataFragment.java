@@ -46,7 +46,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     public static final String KEY_ID_DATA = "id_data";
     private OnFragmentListener onFragmentListener;
 
-    private View rootView;
     private EditText inputReading;
     private EditText inputPotenciaReading;
     private EditText inputObsCode;
@@ -61,6 +60,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private TextView labelHoraAlto;
     private TextView labelHoraMedio;
     private TextView labelHoraBajo;
+    private EditText inputPreNue1;
+    private EditText inputPreNue2;
 
     private ArrayList<String> printTitles;
     private ArrayList<Double> printValues;
@@ -105,10 +106,19 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             listPrintObs.add(PrintObs.fromCursor(cursor));
         }
         dataModel = dbAdapter.getData(arguments.getInt(KEY_ID_DATA));
-        Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd() + " - "+ dataModel.getTlxNom());
+        Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd() + " " +
+                "\n " + dataModel.getTlxNom() +
+                "\n tiplec: " + dataModel.getTlxTipLec() +
+                "\n kwhdev: " + dataModel.getTlxKwhDev() +
+                "\n kwhadi: " + dataModel.getTlxKwhAdi() +
+                "\n leytag: " + dataModel.getTlxLeyTag() +
+                "\n pottag: " + dataModel.getTlxPotTag() +
+                "\n dignidad: " + dataModel.getTlxDignidad() +
+                "\n deudas aseo: " + dataModel.getTlxDeuAseC() +
+                "\n deudas energia: " + dataModel.getTlxDeuEneC() +
+                "\n " + dataModel.getTlxNom());
         dbAdapter.close();
         setupUI(view, dataModel);
-        rootView = view.findViewById(R.id.data_layout);
         actionButtons(view);
         validSaved();
         return view;
@@ -140,6 +150,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         estadoMedidor.setText(DataFragment.estados_lectura.values()[data.getEstadoLectura()].name());
         estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
         inputRemenber = (EditText) view.findViewById(R.id.input_remenber);
+
         if (data.getTlxRecordatorio() != null) {
             inputRemenber.setText(data.getTlxRecordatorio());
         }
@@ -158,7 +169,22 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         inputPotenciaReading = (EditText) view.findViewById(R.id.input_potencia_reading);
         if (dataModel.getTlxTipDem() == 2) {
             inputPotenciaReading.setVisibility(View.VISIBLE);
+            if (dataModel.getTlxPotLei() > 0) {
+                inputPotenciaReading.setText(String.valueOf(dataModel.getTlxPotLei()));
+                inputPotenciaReading.setEnabled(false);
+            }
         }
+        inputPreNue1 = (EditText) view.findViewById(R.id.input_pre_nue1);
+        inputPreNue2 = (EditText) view.findViewById(R.id.input_pre_nue2);
+        if (dataModel.getTlxPreNue1() != null) {
+            inputPreNue1.setText(dataModel.getTlxPreNue1());
+            inputPreNue1.setEnabled(false);
+            inputPreNue2.setEnabled(false);
+        }
+        if (dataModel.getTlxPreNue2() != null) {
+            inputPreNue2.setText(dataModel.getTlxPreNue2());
+        }
+
         View layoutPrecinto = view.findViewById(R.id.layout_precinto_nuevo);
         if (dataModel.getTlxPotTag() == 1) {
             layoutPrecinto.setVisibility(View.VISIBLE);
@@ -174,99 +200,109 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         View layoutGranDemanda = view.findViewById(R.id.layout_gran_demanda);
         if (dataModel.getTlxTipDem() == 3) {
             layoutGranDemanda.setVisibility(View.VISIBLE);
+            View fechaAlto = view.findViewById(R.id.input_gd_fechaalto);
+            View fechaMedio = view.findViewById(R.id.input_gd_fechamedio);
+            View fechaBajo = view.findViewById(R.id.input_gd_fechabajo);
+            View horaAlto = view.findViewById(R.id.input_gd_horaalto);
+            View horaMedio = view.findViewById(R.id.input_gd_horamedio);
+            View horaBajo = view.findViewById(R.id.input_gd_horabajo);
+            fechaAlto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    positionFecha = 3;
+                    new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                }
+            });
+            fechaMedio.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    positionFecha = 2;
+                    new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                }
+            });
+            fechaBajo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    positionFecha = 1;
+                    new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                }
+            });
+            horaAlto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                    positionHora = 3;
+                }
+            });
+            horaMedio.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                    positionHora = 2;
+                }
+            });
+            horaBajo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar calendar = Calendar.getInstance();
+                    new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
+                    positionHora = 1;
+                }
+            });
+
+            labelFechaAlto = (TextView) view.findViewById(R.id.label_gd_fechaalto);
+            labelFechaMedio = (TextView) view.findViewById(R.id.label_gd_fechamedio);
+            labelFechaBajo = (TextView) view.findViewById(R.id.label_gd_fechabajo);
+            labelHoraAlto = (TextView) view.findViewById(R.id.label_gd_horaalto);
+            labelHoraMedio = (TextView) view.findViewById(R.id.label_gd_horamedio);
+            labelHoraBajo = (TextView) view.findViewById(R.id.label_gd_horabajo);
         }
-
-        View fechaAlto = view.findViewById(R.id.input_gd_fechaalto);
-        View fechaMedio = view.findViewById(R.id.input_gd_fechamedio);
-        View fechaBajo = view.findViewById(R.id.input_gd_fechabajo);
-        View horaAlto = view.findViewById(R.id.input_gd_horaalto);
-        View horaMedio = view.findViewById(R.id.input_gd_horamedio);
-        View horaBajo = view.findViewById(R.id.input_gd_horabajo);
-        fechaAlto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                positionFecha = 3;
-                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-        fechaMedio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                positionFecha = 2;
-                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-        fechaBajo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                positionFecha = 1;
-                new DatePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-        horaAlto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
-                positionHora = 3;
-            }
-        });
-        horaMedio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
-                positionHora = 2;
-            }
-        });
-        horaBajo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                new TimePickerDialog(getContext(), DataFragment.this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), true).show();
-                positionHora = 1;
-            }
-        });
-
-        labelFechaAlto = (TextView) view.findViewById(R.id.label_gd_fechaalto);
-        labelFechaMedio = (TextView) view.findViewById(R.id.label_gd_fechamedio);
-        labelFechaBajo = (TextView) view.findViewById(R.id.label_gd_fechabajo);
-        labelHoraAlto = (TextView) view.findViewById(R.id.label_gd_horaalto);
-        labelHoraMedio = (TextView) view.findViewById(R.id.label_gd_horamedio);
-        labelHoraBajo = (TextView) view.findViewById(R.id.label_gd_horabajo);
     }
 
     private void actionButtons(final View viewRoot) {
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                if (dataModel.getTlxPotTag() == 1) {
-                    String inputPreNue1 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue1)).getText().toString();
-                    String inputPreNue2 = ((EditText) viewRoot.findViewById(R.id.input_pre_nue2)).getText().toString();
-                    if (!inputPreNue1.isEmpty()) {
-                        Log.e(TAG, "onClick: " + inputPreNue1 + " - " + inputPreNue2);
-                        dataModel.setTlxPreNue1(inputPreNue1);
-                        dataModel.setTlxPreNue2(inputPreNue2);
-                        Log.e(TAG, "onClick: " + dataModel.getTlxPreNue1() + " - " + dataModel.getTlxPreNue2());
-
-                    } else {
-                        Snackbar.make(view, "Ingrese un precinto", Snackbar.LENGTH_SHORT).show();
-                        return;
-                    }
-                }
-
-                if (dataModel.getTlxTipDem() == 3) {
-                    methodGranDemanda(viewRoot);
-                    return;
-                }
-
                 if (dataModel.getEstadoLectura() == estados_lectura.Impreso.ordinal()) {
                     rePrint();
                 } else {
-                    methodPequeñaMedianaDemanda(view);
+                    // Precintos
+                    if (dataModel.getTlxPotTag() == 1) {
+                        String sPreNue1 = inputPreNue1.getText().toString();
+                        String sPreNue2 = inputPreNue2.getText().toString();
+                        if (!sPreNue1.isEmpty()) {
+                            dataModel.setTlxPreNue1(sPreNue1);
+                            dataModel.setTlxPreNue2(sPreNue2);
+                        } else {
+                            Snackbar.make(view, "Ingrese un precinto", Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                    if (dataModel.getTlxTipDem() == 3) {
+                        methodGranDemanda(viewRoot);
+                    }
+
+                    if (inputReading.getText().toString().isEmpty()) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                        dialog.setTitle("Advertencia");
+                        dialog.setMessage("La lectura va ser 0 de consumo.\n¿Esta seguro?");
+                        dialog.setNegativeButton("Cancelar", null);
+                        dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                inputReading.setText("0");
+                                methodPequeñaMedianaDemanda(view);
+                            }
+                        });
+                        dialog.show();
+                    } else {
+                        methodPequeñaMedianaDemanda(view);
+                    }
                 }
             }
         });
@@ -276,7 +312,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             public void onClick(View view) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Selecionar una observacion");
-                final DBAdapter dbAdapter = new DBAdapter(getContext());
+                DBAdapter dbAdapter = new DBAdapter(getContext());
                 Cursor cursor = dbAdapter.getObs();
                 final String[] stringObs = new String[cursor.getCount()];
                 for (int i = 0; i < cursor.getCount(); i++) {
@@ -284,11 +320,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     stringObs[i] = Obs.fromCursor(cursor).getObsDes();
                 }
                 cursor.close();
+                dbAdapter.close();
                 alertDialog.setSingleChoiceItems(stringObs, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
                         dialogInterface.dismiss();
+                        DBAdapter dbAdapter = new DBAdapter(getContext());
                         Obs obs = Obs.fromCursor(dbAdapter.getObs(stringObs[position]));
+                        dbAdapter.close();
                         labelObs.setText(obs.getObsDes());
                         inputObsCode.setText(String.valueOf(obs.getId()));
                     }
@@ -321,6 +360,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 } else {
                     labelObs.setText("Codigo incorrecto");
                 }
+                dbAdapter.close();
             }
         });
     }
@@ -335,20 +375,37 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         EditText demMedio = (EditText) view.findViewById(R.id.input_gd_demmedio);
         EditText demAlto = (EditText) view.findViewById(R.id.input_gd_demalto);
 
-        dataModel.setTlxKwInst(Integer.parseInt(kwInst.getText().toString()));
-        dataModel.setTlxReactiva(Integer.parseInt(reactiva.getText().toString()));
-        dataModel.setTlxKwhAlto(Integer.parseInt(kwalto.getText().toString()));
-        dataModel.setTlxKwhMedio(Integer.parseInt(kwmedio.getText().toString()));
-        dataModel.setTlxKwhBajo(Integer.parseInt(kwBajo.getText().toString()));
-        dataModel.setTlxDemBajo(Integer.parseInt(demBajo.getText().toString()));
-        dataModel.setTlxDemMedio(Integer.parseInt(demMedio.getText().toString()));
-        dataModel.setTlxDemAlto(Integer.parseInt(demAlto.getText().toString()));
-        dataModel.setTlxFechaAlto(Integer.parseInt(labelFechaAlto.getText().toString()));
-        dataModel.setTlxFechaMedio(Integer.parseInt(labelFechaMedio.getText().toString()));
-        dataModel.setTlxFechaBajo(Integer.parseInt(labelFechaBajo.getText().toString()));
-        dataModel.setTlxHoraAlto(Integer.parseInt(labelHoraAlto.getText().toString()));
-        dataModel.setTlxHoraMedio(Integer.parseInt(labelHoraMedio.getText().toString()));
-        dataModel.setTlxHoraBajo(Integer.parseInt(labelHoraBajo.getText().toString()));
+        if (!kwInst.getText().toString().isEmpty()) {
+            dataModel.setTlxKwInst(Integer.parseInt(kwInst.getText().toString()));
+        }
+        if (!reactiva.getText().toString().isEmpty()) {
+            dataModel.setTlxReactiva(Integer.parseInt(reactiva.getText().toString()));
+        }
+        if (!kwalto.getText().toString().isEmpty()) {
+            dataModel.setTlxKwhAlto(Integer.parseInt(kwalto.getText().toString()));
+        }
+        if (!kwmedio.getText().toString().isEmpty()) {
+            dataModel.setTlxKwhMedio(Integer.parseInt(kwmedio.getText().toString()));
+        }
+        if (!kwBajo.getText().toString().isEmpty()) {
+            dataModel.setTlxKwhBajo(Integer.parseInt(kwBajo.getText().toString()));
+        }
+        if (!demBajo.getText().toString().isEmpty()) {
+            dataModel.setTlxDemBajo(Integer.parseInt(demBajo.getText().toString()));
+        }
+        if (!demMedio.getText().toString().isEmpty()) {
+            dataModel.setTlxDemMedio(Integer.parseInt(demMedio.getText().toString()));
+        }
+        if (!demAlto.getText().toString().isEmpty()) {
+            dataModel.setTlxDemAlto(Integer.parseInt(demAlto.getText().toString()));
+        }
+        // TODO: 26-10-16 cambiar de int a string, xq son fechas y horas
+//        dataModel.setTlxFechaAlto(Integer.parseInt(labelFechaAlto.getText().toString()));
+//        dataModel.setTlxFechaMedio(Integer.parseInt(labelFechaMedio.getText().toString()));
+//        dataModel.setTlxFechaBajo(Integer.parseInt(labelFechaBajo.getText().toString()));
+//        dataModel.setTlxHoraAlto(Integer.parseInt(labelHoraAlto.getText().toString()));
+//        dataModel.setTlxHoraMedio(Integer.parseInt(labelHoraMedio.getText().toString()));
+//        dataModel.setTlxHoraBajo(Integer.parseInt(labelHoraBajo.getText().toString()));
     }
 
     private void methodPequeñaMedianaDemanda(final View view) {
@@ -382,7 +439,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             return;
         } else {
             int nuevaLectura = Integer.parseInt(input);
-            Log.e(TAG, "onClick: " + nuevaLectura + " - " + dataModel.getTlxTope());
             if (nuevaLectura > dataModel.getTlxTope()) {
                 Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                 return;
@@ -446,6 +502,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             saveLectura(obs);
             printFactura(view, obs);
         }
+        dbAdapter.close();
     }
 
     private void rePrint() {
@@ -508,34 +565,59 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 sendPrint();
             }
         });
+        dbAdapter.close();
         reprintDialog.show();
     }
 
     private void hidingViews(Obs obs) {
-        if (obs.getObsFac() == 1) {
+        buttonObs.setEnabled(false);
+        inputObsCode.setEnabled(false);
+        inputReading.setEnabled(false);
+        if (obs.getObsFac() == 1 && dataModel.getTlxTipLec() != 4) {
             dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
             estadoMedidor.setText(estados_lectura.Impreso.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
             buttonConfirm.setText(R.string.re_print);
-            buttonObs.setEnabled(false);
-            inputObsCode.setEnabled(false);
-            inputReading.setEnabled(false);
+            inputPotenciaReading.setEnabled(false);
+            inputPreNue1.setEnabled(false);
+            inputPreNue2.setEnabled(false);
         } else {
+            buttonConfirm.setEnabled(false);
             dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
             estadoMedidor.setText(estados_lectura.Postergado.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
         }
+        if (dataModel.getTlxTipDem() == 3) {
+            dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+            estadoMedidor.setText(estados_lectura.Postergado.name());
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
+            // TODO: 31-10-16 ocultamos lo que haya que ocultar gran demanda
+        }
+
+        if (dataModel.getTlxImpAvi() == 1){
+            dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
+        } else if (dataModel.getTlxImpAvi() == 2){
+            dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+        }
     }
 
     private void printFactura(View view, Obs obs) {
-        if (dataModel.getTlxTipLec() == 4){
-            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
+        if (dataModel.getTlxTipDem() == 3) {
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        if (dataModel.getTlxTipLec() == 4) {
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
             return;
         }
         if (obs.getObsFac() == 1) {
-            sendPrint();
+            if (dataModel.getTlxImpAvi() == 1){
+                sendPrint();
+            } else {
+                Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
+            }
         } else {
-            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -543,6 +625,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         DBAdapter dbAdapter = new DBAdapter(getContext());
         String[] leyenda = dbAdapter.getLeyenda();
         Historico historico = dbAdapter.getHistorico(dataModel.getId());
+        dbAdapter.close();
         onFragmentListener.onPrinting(PrintGenerator.creator(
                 dataModel,
                 printTitles,
@@ -609,7 +692,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
         cv.put(DataObs.Columns.observacion_id.name(), obs.getId());
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        Log.e(TAG, "saveLectura: save obs " + obs.getId());
 
         int conPro = dataModel.getTlxConPro();
         if (dataModel.getTlxNvaLec() > (conPro + conPro * 0.2)) {
@@ -617,13 +699,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-            Log.e(TAG, "saveLectura: consumo elevado");
         } else if (dataModel.getTlxNvaLec() < (conPro * 0.8)) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 81);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-            Log.e(TAG, "saveLectura: consumo bajo");
         }
 
         dbAdapter.close();
@@ -712,16 +792,25 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputReading.setEnabled(false);
             inputReading.setText(String.valueOf(dataModel.getTlxNvaLec()));
         } else if (dataModel.getEstadoLectura() == 2) {
+            buttonObs.setEnabled(false);
+            inputObsCode.setEnabled(false);
+            inputReading.setEnabled(false);
+            buttonConfirm.setEnabled(false);
             estadoMedidor.setText(estados_lectura.Postergado.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
         } else {
             estadoMedidor.setText(estados_lectura.Pendiente.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
         }
-    }
-
-    public void printResponse(String response) {
-        Snackbar.make(rootView, response, Snackbar.LENGTH_LONG).show();
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+        Obs obs = dbAdapter.getObsByCli(dataModel.getId());
+        if (obs != null) {
+            inputObsCode.setText(String.valueOf(obs.getId()));
+            labelObs.setText(obs.getObsDes());
+        }
+        if (dataModel.getTlxTipDem() == 2 && dataModel.getTlxPotLei() > 0) {
+            inputPotenciaReading.setText(String.valueOf(dataModel.getTlxPotLei()));
+        }
     }
 
     @Override
@@ -764,20 +853,39 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         Pendiente, Impreso, Postergado
     }
 
-    private int correccionDeDigitos(int nuevaLectura, int decEne) {
-        if (decEne == 0) {
-            return nuevaLectura;
+    private int correccionDeDigitos(int nuevaLectura, int decimales) {
+        if (decimales == 0) {
+            return (nuevaLectura);
         }
         String strlectura = String.valueOf(nuevaLectura);
-        String res = strlectura.substring(strlectura.length() - decEne, strlectura.length());
-        int intDec = Integer.parseInt(res);
-        Double as = Double.parseDouble("0." + intDec);
+        String res;
+        if (strlectura.length() == decimales) {
+            res = strlectura;
+            Double as = Double.parseDouble("0." + res);
+            return (roundDouble(as));
+        } else if (strlectura.length() < decimales) {
+            int lendif = decimales - strlectura.length();
+            res = "";
+            for (int i = 0; i < lendif; i++) {
+                res += "0";
+            }
+            res += strlectura;
+            Double as = Double.parseDouble("0." + res);
+            return (roundDouble(as));
+        } else {
+            res = strlectura.substring(strlectura.length() - decimales, strlectura.length());
+            Double as = Double.parseDouble("0." + res);
+            int newInt = roundDouble(as);
+            int intLecttura = Integer.parseInt(strlectura.substring(0, strlectura.length() - decimales));
+            return (intLecttura + newInt);
+        }
+    }
 
+    private static int roundDouble(double as) {
         long factor = (long) Math.pow(10, 0);
         as = as * factor;
         long tmp = Math.round(as);
         int newInt = (int) ((double) tmp / factor);
-        int intLecttura = Integer.parseInt(strlectura.substring(0, strlectura.length() - decEne));
-        return intLecttura + newInt;
+        return newInt;
     }
 }

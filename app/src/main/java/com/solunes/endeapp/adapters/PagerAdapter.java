@@ -18,18 +18,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "PagerAdapter";
     private int size;
     private ArrayList<DataModel> dataModels;
-    private FragmentManager fragmentManager;
-
-    public PagerAdapter(FragmentManager fm, int sizeTable) {
-        super(fm);
-        this.fragmentManager = fm;
-        this.size = sizeTable;
-        this.dataModels = new ArrayList<>();
-    }
 
     public PagerAdapter(FragmentManager fm, int sizeTable, ArrayList<DataModel> dataModels) {
         super(fm);
-        this.fragmentManager = fm;
         this.size = sizeTable;
         this.dataModels = dataModels;
     }
