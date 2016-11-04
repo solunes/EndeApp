@@ -85,6 +85,9 @@ public class DataModel {
     private int TlxKwhDev;
     private int TlxUltTipL;
     private int TlxCliNew;
+    private double TlxCarCon;
+    private double TlxCarRec;
+    private double TlxCarDep;
     private int TlxEntEne;
     private int TlxEntPot;
     private int TlxPotFacM;
@@ -103,14 +106,14 @@ public class DataModel {
     private int TlxKwhMedio;
     private int TlxKwhAlto;
     private int TlxDemBajo;
-    private int TlxFechaBajo;
-    private int TlxHoraBajo;
+    private String TlxFechaBajo;
+    private String TlxHoraBajo;
     private int TlxDemMedio;
-    private int TlxFechaMedio;
-    private int TlxHoraMedio;
+    private String TlxFechaMedio;
+    private String TlxHoraMedio;
     private int TlxDemAlto;
-    private int TlxFechaAlto;
-    private int TlxHoraAlto;
+    private String TlxFechaAlto;
+    private String TlxHoraAlto;
     private double TlxPerCo3;
     private double TlxPerHr3;
     private double TlxPerCo2;
@@ -202,6 +205,9 @@ public class DataModel {
         TlxKwhDev,
         TlxUltTipL,
         TlxCliNew,
+        TlxCarCon,
+        TlxCarRec,
+        TlxCarDep,
         TlxEntEne,
         TlxDecEne,
         TlxEntPot,
@@ -371,22 +377,25 @@ public class DataModel {
         dataModel.setTlxDemBajo(cursor.getInt(Columns.TlxDemBajo.ordinal()));
         dataModel.setTlxDemMedio(cursor.getInt(Columns.TlxDemMedio.ordinal()));
         dataModel.setTlxDemAlto(cursor.getInt(Columns.TlxDemAlto.ordinal()));
-        dataModel.setTlxHoraBajo(cursor.getInt(Columns.TlxHoraBajo.ordinal()));
-        dataModel.setTlxHoraMedio(cursor.getInt(Columns.TlxHoraMedio.ordinal()));
-        dataModel.setTlxHoraAlto(cursor.getInt(Columns.TlxHoraAlto.ordinal()));
-        dataModel.setTlxFechaAlto(cursor.getInt(Columns.TlxFechaAlto.ordinal()));
-        dataModel.setTlxFechaMedio(cursor.getInt(Columns.TlxFechaMedio.ordinal()));
-        dataModel.setTlxFechaBajo(cursor.getInt(Columns.TlxFechaBajo.ordinal()));
+        dataModel.setTlxHoraBajo(cursor.getString(Columns.TlxHoraBajo.ordinal()));
+        dataModel.setTlxHoraMedio(cursor.getString(Columns.TlxHoraMedio.ordinal()));
+        dataModel.setTlxHoraAlto(cursor.getString(Columns.TlxHoraAlto.ordinal()));
+        dataModel.setTlxFechaAlto(cursor.getString(Columns.TlxFechaAlto.ordinal()));
+        dataModel.setTlxFechaMedio(cursor.getString(Columns.TlxFechaMedio.ordinal()));
+        dataModel.setTlxFechaBajo(cursor.getString(Columns.TlxFechaBajo.ordinal()));
+        dataModel.setTlxCarCon(cursor.getDouble(Columns.TlxCarCon.ordinal()));
+        dataModel.setTlxCarRec(cursor.getDouble(Columns.TlxCarRec.ordinal()));
+        dataModel.setTlxCarDep(cursor.getDouble(Columns.TlxCarDep.ordinal()));
         return dataModel;
     }
 
     public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList) {
         JSONObject jsonObject = new JSONObject();
         try {
-            if (dataModel.getTlxHorLec() == null){
+            if (dataModel.getTlxHorLec() == null) {
                 jsonObject.put(Columns.TlxHorLec.name(), "");
             } else {
-            jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
+                jsonObject.put(Columns.TlxHorLec.name(), dataModel.getTlxHorLec());
             }
             jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
@@ -412,18 +421,22 @@ public class DataModel {
             jsonObject.put(Columns.TlxDemBajo.name(), dataModel.getTlxDemBajo());
             jsonObject.put(Columns.TlxDemMedio.name(), dataModel.getTlxDemMedio());
             jsonObject.put(Columns.TlxDemAlto.name(), dataModel.getTlxDemAlto());
-            jsonObject.put(Columns.TlxFechaBajo.name(), dataModel.getTlxFechaBajo());
-            jsonObject.put(Columns.TlxFechaMedio.name(), dataModel.getTlxFechaMedio());
-            jsonObject.put(Columns.TlxFechaAlto.name(), dataModel.getTlxFechaAlto());
-            jsonObject.put(Columns.TlxHoraBajo.name(), dataModel.getTlxHoraBajo());
-            jsonObject.put(Columns.TlxHoraMedio.name(), dataModel.getTlxHoraMedio());
-            jsonObject.put(Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto());
+            jsonObject.put(Columns.TlxFechaBajo.name(), dataModel.getTlxFechaBajo() == null ? "" : dataModel.getTlxFechaBajo());
+            jsonObject.put(Columns.TlxFechaMedio.name(), dataModel.getTlxFechaMedio() == null ? "" : dataModel.getTlxFechaMedio());
+            jsonObject.put(Columns.TlxFechaAlto.name(), dataModel.getTlxFechaAlto() == null ? "" : dataModel.getTlxFechaAlto());
+            jsonObject.put(Columns.TlxHoraBajo.name(), dataModel.getTlxHoraBajo() == null ? "" : dataModel.getTlxHoraBajo());
+            jsonObject.put(Columns.TlxHoraMedio.name(), dataModel.getTlxHoraMedio() == null ? "" : dataModel.getTlxHoraMedio());
+            jsonObject.put(Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto() == null ? "" : dataModel.getTlxHoraAlto());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
             jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
             jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
             jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
             jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
+
+            jsonObject.put(Columns.TlxImpAvi.name(), dataModel.getTlxImpAvi());
+            jsonObject.put("TlxImpEst", dataModel.getEstadoLectura());
+            jsonObject.put(Columns.TlxCodCon.name(), dataModel.getTlxCodCon());
 
             jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
             JSONArray jsonArray = new JSONArray();
@@ -443,6 +456,30 @@ public class DataModel {
             Log.e(TAG, "getJsonToSend: ", e);
         }
         return jsonObject.toString();
+    }
+
+    public double getTlxCarCon() {
+        return TlxCarCon;
+    }
+
+    public void setTlxCarCon(double tlxCarCon) {
+        TlxCarCon = tlxCarCon;
+    }
+
+    public double getTlxCarRec() {
+        return TlxCarRec;
+    }
+
+    public void setTlxCarRec(double tlxCarRec) {
+        TlxCarRec = tlxCarRec;
+    }
+
+    public double getTlxCarDep() {
+        return TlxCarDep;
+    }
+
+    public void setTlxCarDep(double tlxCarDep) {
+        TlxCarDep = tlxCarDep;
     }
 
     public int getId() {
@@ -637,19 +674,19 @@ public class DataModel {
         TlxDemBajo = tlxDemBajo;
     }
 
-    public int getTlxFechaBajo() {
+    public String getTlxFechaBajo() {
         return TlxFechaBajo;
     }
 
-    public void setTlxFechaBajo(int tlxFechaBajo) {
+    public void setTlxFechaBajo(String tlxFechaBajo) {
         TlxFechaBajo = tlxFechaBajo;
     }
 
-    public int getTlxHoraBajo() {
+    public String getTlxHoraBajo() {
         return TlxHoraBajo;
     }
 
-    public void setTlxHoraBajo(int tlxHoraBajo) {
+    public void setTlxHoraBajo(String tlxHoraBajo) {
         TlxHoraBajo = tlxHoraBajo;
     }
 
@@ -661,19 +698,19 @@ public class DataModel {
         TlxDemMedio = tlxDemMedio;
     }
 
-    public int getTlxFechaMedio() {
+    public String getTlxFechaMedio() {
         return TlxFechaMedio;
     }
 
-    public void setTlxFechaMedio(int tlxFechaMedio) {
+    public void setTlxFechaMedio(String tlxFechaMedio) {
         TlxFechaMedio = tlxFechaMedio;
     }
 
-    public int getTlxHoraMedio() {
+    public String getTlxHoraMedio() {
         return TlxHoraMedio;
     }
 
-    public void setTlxHoraMedio(int tlxHoraMedio) {
+    public void setTlxHoraMedio(String tlxHoraMedio) {
         TlxHoraMedio = tlxHoraMedio;
     }
 
@@ -685,19 +722,19 @@ public class DataModel {
         TlxDemAlto = tlxDemAlto;
     }
 
-    public int getTlxFechaAlto() {
+    public String getTlxFechaAlto() {
         return TlxFechaAlto;
     }
 
-    public void setTlxFechaAlto(int tlxFechaAlto) {
+    public void setTlxFechaAlto(String tlxFechaAlto) {
         TlxFechaAlto = tlxFechaAlto;
     }
 
-    public int getTlxHoraAlto() {
+    public String getTlxHoraAlto() {
         return TlxHoraAlto;
     }
 
-    public void setTlxHoraAlto(int tlxHoraAlto) {
+    public void setTlxHoraAlto(String tlxHoraAlto) {
         TlxHoraAlto = tlxHoraAlto;
     }
 

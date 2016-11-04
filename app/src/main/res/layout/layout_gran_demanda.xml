@@ -72,10 +72,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:paddingTop="@dimen/activity_horizontal_margin_half"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/activity_horizontal_margin_half">
 
         <LinearLayout
             android:id="@+id/input_gd_fechabajo"
@@ -104,8 +104,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Hora Demanda A"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <TextView
@@ -130,8 +130,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Fecha Demanda B"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <TextView
@@ -149,8 +149,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Hora Demanda B"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <TextView
@@ -194,8 +194,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
                 android:text="Hora Demanda C"
+                android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
             <TextView

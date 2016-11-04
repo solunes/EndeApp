@@ -173,12 +173,13 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void run() {
+                        boolean response = false;
                         try {
-                            processResponse(result);
+                            response = processResponse(result);
                         } catch (JSONException e) {
                             Log.e(TAG, "onSuccess: ", e);
                         }
-                        progressDialog.dismiss();
+                        if (response){
                         wasDownload = true;
                         UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
                         UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
@@ -187,6 +188,10 @@ public class MainActivity extends AppCompatActivity {
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
                         UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
+                        } else {
+                            Snackbar.make(view, "No hay datos en la descarga", Snackbar.LENGTH_SHORT).show();
+                        }
+                        progressDialog.dismiss();
                     }
                 };
                 new Thread(runSaveData).start();
@@ -290,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
-    private void processResponse(String result) throws JSONException {
+    private boolean processResponse(String result) throws JSONException {
         JSONArray results = new JSONArray(result);
         DBAdapter dbAdapter = new DBAdapter(this);
         for (int i = 0; i < results.length(); i++) {
@@ -405,6 +410,7 @@ public class MainActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
         }
         dbAdapter.close();
+        return results.length() > 0;
     }
 
     private Hashtable<String, String> prepareDataToPost() {

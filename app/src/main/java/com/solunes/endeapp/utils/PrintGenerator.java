@@ -47,8 +47,7 @@ public class PrintGenerator {
                 "|" + dataModel.getTlxFecEmi() +
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) +
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) +
-                // TODO: 02-11-16 code control
-                "|E5-F8-BE-B3" +
+                "|" + dataModel.getTlxCodCon() +
                 "|" + dataModel.getTlxCliNit() +
                 "|" + tasas +
                 "|0" +
@@ -148,7 +147,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
                 // TODO: 02-11-16 code control
-                "T CONSO2.CPF 0 270 1100 38-89-FC-GA-DT\r\n" +
+                "T CONSO2.CPF 0 270 1100 " + dataModel.getTlxCodCon() + "\r\n" +
                 "T CONSO2.CPF 0 270 1130 " + dataModel.getTlxFecLim() + "\r\n" +
 
                 "CENTER\r\n" +

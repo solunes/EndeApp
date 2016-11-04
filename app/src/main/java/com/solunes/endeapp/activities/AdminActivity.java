@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
+import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
@@ -261,6 +262,26 @@ public class AdminActivity extends AppCompatActivity {
             values.put(PrintObs.Columns.ObiDes.name(), object.getString(PrintObs.Columns.ObiDes.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.PRINT_OBS_TABLE, values);
+        }
+        JSONArray facturaDosificacion = jsonObject.getJSONArray("factura_dosificacion");
+        for (int i = 0; i < facturaDosificacion.length(); i++) {
+            JSONObject object = facturaDosificacion.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(FacturaDosificacion.Columns.id.name(), object.getInt(FacturaDosificacion.Columns.id.name()));
+            values.put(FacturaDosificacion.Columns.area_id.name(), object.getInt(FacturaDosificacion.Columns.area_id.name()));
+            values.put(FacturaDosificacion.Columns.numero.name(), object.getInt(FacturaDosificacion.Columns.numero.name()));
+            values.put(FacturaDosificacion.Columns.comprobante.name(), object.getInt(FacturaDosificacion.Columns.comprobante.name()));
+            values.put(FacturaDosificacion.Columns.numero_autorizacion.name(), object.getInt(FacturaDosificacion.Columns.numero_autorizacion.name()));
+            values.put(FacturaDosificacion.Columns.numero_factura.name(), object.getInt(FacturaDosificacion.Columns.numero_factura.name()));
+            values.put(FacturaDosificacion.Columns.estado.name(), object.getInt(FacturaDosificacion.Columns.estado.name()));
+            values.put(FacturaDosificacion.Columns.fecha_inicial.name(), object.getString(FacturaDosificacion.Columns.fecha_inicial.name()));
+            values.put(FacturaDosificacion.Columns.fecha_limite_emision.name(), object.getString(FacturaDosificacion.Columns.fecha_limite_emision.name()));
+            values.put(FacturaDosificacion.Columns.llave_dosificacion.name(), object.getString(FacturaDosificacion.Columns.llave_dosificacion.name()));
+            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()));
+            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()));
+            values.put(FacturaDosificacion.Columns.actividad_economica.name(), object.getString(FacturaDosificacion.Columns.actividad_economica.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.FACTURA_DOSIFICACION_TABLE, values);
         }
     }
 }

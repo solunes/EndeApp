@@ -62,8 +62,10 @@ public class ControlCode {
 
         String[] ary = fiveDigitsVerhoeff.split("");//java 8
         int[] numbers = new int[ary.length];
-        for(int i=0;i<ary.length;i++){
-            numbers[i] = Integer.parseInt(ary[i]) + 1;
+        // java7 i=1
+        // java8 i=0
+        for(int i=1;i<ary.length;i++){
+            numbers[i-1] = Integer.parseInt(ary[i]) + 1;
         }
 
         String string1 = dosageKey.substring(0, numbers[0] );

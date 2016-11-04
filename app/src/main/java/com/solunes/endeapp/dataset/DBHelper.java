@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.solunes.endeapp.models.FacturaDosificacion;
+
 /**
  * Created by jhonlimaster on 11-08-16.
  */
@@ -11,7 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 15;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -25,6 +27,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String PRINT_OBS_DATA_TABLE = "print_obs_data_table";
     public static final String PRINT_OBS_TABLE = "print_obs_table";
     public static final String MED_ENTRE_LINEAS_TABLE = "med_entre_lineas_table";
+    public static final String FACTURA_DOSIFICACION_TABLE = "factura_dosificacion_table";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -131,6 +134,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxKwhDev integer, " +
                 "TlxUltTipL integer, " +
                 "TlxCliNew integer, " +
+                "TlxCarCon decimal(15, 2), " +
+                "TlxCarRec decimal(15, 2), " +
+                "TlxCarDep decimal(15, 2), " +
                 "TlxEntEne integer, " +
                 "TlxDecEne integer, " +
                 "TlxEntPot integer, " +
@@ -151,14 +157,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxKwhMedio integer, " +
                 "TlxKwhAlto integer, " +
                 "TlxDemBajo integer, " +
-                "TlxFechaBajo integer, " +
-                "TlxHoraBajo integer, " +
+                "TlxFechaBajo text, " +
+                "TlxHoraBajo text, " +
                 "TlxDemMedio integer, " +
-                "TlxFechaMedio integer, " +
-                "TlxHoraMedio integer, " +
+                "TlxFechaMedio text, " +
+                "TlxHoraMedio text, " +
                 "TlxDemAlto integer, " +
-                "TlxFechaAlto integer, " +
-                "TlxHoraAlto integer, " +
+                "TlxFechaAlto text, " +
+                "TlxHoraAlto text, " +
                 "TlxPerCo3 numeric, " +
                 "TlxPerHr3 numeric, " +
                 "TlxPerCo2 numeric, " +
@@ -236,6 +242,21 @@ public class DBHelper extends SQLiteOpenHelper {
                 "MelMed integer," +
                 "MelLec integer)");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + FACTURA_DOSIFICACION_TABLE + " (" +
+                FacturaDosificacion.Columns.id.name() + " integer," +
+                FacturaDosificacion.Columns.area_id.name() + " integer," +
+                FacturaDosificacion.Columns.numero.name() + " integer," +
+                FacturaDosificacion.Columns.comprobante.name() + " integer," +
+                FacturaDosificacion.Columns.fecha_inicial.name() + " text," +
+                FacturaDosificacion.Columns.fecha_limite_emision.name() + " text," +
+                FacturaDosificacion.Columns.numero_autorizacion.name() + " integer," +
+                FacturaDosificacion.Columns.llave_dosificacion.name() + " text," +
+                FacturaDosificacion.Columns.numero_factura.name() + " integer," +
+                FacturaDosificacion.Columns.estado.name() + " integer," +
+                FacturaDosificacion.Columns.leyenda1.name() + " text," +
+                FacturaDosificacion.Columns.leyenda2.name() + " text," +
+                FacturaDosificacion.Columns.actividad_economica.name() + " text)");
+
         // inserts
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
@@ -262,6 +283,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PRINT_OBS_DATA_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + PRINT_OBS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MED_ENTRE_LINEAS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FACTURA_DOSIFICACION_TABLE);
 
         onCreate(sqLiteDatabase);
     }

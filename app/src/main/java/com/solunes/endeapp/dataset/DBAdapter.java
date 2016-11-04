@@ -10,6 +10,7 @@ import android.util.Log;
 import com.solunes.endeapp.activities.MainActivity;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
+import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
@@ -436,5 +437,13 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id + " = 41", null, null, null, null);
         cursor.moveToNext();
         return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+    }
+
+    public String getLlaveDosificacion(int are) {
+        open();
+        Cursor cursor = db.query(DBHelper.FACTURA_DOSIFICACION_TABLE, null,
+                FacturaDosificacion.Columns.area_id + " = " + are, null, null, null, null);
+        cursor.moveToFirst();
+        return cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
     }
 }
