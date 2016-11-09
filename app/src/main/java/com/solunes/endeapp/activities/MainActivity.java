@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
-        dbAdapter.deleteAllData();
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
@@ -298,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean processResponse(String result) throws JSONException {
         JSONArray results = new JSONArray(result);
         DBAdapter dbAdapter = new DBAdapter(this);
+        dbAdapter.deleteAllData();
         for (int i = 0; i < results.length(); i++) {
             JSONObject object = results.getJSONObject(i);
             ContentValues values = new ContentValues();

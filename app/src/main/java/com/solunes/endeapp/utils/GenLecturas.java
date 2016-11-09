@@ -62,17 +62,16 @@ public class GenLecturas {
     }
 
     public static double ley1886(Context context, int kWhConsumo, int categoria) {
-            DBAdapter dbAdapter = new DBAdapter(context);
+        DBAdapter dbAdapter = new DBAdapter(context);
         if (kWhConsumo <= 100) {
             return round(-0.2 * (dbAdapter.getCargoFijo(categoria) + subTotal(context, kWhConsumo, categoria)));
         } else {
-            ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
-            return round(-0.2 * (dbAdapter.getCargoFijo(categoria) + (cargoEnergia.get(0).getImporte() * 30) + (cargoEnergia.get(1).getImporte() * 50)));
+            return round(-0.2 * (dbAdapter.getCargoFijo(categoria) + subTotal(context, 100, categoria)));
         }
     }
 
-    public static double totalSuministro(double totalConsumo, double ley1886) {
-        return round(totalConsumo + Constants.CONEXION_RECONEXION + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
+    public static double totalSuministro(double totalConsumo, double ley1886, double carCon, double carRec) {
+        return round(totalConsumo + carCon + carRec + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
     }
 
     public static double totalSuministroTap(int kWhConsumo) {
@@ -86,15 +85,6 @@ public class GenLecturas {
     public static double totalFacturar(double totalSuministro, double tap, double aseo) {
 
         return round(totalSuministro + tap + aseo);
-    }
-
-    public static double totalFacturar(int lectura, double ley1886, double tarifaDignidad, double importeConsumo) {
-
-        GenLecturas.totalSuministro(GenLecturas.totalConsumo(importeConsumo, tarifaDignidad), ley1886);
-
-        return round(GenLecturas.totalSuministro(GenLecturas.totalConsumo(importeConsumo, tarifaDignidad), ley1886)
-                + GenLecturas.totalSuministroTap(lectura)
-                + GenLecturas.totalSuministroAseo(lectura));
     }
 
     public static double totalConsumo(double importeConsumo, double tarifaDignidad) {

@@ -146,7 +146,6 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 40 1100 CÓDIGO DE CONTROL:\r\n" +
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
-                // TODO: 02-11-16 code control
                 "T CONSO2.CPF 0 270 1100 " + dataModel.getTlxCodCon() + "\r\n" +
                 "T CONSO2.CPF 0 270 1130 " + dataModel.getTlxFecLim() + "\r\n" +
 
@@ -181,7 +180,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 510 1430 " + dataModel.getTlxFacNro() + "\r\n" +
                 "T CONSO1.CPF 0 720 1430 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n";
 
-        cpclConfigLabel += detalleFacturacion(printTitles, printValues, null, importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
+        cpclConfigLabel += detalleFacturacion(printTitles, printValues, dataModel.getTlxCarDep(), importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
         cpclConfigLabel += "" +
                 "FORM\r\n" +
                 "PRINT\r\n";
@@ -249,7 +248,7 @@ public class PrintGenerator {
         return mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
     }
 
-    public static String detalleFacturacion(ArrayList<String> titles, ArrayList<Double> values, String garantia, double impTotFac, double importeMes, double tap, double impAse) {
+    public static String detalleFacturacion(ArrayList<String> titles, ArrayList<Double> values, double garantia, double impTotFac, double importeMes, double tap, double impAse) {
         String res = "";
 //        String[] strings = (String[]) list.keySet().toArray();
         int yValue = 480;
@@ -287,7 +286,7 @@ public class PrintGenerator {
         res += "RIGHT 782\r\n";
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
 
-        if (garantia != null) {
+        if (garantia > 0) {
             yValue += 20;
             res += "LEFT\r\n";
             res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";

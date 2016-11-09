@@ -429,10 +429,10 @@ public class DataModel {
             jsonObject.put(Columns.TlxHoraAlto.name(), dataModel.getTlxHoraAlto() == null ? "" : dataModel.getTlxHoraAlto());
             jsonObject.put(Columns.TlxConsumo.name(), dataModel.getTlxConsumo());
             jsonObject.put(Columns.TlxConsFacturado.name(), dataModel.getTlxConsFacturado());
-            jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1());
-            jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2());
-            jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3());
-            jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4());
+            jsonObject.put(Columns.TlxPreNue1.name(), dataModel.getTlxPreNue1() == null ? "" : dataModel.getTlxPreNue1());
+            jsonObject.put(Columns.TlxPreNue2.name(), dataModel.getTlxPreNue2() == null ? "" : dataModel.getTlxPreNue2());
+            jsonObject.put(Columns.TlxPreNue3.name(), dataModel.getTlxPreNue3() == null ? "" : dataModel.getTlxPreNue3());
+            jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4() == null ? "" : dataModel.getTlxPreNue4());
 
             jsonObject.put(Columns.TlxImpAvi.name(), dataModel.getTlxImpAvi());
             jsonObject.put("TlxImpEst", dataModel.getEstadoLectura());

@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -228,12 +229,12 @@ public class AdminActivity extends AppCompatActivity {
             ContentValues values = new ContentValues();
             values.put(Parametro.Columns.id.name(), object.getInt(Parametro.Columns.id.name()));
             try {
-                values.put(Parametro.Columns.valor.name(), object.getString(Parametro.Columns.valor.name()));
+                values.put(Parametro.Columns.valor.name(), object.getInt(Parametro.Columns.valor.name()));
             } catch (JSONException e) {
                 values.put(Parametro.Columns.valor.name(), 0);
             }
             try {
-                values.put(Parametro.Columns.texto.name(), object.getInt(Parametro.Columns.texto.name()));
+                values.put(Parametro.Columns.texto.name(), object.getString(Parametro.Columns.texto.name()));
             } catch (JSONException e) {
                 values.put(Parametro.Columns.texto.name(), "");
             }
