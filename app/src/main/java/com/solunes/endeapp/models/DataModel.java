@@ -52,7 +52,7 @@ public class DataModel {
     private double TlxLey1886;
     private int TlxLeePot;
     private int TlxCotaseo;
-    private double TlxTap;
+    private int TlxTap;
     private int TlxPotCon;
     private int TlxPotFac;
     private int TlxCliNit;
@@ -303,7 +303,7 @@ public class DataModel {
         dataModel.setTlxLey1886(cursor.getDouble(Columns.TlxLey1886.ordinal()));
         dataModel.setTlxLeePot(cursor.getInt(Columns.TlxLeePot.ordinal()));
         dataModel.setTlxCotaseo(cursor.getInt(Columns.TlxCotaseo.ordinal()));
-        dataModel.setTlxTap(cursor.getDouble(Columns.TlxTap.ordinal()));
+        dataModel.setTlxTap(cursor.getInt(Columns.TlxTap.ordinal()));
         dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
         dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
         dataModel.setTlxCliNit(cursor.getInt(Columns.TlxCliNit.ordinal()));
@@ -412,6 +412,7 @@ public class DataModel {
             jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
             jsonObject.put(Columns.TlxUltObs.name(), dataModel.getTlxUltObs());
             jsonObject.put(Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+            jsonObject.put(Columns.TlxOrdTpl.name(), dataModel.getTlxOrdTpl());
 
             jsonObject.put(Columns.TlxKwInst.name(), dataModel.getTlxKwInst());
             jsonObject.put(Columns.TlxReactiva.name(), dataModel.getTlxReactiva());
@@ -1010,11 +1011,11 @@ public class DataModel {
         TlxCotaseo = tlxCotaseo;
     }
 
-    public double getTlxTap() {
+    public int getTlxTap() {
         return TlxTap;
     }
 
-    public void setTlxTap(double tlxTap) {
+    public void setTlxTap(int tlxTap) {
         TlxTap = tlxTap;
     }
 

@@ -7,19 +7,29 @@ import android.database.Cursor;
  */
 public class Parametro {
     private int id;
+    private String codigo;
     private int valor;
     private String texto;
 
     public enum Columns{
-        id, valor, texto
+        id, codigo, valor, texto
     }
 
     public static Parametro fromCursor(Cursor cursor){
         Parametro parametro = new Parametro();
         parametro.setId(cursor.getInt(Columns.id.ordinal()));
+        parametro.setCodigo(cursor.getString(Columns.codigo.ordinal()));
         parametro.setValor(cursor.getInt(Columns.valor.ordinal()));
         parametro.setTexto(cursor.getString(Columns.texto.ordinal()));
         return parametro;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public int getId() {

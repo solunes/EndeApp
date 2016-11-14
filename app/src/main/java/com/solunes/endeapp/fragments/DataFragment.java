@@ -36,16 +36,10 @@ import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.PrintGenerator;
 import com.solunes.endeapp.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
 
 /**
  * Created by jhonlimaster on 01-12-15.
@@ -133,8 +127,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         Log.e(TAG, "onCreateView: " + dataModel.getTlxUltInd() + " " +
                 "\n " + dataModel.getTlxNom() +
                 "\n tiplec: " + dataModel.getTlxTipLec() +
-                "\n leytag: " + dataModel.getTlxLeyTag() +
-                "\n impavi: " + dataModel.getTlxLey1886());
+                "\n ordtpl: " + dataModel.getTlxOrdTpl());
         dbAdapter.close();
         setupUI(view, dataModel);
         actionButtons();
@@ -222,7 +215,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                if (dataModel.getEstadoLectura() == estados_lectura.Impreso.ordinal()) {
+                if (dataModel.getEstadoLectura() == estados_lectura.Leido.ordinal()) {
                     rePrint();
                 } else {
                     // Precintos
@@ -358,9 +351,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (!inputObsCode.getText().toString().isEmpty()) {
             obsCod = Integer.parseInt(inputObsCode.getText().toString());
         }
+        dataModel.setTlxImpAvi(0);
         DBAdapter dbAdapter = new DBAdapter(getContext());
         final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
         hidingViews(obs);
+        onFragmentListener.onAjusteOrden(dataModel.getId());
         saveLectura(obs);
         Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
     }
@@ -385,17 +380,20 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
         }
 
+        int tipoLectura = dataModel.getTlxTipLec();
+        int nuevaLectura = 0;
         int lecturaKwh;
         boolean giro = false;
-        if (obs.getObsLec() == 3) {
+        if (obs.getId() != 104) {
+            tipoLectura = obs.getObsLec();
+        }
+        if (tipoLectura == 3) {
             lecturaKwh = dataModel.getTlxConPro();
-            dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
-            dataModel.setTlxKwhDev(lecturaKwh);
         } else if (input.isEmpty()) {
             Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
             return;
         } else {
-            int nuevaLectura = Integer.parseInt(input);
+            nuevaLectura = Integer.parseInt(input);
             if (nuevaLectura > dataModel.getTlxTope()) {
                 Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                 return;
@@ -404,34 +402,18 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (nuevaLectura < dataModel.getTlxUltInd()) {
                 giro = true;
             }
-            dataModel.setTlxNvaLec(nuevaLectura);
             lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
         }
 
-        dataModel.setTlxConsumo(lecturaKwh);
-        if (dataModel.getTlxKwhDev() > 0 && obs.getObsLec() != 3) {
-            lecturaKwh = lecturaKwh - dataModel.getTlxKwhDev();
-            if (lecturaKwh > 0) {
-                dataModel.setTlxKwhDev(0);
-            } else {
-                dataModel.setTlxKwhDev(Math.abs(lecturaKwh));
-                lecturaKwh = 0;
-            }
-        }
-        lecturaKwh = lecturaKwh + dataModel.getTlxKwhAdi();
-        dataModel.setTlxConsFacturado(lecturaKwh);
-        dataModel.setTlxKwhAdi(0);
-
         int conPro = dataModel.getTlxConPro();
-
         boolean isAlert = false;
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Alerta!");
         String message = "Se ha detectado:";
-        if (dataModel.getTlxConsumo() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
+        if (lecturaKwh > (conPro + conPro * dbAdapter.getConsumoElevado())) {
             message = message + "\n- Consumo elevado";
             isAlert = true;
-        } else if (dataModel.getTlxConsumo() < (conPro * dbAdapter.getConsumoBajo())) {
+        } else if (lecturaKwh < (conPro * dbAdapter.getConsumoBajo())) {
             message = message + "\n- Consumo bajo";
             isAlert = true;
         }
@@ -442,22 +424,27 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         builder.setMessage(message);
         builder.setNegativeButton("Cancelar", null);
         final int finalLecturaKwh = lecturaKwh;
+        final int finalNuevaLectura = nuevaLectura;
+        final int finalTipoLectura = tipoLectura;
+
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                calculo(finalLecturaKwh, false);
+                calculo(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, false, obs);
                 hidingViews(obs);
+                onFragmentListener.onAjusteOrden(dataModel.getId());
                 saveLectura(obs);
-                printFactura(view, obs);
+                printFactura(view);
             }
         });
         if (isAlert) {
             builder.show();
         } else {
-            calculo(finalLecturaKwh, false);
+            calculo(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, false, obs);
             hidingViews(obs);
+            onFragmentListener.onAjusteOrden(dataModel.getId());
             saveLectura(obs);
-            printFactura(view, obs);
+            printFactura(view);
         }
         dbAdapter.close();
     }
@@ -487,7 +474,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 contentValues.put(PrintObsData.Columns.observacion_imp_id.name(), printObs.getId());
                 dbAdapter.saveObject(DBHelper.PRINT_OBS_DATA_TABLE, contentValues);
 
-                calculo(0, true);
+                calculo(0, 0, 0, true, null);
 
                 sendPrint();
             }
@@ -497,28 +484,23 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
 
     private void hidingViews(Obs obs) {
+        String impaviString = "";
+        if (dataModel.getTlxImpAvi() == 0) {
+            impaviString = "No Impreso";
+        } else {
+            impaviString = "Impreso";
+        }
         buttonObs.setEnabled(false);
+        inputObsCode.setText(String.valueOf(obs.getId()));
         inputObsCode.setEnabled(false);
         inputReading.setEnabled(false);
-        if (obs.getObsFac() == 1 && dataModel.getTlxTipLec() != 4) {
-            dataModel.setEstadoLectura(estados_lectura.Impreso.ordinal());
-            estadoMedidor.setText(estados_lectura.Impreso.name());
-            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
-            buttonConfirm.setText(R.string.re_print);
-            inputPotenciaReading.setEnabled(false);
-            inputPreNue1.setEnabled(false);
-            inputPreNue2.setEnabled(false);
+        if (dataModel.getTlxTipLec() != 5) {
+            dataModel.setEstadoLectura(estados_lectura.Leido.ordinal());
         } else {
-            buttonConfirm.setEnabled(false);
             dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
-            estadoMedidor.setText(estados_lectura.Postergado.name());
-            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
         }
         if (dataModel.getTlxTipDem() == 3) {
             dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
-            estadoMedidor.setText(estados_lectura.Postergado.name());
-            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
-
             kwInst.setEnabled(false);
             reactiva.setEnabled(false);
             kwalto.setEnabled(false);
@@ -534,37 +516,30 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputHoraMedio.setEnabled(false);
             inputHoraBajo.setEnabled(false);
         }
-
-        if (dataModel.getTlxImpAvi() == 0) {
-            dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
-            estadoMedidor.setText(estados_lectura.Postergado.name());
+        if (dataModel.getEstadoLectura() == 1) {
+            estadoMedidor.setText(estados_lectura.Leido.name() + " - " + impaviString);
+            estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
+            buttonConfirm.setText(R.string.re_print);
+            inputPotenciaReading.setEnabled(false);
+            inputPreNue1.setEnabled(false);
+            inputPreNue2.setEnabled(false);
+        } else {
+            buttonConfirm.setEnabled(false);
+            estadoMedidor.setText(estados_lectura.Postergado.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
             buttonConfirm.setEnabled(false);
             buttonConfirm.setText("confirmar");
         }
     }
 
-    private void printFactura(View view, Obs obs) {
+    private void printFactura(View view) {
         if (dataModel.getTlxTipDem() == 3) {
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
             return;
         }
-        if (dataModel.getTlxTipLec() == 4) {
-            Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
-            return;
-        }
-        if (obs.getObsFac() == 1) {
-            if (dataModel.getTlxImpAvi() == 1) {
-                sendPrint();
-            } else {
-                Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
-            }
+        if (dataModel.getTlxImpAvi() == 1) {
+            sendPrint();
         } else {
-            DBAdapter dbAdapter = new DBAdapter(getContext());
-            ContentValues values = new ContentValues();
-            values.put(DataModel.Columns.TlxImpAvi.name(), 0);
-            dbAdapter.updateData(dataModel.getTlxCli(), values);
-            dbAdapter.close();
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
         }
     }
@@ -635,8 +610,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
 
         cv.put(DataModel.Columns.TlxCodCon.name(), dataModel.getTlxCodCon());
+        cv.put(DataModel.Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
+        cv.put(DataModel.Columns.TlxImpAvi.name(), dataModel.getTlxImpAvi());
 
-        dbAdapter.updateData(dataModel.getTlxCli(), cv);
+        dbAdapter.updateData(dataModel.getId(), cv);
 
         cv = new ContentValues();
         cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
@@ -644,12 +621,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
 
         int conPro = dataModel.getTlxConPro();
-        if (dataModel.getTlxNvaLec() > (conPro + conPro * 0.2)) {
+        if (dataModel.getTlxNvaLec() > (conPro + conPro * dbAdapter.getConsumoElevado())) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        } else if (dataModel.getTlxNvaLec() < (conPro * 0.8)) {
+        } else if (dataModel.getTlxNvaLec() < (conPro * dbAdapter.getConsumoBajo())) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 81);
@@ -660,9 +637,32 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         onFragmentListener.onTabListener();
     }
 
-    private void calculo(int lectura, boolean reprint) {
+    private void calculo(int tipoLectura, int nuevaLectura, int lectura, boolean reprint, Obs obs) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         if (!reprint) {
+            if (obs.getObsFac() == 0) {
+                dataModel.setTlxImpAvi(0);
+            }
+            if (tipoLectura == 3) {
+                dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
+                dataModel.setTlxKwhDev(lectura);
+            }
+            dataModel.setTlxTipLec(tipoLectura);
+            dataModel.setTlxNvaLec(nuevaLectura);
+            dataModel.setTlxConsumo(lectura);
+            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 6) {
+                lectura = lectura - dataModel.getTlxKwhDev();
+                if (lectura > 0) {
+                    dataModel.setTlxKwhDev(0);
+                } else {
+                    dataModel.setTlxKwhDev(Math.abs(lectura));
+                    lectura = 0;
+                }
+            }
+            lectura = lectura + dataModel.getTlxKwhAdi();
+            dataModel.setTlxConsFacturado(lectura);
+            dataModel.setTlxKwhAdi(0);
+
             lectura = (int) (lectura * dataModel.getTlxFacMul());
             dataModel.setTlxCarFij(dbAdapter.getCargoFijo(dataModel.getTlxCtg()));
             double importeEnergia = GenLecturas.importeEnergia(getContext(), lectura, dataModel.getTlxCtg());
@@ -716,11 +716,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             printValues.add(dataModel.getTlxLey1886());
         }
 
-        if (dataModel.getTlxCarCon() > 0){
+        if (dataModel.getTlxCarCon() > 0) {
             printTitles.add("Mas Cargo por Conexion");
             printValues.add(dataModel.getTlxCarCon());
         }
-        if (dataModel.getTlxCarRec() > 0){
+        if (dataModel.getTlxCarRec() > 0) {
             printTitles.add("Mas Cargo por Reconexion");
             printValues.add(dataModel.getTlxCarRec());
         }
@@ -731,8 +731,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         printValues.add(totalConsumo);
         printTitles.add("Importe total por el suministro");
         printValues.add(dataModel.getTlxImpFac());
-        double totalSuministroTap = GenLecturas.totalSuministroTap(lectura);
-        double totalSuministroAseo = GenLecturas.totalSuministroAseo(lectura);
+        double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), totalConsumo);
+        double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), lectura);
         importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo);
         importeMesCancelar = importeTotalFactura + dataModel.getTlxCarDep();
 
@@ -740,15 +740,26 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             dataModel.setTlxImpFac(totalSuministro);
             dataModel.setTlxImpTap(totalSuministroTap);
             dataModel.setTlxImpAse(totalSuministroAseo);
-            dataModel.setTlxImpTot(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI());
+            dataModel.setTlxImpTot(GenLecturas.round(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI()));
             dataModel.setTlxCodCon(getControlCode(dataModel));
+            if (dataModel.getTlxTipLec() != 5) {
+                dataModel.setEstadoLectura(estados_lectura.Leido.ordinal());
+            } else {
+                dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+            }
             dbAdapter.close();
         }
     }
 
     private void validSaved() {
+        String impaviString = "";
+        if (dataModel.getTlxImpAvi() == 0) {
+            impaviString = "No Impreso";
+        } else {
+            impaviString = "Impreso";
+        }
         if (dataModel.getEstadoLectura() == 1) {
-            estadoMedidor.setText(estados_lectura.Impreso.name());
+            estadoMedidor.setText(estados_lectura.Leido.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
             buttonConfirm.setText(R.string.re_print);
             inputReading.setEnabled(false);
@@ -761,7 +772,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputObsCode.setEnabled(false);
             inputReading.setEnabled(false);
             buttonConfirm.setEnabled(false);
-            estadoMedidor.setText(estados_lectura.Postergado.name());
+            estadoMedidor.setText(estados_lectura.Postergado.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
         } else {
             estadoMedidor.setText(estados_lectura.Pendiente.name());
@@ -778,9 +789,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
         if (dataModel.getEstadoLectura() != 0) {
             if (dataModel.getTlxImpAvi() == 0) {
-                dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
-                estadoMedidor.setText(estados_lectura.Postergado.name());
-                estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
                 buttonConfirm.setEnabled(false);
                 buttonConfirm.setText("confirmar");
             }
@@ -838,10 +846,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         void onTabListener();
 
         void onPrinting(String srcToPrint);
+
+        void onAjusteOrden(int idData);
     }
 
-    private enum estados_lectura {
-        Pendiente, Impreso, Postergado
+    public enum estados_lectura {
+        Pendiente, Leido, Postergado
     }
 
     private void layoutGranDemanda(View view) {
@@ -998,43 +1008,5 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 String.valueOf((int) dataModel.getTlxImpFac()),
                 llaveDosificacion);
         return generateControlCode;
-
-//        int count=0;
-//        int fiveDigitsVerhoeffCount=0;
-//        int stringDKeyCount=0;
-//        int sumProductCount=0;
-//        int base64SINCount=0;
-//        int ccCount=0;
-//
-//        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                count+=1;
-//                //reemplaza "|" por "/-/" por no ser compatible con el metodo split
-//                line = line.replace("|", "/-/");
-//                String[] ary = line.split("/-/");
-//                //genera codigo de control
-//                String cc = controlCode.generate(ary[0], ary[1], ary[2], ary[3].replace("/", ""), ary[4], ary[5]);
-//                System.out.println(cc);
-//
-//                //controla errores
-//                if(!ary[6].equals(controlCode.getFiveDigitsVerhoeff()))fiveDigitsVerhoeffCount+=1;
-//                if(!ary[7].equals(controlCode.getStringDKey()))stringDKeyCount+=1;
-//                if(!ary[8].equals(String.valueOf(controlCode.getSumProduct())))sumProductCount+=1;
-//                if(!ary[9].equals(String.valueOf(controlCode.getBase64SIN())))base64SINCount+=1;
-//                if(!ary[10].equals(cc))ccCount+=1;
-//            }
-//        } catch (IOException e) {
-//            System.err.println(e.getMessage());
-//        }
-//
-//        System.out.println("Error 5 digitos Verhoeff: " + fiveDigitsVerhoeffCount);
-//        System.out.println("Error Cadena de dosificación: " + stringDKeyCount);
-//        System.out.println("Error Suma Producto: " + sumProductCount);
-//        System.out.println("Error Base64: " + base64SINCount);
-//        System.out.println("Error codigo de control: " + ccCount);
-//        System.out.println("---------------------------------------------");
-//        System.out.println("Total Registros testeados: " + count);
     }
-
 }

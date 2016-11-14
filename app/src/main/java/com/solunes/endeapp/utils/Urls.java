@@ -12,7 +12,7 @@ public class Urls {
 
     public static String endpointBase(Context context) {
         String url = UserPreferences.getString(context, AdminActivity.KEY_DOMAIN);
-        return "http://"+url;
+        return "http://" + url;
     }
 
     public static String urlDescarga(Context context) {
@@ -25,5 +25,9 @@ public class Urls {
 
     public static String urlParametros(Context context) {
         return endpointBase(context) + "/api/parametros-fijos";
+    }
+
+    public static String urlauthenticate(Context context) {
+        return endpointBase(context) + "/api-auth/authenticate";
     }
 }

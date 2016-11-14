@@ -28,14 +28,18 @@ public class PrintGenerator {
         double deudas = 0;
 
         if (dataModel.getTlxDeuEneC() > 0) {
-            deudasEnergia = "T CONSO2.CPF 0 45 925 Mas deuda(s) pendiente(s) de energia  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
-            deudasEnergia = deudasEnergia + "T CONSO2.CPF 0 45 925 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuEneI()) + "\r\n";
+            deudasEnergia = "LEFT\r\n";
+            deudasEnergia += "T CONSO2.CPF 0 45 925 Mas deuda(s) pendiente(s) de energia  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
+            deudasEnergia += "RIGHT 782\r\n";
+            deudasEnergia += "T CONSO2.CPF 0 45 925 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuEneI()) + "\r\n";
             deudas += dataModel.getTlxDeuEneI();
         }
         String deudasAseo = "";
         if (dataModel.getTlxDeuAseC() > 0) {
-            deudasAseo = "T CONSO2.CPF 0 45 945 Deuda(s) pendiente(s) de tasa de aseo (" + dataModel.getTlxDeuAseC() + ") Bs\r\n";
-            deudasAseo = deudasAseo + "T CONSO2.CPF 0 45 945 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuAseI()) + "\r\n";
+            deudasAseo = "LEFT\r\n";
+            deudasAseo += "T CONSO2.CPF 0 45 945 Deuda(s) pendiente(s) de tasa de aseo (" + dataModel.getTlxDeuAseC() + ") Bs\r\n";
+            deudasAseo += "RIGHT 782\r\n";
+            deudasAseo += "T CONSO2.CPF 0 45 945 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuAseI()) + "\r\n";
             deudas += dataModel.getTlxDeuAseI();
         }
 
@@ -49,9 +53,9 @@ public class PrintGenerator {
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) +
                 "|" + dataModel.getTlxCodCon() +
                 "|" + dataModel.getTlxCliNit() +
-                "|" + tasas +
+                "|" + StringUtils.roundTwoDigits(tasas) +
                 "|0" +
-                "|" + deudas +
+                "|" + StringUtils.roundTwoDigits(tasas + dataModel.getTlxCarDep()) +
                 "|0";
 
         String cpclConfigLabel = "! 0 200 200 1570 1\r\n" +
@@ -133,12 +137,11 @@ public class PrintGenerator {
                 "T CONSO3.CPF 0 45 968 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n" +
                 "T CONSO3.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) + "\r\n" +
 
-                "LEFT\r\n" +
                 deudasEnergia +
                 deudasAseo +
 
-
                 // BLOQUE 4: QR, control code
+                "LEFT\r\n" +
                 "B QR 485 1070 M 2 U 4\r\n" +
                 "MA," + qrData + "\r\n" +
                 "ENDQR\r\n" +
@@ -166,6 +169,7 @@ public class PrintGenerator {
                 "T CONSO0.CPF 0 435 1308 Mes/Año  Consumo kWh\r\n" +
                 "T CONSO0.CPF 0 635 1308 Mes/Año  Consumo kWh\r\n" +
 
+                "LEFT\r\n" +
                 createHistorico(historico) +
 
                 "T CONSO0.CPF 0 55 1378 Fecha Vencimiento: \r\n" +
@@ -299,6 +303,7 @@ public class PrintGenerator {
         res += "LEFT\r\n";
         res += "T CONSO3.CPF 0 40 " + yValue + " Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(importeMes)) + "\r\n";
 
+        Log.e(TAG, "detalleFacturacion: " + res);
         return res;
     }
 
@@ -334,7 +339,7 @@ public class PrintGenerator {
     private static String detalleConsumo(DataModel dataModel) {
         String res = "";
         int offsetX = 340;
-        if (dataModel.getTlxKwhDev() > 0) {
+        if (dataModel.getTlxKwhDev() > 0 && dataModel.getTlxTipLec() != 3 && dataModel.getTlxTipLec() != 6) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a devolver\r\n" +

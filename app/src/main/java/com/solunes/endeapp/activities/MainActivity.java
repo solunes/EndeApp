@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     public static final String KEY_RATE = "update_rate";
     public static final String KEY_RATE_MONTH = "update_rate_month";
-    private static final String KEY_DOWNLOAD = "download";
-    private static final String KEY_WAS_UPLOAD = "was_upload";
+    public static final String KEY_DOWNLOAD = "download";
+    public static final String KEY_WAS_UPLOAD = "was_upload";
     private static final String KEY_SEND = "send";
     private static final String KEY_ENDPOINT_GESTION = "endpoint_gestion";
     private static final String KEY_ENDPOINT_MONTH = "endpoint_month";
@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Log.e(TAG, "onCreate: " + StringUtils.roundTwoDigits(100));
 
         DBAdapter adapter = new DBAdapter(this);
         user = adapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
@@ -132,11 +134,6 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logout:
                 UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);
-                UserPreferences.putInt(this, LoginActivity.KEY_LOGIN_ID, 0);
-                DBAdapter dbAdapter = new DBAdapter(this);
-                UserPreferences.putLong(this, KEY_DOWNLOAD, 0);
-                UserPreferences.putBoolean(this, KEY_WAS_UPLOAD, false);
-                dbAdapter.clearTablesNoUser();
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
                 return true;
@@ -165,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         }
         String url = Urls.urlDescarga(getApplicationContext()) + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
         final String finalRemesa = remesa;
-        new GetRequest(url, new CallbackAPI() {
+        new GetRequest(getApplicationContext(),url, new CallbackAPI() {
             @Override
             public void onSuccess(final String result, int statusCode) {
                 Runnable runSaveData = new Runnable() {
@@ -178,15 +175,15 @@ public class MainActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             Log.e(TAG, "onSuccess: ", e);
                         }
-                        if (response){
-                        wasDownload = true;
-                        UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
-                        UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
-                        UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
+                        if (response) {
+                            wasDownload = true;
+                            UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
+                            UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
+                            UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
 
-                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
-                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
-                        UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
+                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
+                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
+                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
                         } else {
                             Snackbar.make(view, "No hay datos en la descarga", Snackbar.LENGTH_SHORT).show();
                         }
@@ -265,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        new GetRequest(Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+        new GetRequest(getApplicationContext(),Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
                 try {
@@ -297,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean processResponse(String result) throws JSONException {
         JSONArray results = new JSONArray(result);
         DBAdapter dbAdapter = new DBAdapter(this);
-        dbAdapter.deleteAllData();
+        dbAdapter.beforeDownloadData();
         for (int i = 0; i < results.length(); i++) {
             JSONObject object = results.getJSONObject(i);
             ContentValues values = new ContentValues();
@@ -345,6 +342,9 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxKwhAdi.name(), object.getInt(DataModel.Columns.TlxKwhAdi.name()));
             values.put(DataModel.Columns.TlxImpAvi.name(), object.getInt(DataModel.Columns.TlxImpAvi.name()));
             values.put(DataModel.Columns.TlxCarFac.name(), object.getInt(DataModel.Columns.TlxCarFac.name()));
+            values.put(DataModel.Columns.TlxCarCon.name(), object.getInt(DataModel.Columns.TlxCarCon.name()));
+            values.put(DataModel.Columns.TlxCarRec.name(), object.getInt(DataModel.Columns.TlxCarRec.name()));
+            values.put(DataModel.Columns.TlxCarDep.name(), object.getInt(DataModel.Columns.TlxCarDep.name()));
             values.put(DataModel.Columns.TlxDeuEneC.name(), object.getInt(DataModel.Columns.TlxDeuEneC.name()));
             values.put(DataModel.Columns.TlxDeuEneI.name(), object.getDouble(DataModel.Columns.TlxDeuEneI.name()));
             values.put(DataModel.Columns.TlxDeuAseC.name(), object.getInt(DataModel.Columns.TlxDeuAseC.name()));
@@ -542,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText nroMed;
     private EditText lecMed;
+
     public void newMedidor(final View view) {
         if (!wasDownload) {
             Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();

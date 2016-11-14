@@ -2,6 +2,7 @@ package com.solunes.endeapp.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Looper;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.adapters.PagerAdapter;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.utils.UserPreferences;
@@ -47,6 +49,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private static final String TAG = "ReadingActivity";
 
     public static final String KEY_LAST_PAGER_PSOTION = "last_pager_position";
+    public static final String KEY_LAST_DATA_SAVED = "last_data_saved";
 
     private ZebraPrinter printer;
     private Connection connection;
@@ -64,6 +67,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private Snackbar snackbar;
 
     private int currentState = -1;
+    private ArrayList<DataModel> datas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +83,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
         DBAdapter dbAdapter = new DBAdapter(this);
-        ArrayList<DataModel> datas = new ArrayList<>();
+        datas = new ArrayList<>();
         if (getIntent().getExtras() != null) {
             int filter = getIntent().getExtras().getInt(MainActivity.KEY_FILTER);
             currentState = filter;
@@ -108,7 +112,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
             tabText.setText(i + 1 + "");
-            if (datas.get(i).getTlxNvaLec() > 0) {
+            if (datas.get(i).getEstadoLectura() != DataFragment.estados_lectura.Pendiente.ordinal()) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
             tabAt.setCustomView(inflate);
@@ -124,8 +128,13 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             }
         }).start();
 
-        int pagerPosition = UserPreferences.getInt(getApplicationContext(), KEY_LAST_PAGER_PSOTION);
-        viewPager.setCurrentItem(pagerPosition);
+        int idData = UserPreferences.getInt(getApplicationContext(), KEY_LAST_PAGER_PSOTION);
+        for (int i = 0; i < datas.size(); i++) {
+            if (datas.get(i).getId() == idData) {
+                viewPager.setCurrentItem(i);
+                break;
+            }
+        }
 
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         radioCli = (RadioButton) findViewById(R.id.cli_radio);
@@ -151,6 +160,24 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     }
 
     @Override
+    public void onAjusteOrden(int idData) {
+        DBAdapter dbAdapter = new DBAdapter(this);
+        DataModel dataLastSaved = dbAdapter.getLastSaved();
+        DataModel dataCurrent = dbAdapter.getData(idData);
+        if (dataLastSaved == null) {
+            dbAdapter.orderPendents(0, dataCurrent.getTlxOrdTpl());
+            dataCurrent.setTlxOrdTpl(1);
+        } else {
+            dbAdapter.orderPendents(dataLastSaved.getTlxOrdTpl(), dataCurrent.getTlxOrdTpl());
+            dataCurrent.setTlxOrdTpl(dataLastSaved.getTlxOrdTpl() + 1);
+        }
+        ContentValues values = new ContentValues();
+        values.put(DataModel.Columns.TlxOrdTpl.name(), dataCurrent.getTlxOrdTpl());
+        dbAdapter.updateData(dataCurrent.getId(), values);
+        dbAdapter.close();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -165,7 +192,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     protected void onPause() {
         super.onPause();
-        UserPreferences.putInt(this, KEY_LAST_PAGER_PSOTION, viewPager.getCurrentItem());
+        UserPreferences.putInt(this, KEY_LAST_PAGER_PSOTION, datas.get(viewPager.getCurrentItem()).getId());
     }
 
     private void doConnection() {

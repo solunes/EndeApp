@@ -71,6 +71,12 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                         } else {
+                            if (user.getLecId() != UserPreferences.getInt(LoginActivity.this, KEY_LOGIN_ID)){
+                                UserPreferences.putInt(LoginActivity.this, LoginActivity.KEY_LOGIN_ID, 0);
+                                UserPreferences.putLong(LoginActivity.this, MainActivity.KEY_DOWNLOAD, 0);
+                                UserPreferences.putBoolean(LoginActivity.this, MainActivity.KEY_WAS_UPLOAD, false);
+                                dbAdapter.clearTablesNoUser();
+                            }
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.solunes.endeapp.Constants;
 import com.solunes.endeapp.dataset.DBAdapter;
+import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.Tarifa;
 
 import java.util.ArrayList;
@@ -74,12 +75,24 @@ public class GenLecturas {
         return round(totalConsumo + carCon + carRec + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
     }
 
-    public static double totalSuministroTap(int kWhConsumo) {
-        return round(kWhConsumo * Constants.ALUMBRADO_PUBLICO);
+    public static double totalSuministroTap(DataModel dataModel, Context context, double importeConsumo) {
+        DBAdapter dbAdapter = new DBAdapter(context);
+        double valorTAP = 0;
+        if (dataModel.getTlxTap() != 0) {
+            valorTAP = dbAdapter.getValorTAP(dataModel.getTlxAre(), dataModel.getTlxCtgTap(), dataModel.getTlxMes(), dataModel.getTlxAno());
+        }
+        dbAdapter.close();
+        return round(importeConsumo * valorTAP);
     }
 
-    public static double totalSuministroAseo(int kWhConsumo) {
-        return round(kWhConsumo * Constants.TASA_ASEO);
+    public static double totalSuministroAseo(DataModel dataModel, Context context, int kWhConsumo) {
+        DBAdapter dbAdapter = new DBAdapter(context);
+        double importeAseo = 0;
+        if (dataModel.getTlxCotaseo() != 0){
+            importeAseo = dbAdapter.getImporteAseo(dataModel.getTlxCtgAseo(), dataModel.getTlxMes(), dataModel.getTlxAno(), kWhConsumo);
+        }
+        dbAdapter.close();
+        return round(importeAseo);
     }
 
     public static double totalFacturar(double totalSuministro, double tap, double aseo) {

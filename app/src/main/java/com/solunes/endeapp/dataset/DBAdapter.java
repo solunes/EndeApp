@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.solunes.endeapp.activities.MainActivity;
+import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.FacturaDosificacion;
@@ -17,6 +18,8 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.Tarifa;
+import com.solunes.endeapp.models.TarifaAseo;
+import com.solunes.endeapp.models.TarifaTap;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.StatisticsItem;
 
@@ -78,8 +81,9 @@ public class DBAdapter {
     public void clearTablesNoUser() {
         open();
         db.delete(DBHelper.DATA_TABLE, null, null);
+        db.delete(DBHelper.HISTORICO_TABLE, null, null);
+        db.delete(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null);
         db.delete(DBHelper.DATA_OBS_TABLE, null, null);
-        db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
     }
 
@@ -90,7 +94,7 @@ public class DBAdapter {
 
     public void updateData(int client, ContentValues contentValues) {
         open();
-        db.update(DBHelper.DATA_TABLE, contentValues, DataModel.Columns.TlxCli.name() + " = " + client, null);
+        db.update(DBHelper.DATA_TABLE, contentValues, DataModel.Columns.id.name() + " = " + client, null);
     }
 
     public ArrayList<DataModel> getAllData() {
@@ -109,7 +113,7 @@ public class DBAdapter {
         ArrayList<DataModel> dataModels = new ArrayList<>();
         Cursor query = db.query(DBHelper.DATA_TABLE, null,
                 DataModel.Columns.estado_lectura.name() + " = 1 " +
-                "OR " + DataModel.Columns.estado_lectura.name() + " = 2",
+                        "OR " + DataModel.Columns.estado_lectura.name() + " = 2",
                 null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
@@ -333,16 +337,23 @@ public class DBAdapter {
         open();
         Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id.name() + " = " + categoria
                 + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
-        cursor.moveToNext();
-        return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+        if (cursor.getCount() > 0) {
+            cursor.moveToNext();
+            return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+        }
+        Log.e(TAG, "getCargoFijo: 0");
+        return 0;
     }
 
     public int getCargoFijoDescuento(int categoria) {
         open();
         Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id.name() + " = " + categoria
                 + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
-        cursor.moveToNext();
-        return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
+        if (cursor.getCount() > 0) {
+            cursor.moveToNext();
+            return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
+        }
+        return 0;
     }
 
     public List<StatisticsItem> getSt(int param) {
@@ -445,5 +456,61 @@ public class DBAdapter {
                 FacturaDosificacion.Columns.area_id + " = " + are, null, null, null, null);
         cursor.moveToFirst();
         return cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
+    }
+
+    public double getValorTAP(int area, int categoriaTarifa, int mes, int anio) {
+        open();
+        Cursor cursor = db.query(DBHelper.TARIFA_TAP_TABLE, null, TarifaTap.Columns.area_id.name() + " = " + area +
+                " AND " + TarifaTap.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
+                " AND " + TarifaTap.Columns.mes.name() + " = " + mes +
+                " AND " + TarifaTap.Columns.anio.name() + " = " + anio, null, null, null, null);
+        cursor.moveToFirst();
+        return cursor.getDouble(TarifaTap.Columns.valor.ordinal());
+    }
+
+    public double getImporteAseo(int categoriaTarifa, int mes, int anio, int kwhConsumo) {
+        open();
+        Cursor cursor = db.query(DBHelper.TARIFA_ASEO_TABLE, null, TarifaAseo.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
+                " AND " + TarifaAseo.Columns.mes.name() + " = " + mes +
+                " AND " + TarifaAseo.Columns.anio.name() + " = " + anio +
+                " AND " + TarifaAseo.Columns.kwh_desde.name() + " <= " + kwhConsumo +
+                " AND " + TarifaAseo.Columns.kwh_hasta.name() + " >= " + kwhConsumo, null, null, null, null);
+        cursor.moveToFirst();
+        return cursor.getDouble(TarifaAseo.Columns.importe.ordinal());
+    }
+
+    public DataModel getLastSaved() {
+        open();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, "NOT " + DataModel.Columns.estado_lectura.name() + " = " + DataFragment.estados_lectura.Pendiente.ordinal(), null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
+        if (query.getCount() > 0) {
+            query.moveToLast();
+            DataModel dataModel = DataModel.fromCursor(query);
+            return dataModel;
+        }
+        query.close();
+        return null;
+    }
+
+    public void orderPendents(int idDataLas, int idDataCurrent) {
+        open();
+        Cursor cursor = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = " + DataFragment.estados_lectura.Pendiente.ordinal() +
+                " AND " + DataModel.Columns.TlxOrdTpl.name() + " > " + idDataLas +
+                " AND " + DataModel.Columns.TlxOrdTpl.name() + " < " + idDataCurrent, null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
+        Cursor allData = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
+        allData.moveToLast();
+        int lastOrdTpl = DataModel.fromCursor(allData).getTlxOrdTpl();
+        while (cursor.moveToNext()) {
+            lastOrdTpl++;
+            ContentValues cv = new ContentValues();
+            cv.put(DataModel.Columns.TlxOrdTpl.name(), lastOrdTpl);
+            db.update(DBHelper.DATA_TABLE, cv, DataModel.Columns.id.name() + " = " + cursor.getInt(DataModel.Columns.id.ordinal()), null);
+        }
+    }
+
+    public void beforeDownloadData() {
+        open();
+        db.delete(DBHelper.DATA_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
+        db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
     }
 }

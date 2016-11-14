@@ -1,7 +1,11 @@
 package com.solunes.endeapp.networking;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.solunes.endeapp.activities.AdminActivity;
+import com.solunes.endeapp.utils.UserPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,15 +23,16 @@ public class GetRequest extends AsyncTask<String, Void, String> {
     private String TAG = GetRequest.class.getSimpleName();
     private Hashtable<String, String> headers;
     private String urlEndpoint;
-    private int statusCode = 0;
-    private String token = null;
+    private int statusCode;
+    private String token;
     private CallbackAPI callbackAPI;
 
 
-    public GetRequest(String urlEndpoint, CallbackAPI callbackAPI) {
-        this.headers = new Hashtable<String, String>();
+    public GetRequest(Context context, String urlEndpoint, CallbackAPI callbackAPI) {
+        this.headers = new Hashtable<>();
         this.urlEndpoint = urlEndpoint;
         this.callbackAPI = callbackAPI;
+        this.token = UserPreferences.getString(context, AdminActivity.KEY_TOKEN);
     }
 
     @Override
@@ -36,18 +41,15 @@ public class GetRequest extends AsyncTask<String, Void, String> {
         Log.e(TAG, "endPoint: " + urlEndpoint);
 
         try {
+            if (token != null) {
+                urlEndpoint += "?token=" + token;
+            }
             urlConnection = (HttpURLConnection) new URL(urlEndpoint).openConnection();
             int TIMEOUT_VALUE = 10000;
             urlConnection.setReadTimeout(TIMEOUT_VALUE);
             urlConnection.setConnectTimeout(TIMEOUT_VALUE);
             urlConnection.setRequestMethod("GET");
 
-            if (this.token != null)
-                urlConnection.setRequestProperty("Authorization", "Token " + this.token);
-
-            if (headers.size() > 0)
-                for (String key : headers.keySet())
-                    urlConnection.setRequestProperty(key, headers.get(key));
 
             urlConnection.setDoInput(true);
             urlConnection.connect();

@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -28,9 +29,12 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.Tarifa;
+import com.solunes.endeapp.models.TarifaAseo;
+import com.solunes.endeapp.models.TarifaTap;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
+import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 
@@ -39,12 +43,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.Hashtable;
 
 public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
     public static final String KEY_DOMAIN = "key_domain";
     public static final String KEY_PRINT_MANE = "key_print_name";
+    public static final String KEY_TOKEN = "key_token";
+    public static final String KEY_EXPIRATION_DATE = "key_expiration_date";
 
     private EditText editDomain;
     private TextView nroDomain;
@@ -66,7 +73,7 @@ public class AdminActivity extends AppCompatActivity {
 
         editDomain = (EditText) findViewById(R.id.edit_domain);
         TextView textUsername = (TextView) findViewById(R.id.text_username);
-        Button btnSaveTpl = (Button) findViewById(R.id.btn_save_domain);
+        Button btnSaveDomain = (Button) findViewById(R.id.btn_save_domain);
         Button btnFixParams = (Button) findViewById(R.id.btn_fix_params);
         nroDomain = (TextView) findViewById(R.id.label_nro_domain);
         url = UserPreferences.getString(getApplicationContext(), KEY_DOMAIN);
@@ -77,16 +84,40 @@ public class AdminActivity extends AppCompatActivity {
 
         int id_user = getIntent().getExtras().getInt("id_user");
         DBAdapter dbAdapter = new DBAdapter(this);
-        User user = dbAdapter.getUser(id_user);
+        final User user = dbAdapter.getUser(id_user);
         dbAdapter.close();
         textUsername.setText(user.getLecNom());
-        btnSaveTpl.setOnClickListener(new View.OnClickListener() {
+        btnSaveDomain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!editDomain.getText().toString().isEmpty()) {
                     url = editDomain.getText().toString();
                     UserPreferences.putString(getApplicationContext(), KEY_DOMAIN, url);
                     nroDomain.setText("Url: " + url);
+                    Hashtable<String, String> params = new Hashtable<>();
+                    params.put("LecCod", user.getLecCod());
+                    params.put("password", user.getLecPas());
+                    new PostRequest(params, null, Urls.urlauthenticate(getApplicationContext()), new CallbackAPI() {
+                        @Override
+                        public void onSuccess(String result, int statusCode) {
+                            JSONObject jsonObject = null;
+                            try {
+                                jsonObject = new JSONObject(result);
+                                Log.e(TAG, "onSuccess: token " + result);
+                                String token = jsonObject.getString("token");
+                                String expirationDate = jsonObject.getString("expirationDate");
+                                UserPreferences.putString(getApplicationContext(), KEY_TOKEN, token);
+                                UserPreferences.putString(getApplicationContext(), KEY_EXPIRATION_DATE, expirationDate);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailed(String reason, int statusCode) {
+                            Toast.makeText(AdminActivity.this, "Error inesperado", Toast.LENGTH_SHORT).show();
+                        }
+                    }).execute();
                 }
             }
         });
@@ -99,11 +130,11 @@ public class AdminActivity extends AppCompatActivity {
                 builder.setPositiveButton("Aceptar", null);
                 progressDialog.setMessage("Descargando....");
                 progressDialog.setCancelable(false);
-                if (url == null){
+                if (url == null) {
                     Snackbar.make(view, "No hay url del servidor", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                new GetRequest(Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+                new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
                     @Override
                     public void onSuccess(String result, int statusCode) {
                         try {
@@ -228,6 +259,7 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = parametros.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(Parametro.Columns.id.name(), object.getInt(Parametro.Columns.id.name()));
+            values.put(Parametro.Columns.codigo.name(), object.getString(Parametro.Columns.codigo.name()));
             try {
                 values.put(Parametro.Columns.valor.name(), object.getInt(Parametro.Columns.valor.name()));
             } catch (JSONException e) {
@@ -283,6 +315,34 @@ public class AdminActivity extends AppCompatActivity {
             values.put(FacturaDosificacion.Columns.actividad_economica.name(), object.getString(FacturaDosificacion.Columns.actividad_economica.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.FACTURA_DOSIFICACION_TABLE, values);
+        }
+
+        JSONArray tarifaTap = jsonObject.getJSONArray("tarifas-tap");
+        for (int i = 0; i < tarifaTap.length(); i++) {
+            JSONObject object = tarifaTap.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(TarifaTap.Columns.id.name(), object.getInt(TarifaTap.Columns.id.name()));
+            values.put(TarifaTap.Columns.area_id.name(), object.getInt(TarifaTap.Columns.area_id.name()));
+            values.put(TarifaTap.Columns.categoria_tarifa_id.name(), object.getInt(TarifaTap.Columns.categoria_tarifa_id.name()));
+            values.put(TarifaTap.Columns.anio.name(), object.getInt(TarifaTap.Columns.anio.name()));
+            values.put(TarifaTap.Columns.mes.name(), object.getInt(TarifaTap.Columns.mes.name()));
+            values.put(TarifaTap.Columns.valor.name(), object.getDouble(TarifaTap.Columns.valor.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.TARIFA_TAP_TABLE, values);
+        }
+        JSONArray tarifaTas = jsonObject.getJSONArray("tarifas-aseo");
+        for (int i = 0; i < tarifaTas.length(); i++) {
+            JSONObject object = tarifaTas.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(TarifaAseo.Columns.id.name(), object.getInt(TarifaAseo.Columns.id.name()));
+            values.put(TarifaAseo.Columns.categoria_tarifa_id.name(), object.getInt(TarifaAseo.Columns.categoria_tarifa_id.name()));
+            values.put(TarifaAseo.Columns.anio.name(), object.getInt(TarifaAseo.Columns.anio.name()));
+            values.put(TarifaAseo.Columns.mes.name(), object.getInt(TarifaAseo.Columns.mes.name()));
+            values.put(TarifaAseo.Columns.kwh_desde.name(), object.getInt(TarifaAseo.Columns.kwh_desde.name()));
+            values.put(TarifaAseo.Columns.kwh_hasta.name(), object.getInt(TarifaAseo.Columns.kwh_hasta.name()));
+            values.put(TarifaAseo.Columns.importe.name(), object.getDouble(TarifaAseo.Columns.importe.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.TARIFA_ASEO_TABLE, values);
         }
     }
 }
