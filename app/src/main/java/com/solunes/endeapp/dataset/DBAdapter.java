@@ -510,7 +510,8 @@ public class DBAdapter {
     public void beforeDownloadData() {
         open();
         db.delete(DBHelper.DATA_TABLE, null, null);
-        db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
+        db.delete(DBHelper.DATA_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
+        db.delete(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null);
     }
 }

@@ -436,7 +436,8 @@ public class DataModel {
             jsonObject.put(Columns.TlxPreNue4.name(), dataModel.getTlxPreNue4() == null ? "" : dataModel.getTlxPreNue4());
 
             jsonObject.put(Columns.TlxImpAvi.name(), dataModel.getTlxImpAvi());
-            jsonObject.put("TlxImpEst", dataModel.getEstadoLectura());
+            jsonObject.put("TlxImpEst", dataModel.getTlxImpAvi());
+            jsonObject.put(Columns.TlxEstado.name(), dataModel.getEstadoLectura());
             jsonObject.put(Columns.TlxCodCon.name(), dataModel.getTlxCodCon());
 
             jsonObject.put(Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());

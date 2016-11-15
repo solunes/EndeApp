@@ -670,9 +670,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
         printTitles.add("Importe por cargo fijo");
-        printValues.add(dataModel.getTlxCarFij());
+        printValues.add(GenLecturas.round(dataModel.getTlxCarFij()));
         printTitles.add("Importe por energía");
-        printValues.add(dataModel.getTlxImpEn());
+        printValues.add(GenLecturas.round(dataModel.getTlxImpEn()));
 
         double importePotencia = 0;
         if (dataModel.getTlxTipDem() == 2) {
@@ -686,7 +686,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
 
             printTitles.add("Importe por potencia");
-            printValues.add(dataModel.getTlxImpPot());
+            printValues.add(GenLecturas.round(dataModel.getTlxImpPot()));
         }
 
         double importeConsumo = GenLecturas.round(dbAdapter.getCargoFijo(dataModel.getTlxCtg())
@@ -716,6 +716,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             printValues.add(dataModel.getTlxLey1886());
         }
 
+        double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad);
+        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, ley1886, dataModel.getTlxCarCon(), dataModel.getTlxCarRec());
+        printTitles.add("Importe total por consumo");
+        printValues.add(totalConsumo);
         if (dataModel.getTlxCarCon() > 0) {
             printTitles.add("Mas Cargo por Conexion");
             printValues.add(dataModel.getTlxCarCon());
@@ -724,22 +728,19 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             printTitles.add("Mas Cargo por Reconexion");
             printValues.add(dataModel.getTlxCarRec());
         }
-
-        double totalConsumo = GenLecturas.totalConsumo(importeConsumo, tarifaDignidad);
-        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, ley1886, dataModel.getTlxCarCon(), dataModel.getTlxCarRec());
-        printTitles.add("Importe total por consumo");
-        printValues.add(totalConsumo);
         printTitles.add("Importe total por el suministro");
         printValues.add(dataModel.getTlxImpFac());
-        double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), totalConsumo);
-        double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), lectura);
-        importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, totalSuministroTap, totalSuministroAseo);
-        importeMesCancelar = importeTotalFactura + dataModel.getTlxCarDep();
 
         if (!reprint) {
+            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), totalConsumo);
+            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), lectura);
             dataModel.setTlxImpFac(totalSuministro);
             dataModel.setTlxImpTap(totalSuministroTap);
             dataModel.setTlxImpAse(totalSuministroAseo);
+        }
+        importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
+        importeMesCancelar = importeTotalFactura + dataModel.getTlxCarDep();
+        if (!reprint) {
             dataModel.setTlxImpTot(GenLecturas.round(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI()));
             dataModel.setTlxCodCon(getControlCode(dataModel));
             if (dataModel.getTlxTipLec() != 5) {
@@ -747,8 +748,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             } else {
                 dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
             }
-            dbAdapter.close();
         }
+        dbAdapter.close();
     }
 
     private void validSaved() {

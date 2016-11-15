@@ -7,6 +7,7 @@ import com.solunes.endeapp.models.Historico;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by jhonlimaster on 05-10-16.
@@ -70,7 +71,7 @@ public class PrintGenerator {
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 40 135 FECHA EMISIÓN: \r\n" +
                 "CENTER\r\n" +
-                "T CONSO2.CPF 0 50 135 " + dataModel.getTlxCiudad() + " " + dataModel.getTlxRem() + " DE " + mesString(dataModel.getTlxMes()) + " DE " + dataModel.getTlxAno() + "\r\n" +
+                "T CONSO2.CPF 0 50 135 " + dataModel.getTlxCiudad() + " " + getFechaEmi(dataModel.getTlxFecEmi()) + "\r\n" +
 
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 40 154 Nombre: " + dataModel.getTlxNom() + " \r\n" +
@@ -296,7 +297,7 @@ public class PrintGenerator {
             res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
             res += "T CONSO3.CPF 0 40 " + yValue + " Más deposito de garantia\r\n";
             res += "RIGHT 782\r\n";
-            res += "T CONSO3.CPF 0 720 " + yValue + " " + garantia + "\r\n";
+            res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(garantia) + "\r\n";
         }
 
         yValue += 55;
@@ -369,5 +370,12 @@ public class PrintGenerator {
                     "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotFac() + " kWh\r\n";
         }
         return res;
+    }
+
+    private static String getFechaEmi(String fecemi) {
+        Date date = StringUtils.formateStringFromDate(StringUtils.DATE_FORMAT, fecemi);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.DAY_OF_MONTH) + " de " + mesString(calendar.get(Calendar.MONTH) + 1) + " de " + calendar.get(Calendar.YEAR);
     }
 }
