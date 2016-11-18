@@ -88,7 +88,7 @@ public class GenLecturas {
     }
 
     public static double totalSuministro(double totalConsumo, double ley1886, double cargoExtras) {
-        return round(totalConsumo + cargoExtras + Constants.MORA + Constants.MAS_DEBITO - Constants.MENOS_CREDITO - ley1886);
+        return round(totalConsumo + cargoExtras + ley1886);
     }
 
     public static double totalSuministroTap(DataModel dataModel, Context context, double importeConsumo) {
@@ -117,7 +117,7 @@ public class GenLecturas {
     }
 
     public static double totalConsumo(double importeConsumo, double tarifaDignidad) {
-        return round(importeConsumo - tarifaDignidad);
+        return round(importeConsumo + tarifaDignidad);
     }
 
     public static double round(double value) {

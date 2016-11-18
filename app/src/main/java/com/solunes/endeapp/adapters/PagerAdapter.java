@@ -11,7 +11,7 @@ import com.solunes.endeapp.models.DataModel;
 import java.util.ArrayList;
 
 /**
- * Created by jhonlimaster on 19-11-15.
+ * Adaptador del pagerview
  */
 public class PagerAdapter extends FragmentStatePagerAdapter {
 

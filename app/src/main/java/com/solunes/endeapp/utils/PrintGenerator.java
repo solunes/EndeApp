@@ -28,7 +28,6 @@ public class PrintGenerator {
                                  String tapTitle,
                                  String[] leyenda) {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
-//        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
         String deudasEnergia = "";
         double deudas = 0;
 
@@ -345,7 +344,7 @@ public class PrintGenerator {
     private static String detalleConsumo(DataModel dataModel) {
         String res = "";
         int offsetX = 340;
-        if (dataModel.getTlxKwhDev() > 0 && dataModel.getTlxTipLec() != 3 && dataModel.getTlxTipLec() != 6) {
+        if (dataModel.getTlxKwhDev() > 0 && dataModel.getTlxTipLec() != 3 && dataModel.getTlxTipLec() != 6 && dataModel.getTlxTipLec() != 9) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a devolver\r\n" +
@@ -366,7 +365,6 @@ public class PrintGenerator {
                     "RIGHT 782\r\n" +
                     "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotLei() + " kWh\r\n";
         }
-        // TODO: 27-10-16 incierto
         if (dataModel.getTlxPotFac() == 2) {
             offsetX += 20;
             res += "LEFT\r\n" +

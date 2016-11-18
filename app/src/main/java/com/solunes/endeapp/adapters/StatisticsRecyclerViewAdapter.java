@@ -14,6 +14,9 @@ import com.solunes.endeapp.utils.StatisticsItem;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Esta clase es un recyclerview adapter de las estadisticas
+ */
 public class StatisticsRecyclerViewAdapter extends RecyclerView.Adapter<StatisticsRecyclerViewAdapter.ViewHolder> {
 
     private static final String TAG = "StatisticsRecyclerViewAdapter";

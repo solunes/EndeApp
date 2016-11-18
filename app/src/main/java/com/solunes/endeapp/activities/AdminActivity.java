@@ -88,6 +88,7 @@ public class AdminActivity extends AppCompatActivity {
             editDomain.setText(url);
         }
 
+        // obtener usuario
         int id_user = getIntent().getExtras().getInt("id_user");
         DBAdapter dbAdapter = new DBAdapter(this);
         user = dbAdapter.getUser(id_user);
@@ -97,6 +98,7 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!editDomain.getText().toString().isEmpty()) {
+                    // guardar url del servidor
                     url = editDomain.getText().toString();
                     UserPreferences.putString(getApplicationContext(), KEY_DOMAIN, url);
                     nroDomain.setText("Url: " + url);
@@ -106,6 +108,7 @@ public class AdminActivity extends AppCompatActivity {
         btnFixParams.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                // mensaje de descarga de parametros fijos
                 builder = new AlertDialog.Builder(AdminActivity.this);
                 progressDialog = new ProgressDialog(AdminActivity.this);
                 builder.setTitle("Administrador");
@@ -116,6 +119,7 @@ public class AdminActivity extends AppCompatActivity {
                     Snackbar.make(view, "No hay url del servidor", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
+                // previamente a la consulta del servidor, se obtiene un Token
                 Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
                     @Override
                     public void onSuccessToken() {
@@ -131,6 +135,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // se muestra el nombre de la impresora
         printName = (TextView) findViewById(R.id.label_print_name);
         String string = UserPreferences.getString(getApplicationContext(), KEY_PRINT_MANE);
         if (string != null) {
@@ -142,6 +147,7 @@ public class AdminActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+                // se guarda el nombre de la impresora si no hay
                 String printname = editPrintName.getText().toString();
                 if (!printname.isEmpty()) {
                     UserPreferences.putString(getApplicationContext(), KEY_PRINT_MANE, printname);
@@ -168,8 +174,16 @@ public class AdminActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Metodo para procesar lo obtenido de los parametros fijos
+     * @param context contexto de la aplicacion para hacer consultas a la base de datos
+     * @param result es una cadena json que contiene de los datos de parametros fijos
+     * @throws JSONException excepcion si el string result no tiene formato json
+     */
     public static void processResultFixParams(Context context, String result) throws JSONException {
         JSONObject jsonObject = new JSONObject(result);
+
+        // guarda tarifas
         JSONArray tarifas = jsonObject.getJSONArray("tarifas");
         DBAdapter dbAdapter = new DBAdapter(context);
         dbAdapter.clearTables();
@@ -194,6 +208,7 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.TARIFA_TABLE, values);
         }
 
+        // guarda usuarios
         JSONArray usuarios = jsonObject.getJSONArray("usuarios");
         for (int i = 0; i < usuarios.length(); i++) {
             JSONObject object = usuarios.getJSONObject(i);
@@ -211,6 +226,7 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.USER_TABLE, values);
         }
 
+        // guarda observaciones
         JSONArray observaciones = jsonObject.getJSONArray("observaciones");
         for (int i = 0; i < observaciones.length(); i++) {
             JSONObject object = observaciones.getJSONObject(i);
@@ -224,6 +240,7 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.OBS_TABLE, values);
         }
 
+        // guarda parametros
         JSONArray parametros = jsonObject.getJSONArray("parametros");
         for (int i = 0; i < parametros.length(); i++) {
             JSONObject object = parametros.getJSONObject(i);
@@ -244,6 +261,7 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.PARAMETRO_TABLE, values);
         }
 
+        // guarda items de facturacion
         JSONArray itemFacturacion = jsonObject.getJSONArray("item_facturacion");
         for (int i = 0; i < itemFacturacion.length(); i++) {
             JSONObject object = itemFacturacion.getJSONObject(i);
@@ -257,6 +275,8 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBHelper.ITEM_FACTURACION_TABLE, values);
         }
+
+        // guarda observaciones de impresion
         JSONArray observacionesImp = jsonObject.getJSONArray("observaciones_imp");
         for (int i = 0; i < observacionesImp.length(); i++) {
             JSONObject object = observacionesImp.getJSONObject(i);
@@ -266,6 +286,8 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBHelper.PRINT_OBS_TABLE, values);
         }
+
+        //  guarda la dosificacion de facturas
         JSONArray facturaDosificacion = jsonObject.getJSONArray("factura_dosificacion");
         for (int i = 0; i < facturaDosificacion.length(); i++) {
             JSONObject object = facturaDosificacion.getJSONObject(i);
@@ -287,6 +309,7 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.FACTURA_DOSIFICACION_TABLE, values);
         }
 
+        // guarda las tarifas de alumbrado publico
         JSONArray tarifaTap = jsonObject.getJSONArray("tarifas-tap");
         for (int i = 0; i < tarifaTap.length(); i++) {
             JSONObject object = tarifaTap.getJSONObject(i);
@@ -300,6 +323,8 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBHelper.TARIFA_TAP_TABLE, values);
         }
+
+        // guarda las tarifas de aseo
         JSONArray tarifaTas = jsonObject.getJSONArray("tarifas-aseo");
         for (int i = 0; i < tarifaTas.length(); i++) {
             JSONObject object = tarifaTas.getJSONObject(i);
@@ -317,6 +342,9 @@ public class AdminActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Este metodo hacer la consulta el servidor para obtener los paratros fijos
+     */
     private void parametrosRequest(){
         new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
             @Override

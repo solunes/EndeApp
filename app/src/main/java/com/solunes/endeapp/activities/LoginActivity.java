@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,11 +15,7 @@ import android.widget.Toast;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.User;
-import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.UserPreferences;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -37,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // si ya hay un usuario logueado, pasa director a la vista principal
         if (UserPreferences.getBoolean(this, KEY_LOGIN)) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
@@ -53,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // validacion de campos
                 boolean valid = true;
                 if (user.getText().toString().isEmpty()) {
                     inputLayoutUser.setError("Campo requerido!!!");
@@ -67,21 +64,27 @@ public class LoginActivity extends AppCompatActivity {
                     inputLayoutPass.setError(null);
                 }
                 if (valid) {
+                    // obtiene un usuario de la base de datos
                     DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
                     Cursor cursor = dbAdapter.checkUser(user.getText().toString(), pass.getText().toString());
+                    // hay usuario
                     if (cursor.getCount() > 0) {
                         User user = User.fromCursor(cursor);
+                        // si el es un administrador, va a la vista de administrador
                         if (user.getLecNiv() == 1) {
                             Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                         } else {
+                            // si se hace un cambio de usuario se eliminan los datos del anterior usuario
                             if (user.getLecId() != UserPreferences.getInt(LoginActivity.this, KEY_LOGIN_ID)) {
+                                UserPreferences.putLong(LoginActivity.this, MainActivity.KEY_SEND, 0);
                                 UserPreferences.putInt(LoginActivity.this, LoginActivity.KEY_LOGIN_ID, 0);
                                 UserPreferences.putLong(LoginActivity.this, MainActivity.KEY_DOWNLOAD, 0);
                                 UserPreferences.putBoolean(LoginActivity.this, MainActivity.KEY_WAS_UPLOAD, false);
                                 dbAdapter.clearTablesNoUser();
                             }
+                            // se ingresa a la vista principal
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
@@ -97,16 +100,5 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        QRGEncoder qrgEncoder = new QRGEncoder("something", null, QRGContents.Type.TEXT, 1000);
-//        try {
-//            ImageView bg = (ImageView) findViewById(R.id.bg);
-//            // Getting QR-Code as Bitmap
-//            Bitmap bitmap = qrgEncoder.encodeAsBitmap();
-//            // Setting Bitmap to ImageView
-//            bg.setImageBitmap(bitmap);
-//        } catch (WriterException e) {
-//            Log.v(TAG, e.toString());
-//        }
     }
 }

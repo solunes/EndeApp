@@ -257,15 +257,17 @@ public class DataModel {
 
     public static String getTipoLectura(int idTipo) {
         if (idTipo == 0) {
-            return "Lectura Normal";
+            return "Lectura normal";
         } else if (idTipo == 3) {
-            return "Lectura Promedio";
+            return "Lectura promedio";
         } else if (idTipo == 4) {
-            return "Ultimo indice";
+            return "Último índice";
         } else if (idTipo == 5) {
             return "No existe";
         } else if (idTipo == 6) {
             return "Lectura ajustada";
+        } else if (idTipo == 9 ){
+            return "Consumo estimado";
         }
         return null;
     }

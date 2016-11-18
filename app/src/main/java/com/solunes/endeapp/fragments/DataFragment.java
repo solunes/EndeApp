@@ -232,11 +232,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                             return;
                         }
                     }
+
+                    // se procede a gran demanda
                     if (dataModel.getTlxTipDem() == 3) {
                         methodGranDemanda(view);
                         return;
                     }
 
+                    // advertencia de lectura 0, luego se procede al calculo de pequeña y gran demanda
                     if (inputReading.getText().toString().isEmpty()) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
                         dialog.setTitle("Advertencia");
@@ -260,6 +263,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         buttonObs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // se selecciona una observacion para la lectura, por defecto 104
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Selecionar una observación");
                 DBAdapter dbAdapter = new DBAdapter(getContext());
@@ -397,7 +401,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (obs.getId() != 104) {
             tipoLectura = obs.getObsLec();
         }
-        if (tipoLectura == 3) {
+        if (tipoLectura == 3 || tipoLectura == 9) {
             lecturaKwh = dataModel.getTlxConPro();
         } else if (input.isEmpty()) {
             Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
@@ -652,12 +656,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
 
         int conPro = dataModel.getTlxConPro();
-        if (dataModel.getTlxNvaLec() > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
+        if (dataModel.getTlxConsumo() > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 80);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        } else if (dataModel.getTlxNvaLec() < (conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_bajo.name()) / 100))) {
+        } else if (dataModel.getTlxConsumo() < (conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_bajo.name()) / 100))) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
             cv.put(DataObs.Columns.observacion_id.name(), 81);
@@ -686,8 +690,18 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 dataModel.setTlxImpAvi(0);
             }
 
+            if (tipoLectura == 5) {
+                dataModel.setTlxNvaLec(nuevaLectura);
+                if (dataModel.getTlxTipDem() == 2) {
+                    int potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+                    potenciaLeida = correccionDeDigitos(potenciaLeida, dataModel.getTlxDecPot());
+                    dataModel.setTlxPotLei(potenciaLeida);
+                }
+                return;
+            }
+
             // correccion para consumo promedio
-            if (tipoLectura == 3) {
+            if (tipoLectura == 3 || tipoLectura == 9) {
                 dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
                 dataModel.setTlxKwhDev(lectura);
             }
@@ -697,7 +711,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             dataModel.setTlxConsumo(lectura);
 
             // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
-            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 6) {
+            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 6 && tipoLectura != 9) {
                 lectura = lectura - dataModel.getTlxKwhDev();
                 if (lectura > 0) {
                     dataModel.setTlxKwhDev(0);
@@ -811,7 +825,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
         // calculo del importe total del suministro
-        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, ley1886, cargoExtraTotal);
+        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, dataModel.getTlxLey1886(), cargoExtraTotal);
 
         // calculo de suministro tap y suministro por aseo
         if (!reprint) {

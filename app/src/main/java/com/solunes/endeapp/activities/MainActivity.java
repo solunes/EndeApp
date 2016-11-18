@@ -86,22 +86,25 @@ public class MainActivity extends AppCompatActivity {
 
         DBAdapter adapter = new DBAdapter(this);
         user = adapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
+
         labelReady = (TextView) findViewById(R.id.label_info);
         labelReadyRuta = (TextView) findViewById(R.id.label_info_ruta);
-
         textDownload = (TextView) findViewById(R.id.text_date_download);
         textSend = (TextView) findViewById(R.id.text_date_send);
         textTarifa = (TextView) findViewById(R.id.text_date_tarifa);
-
         stateMissing = (TextView) findViewById(R.id.state_missing);
         statePerformed = (TextView) findViewById(R.id.state_performed);
         statePrinted = (TextView) findViewById(R.id.state_printed);
         statePostponed = (TextView) findViewById(R.id.state_postponed);
+        cardRate = (CardView) findViewById(R.id.card_rate);
+
+        // se verifican las fechas de las accciones como descarga, envio y parametros fijos
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
         if (dateDownload > 0) {
             calendar.setTimeInMillis(dateDownload);
             textDownload.setText(StringUtils.getHumanDate(calendar.getTime()));
+
             wasDownload = true;
         }
         long dateSend = UserPreferences.getLong(this, KEY_SEND);
@@ -115,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
             textTarifa.setText(StringUtils.getHumanDate(calendar.getTime()));
             isRate = true;
         }
-
-        cardRate = (CardView) findViewById(R.id.card_rate);
 
         validDay();
         updateStates();
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_logout:
+                // opcion del menu para cerrar sesion
                 UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
@@ -140,6 +142,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * metodo para descargar las lecturas del usuario actual
+     *
+     * @param view vista para mostrar mensajes al usuario
+     */
     public void downloadRoutes(final View view) {
         DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         if (dbAdapter.getSizeData() > 0) {
@@ -152,9 +159,9 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
         final Calendar calendar = Calendar.getInstance();
+
         final String gestion = calendar.get(Calendar.YEAR) + "";
         final String month = (calendar.get(Calendar.MONTH) + 1) + "";
-        // TODO: 24-10-16 un dia menos. solo para pruebas
         String remesa = (calendar.get(Calendar.DAY_OF_MONTH) - 1) + "";
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
@@ -224,13 +231,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * metodo para mostrar un dialogo de espera mientras se esta conectando al servicor
+     *
+     * @param view
+     */
     public void sendReading(final View view) {
         if (!wasDownload) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
-//        DBAdapter dbAdapter = new DBAdapter(this);
-//        if (dbAdapter.getSizeData() == dbAdapter.getCountSave()) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Enviando....");
         progressDialog.setCancelable(false);
@@ -244,11 +254,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         new Thread(runSaveData).start();
-//        } else {
-//            Snackbar.make(view, "No se han completado las lecturas", Snackbar.LENGTH_SHORT).show();
-//        }
     }
 
+    /**
+     * metodo para enviar las lecturas el servidor
+     *
+     * @param view
+     * @param progressDialog
+     */
     public void sendPostRequest(final View view, final ProgressDialog progressDialog) {
         Hashtable<String, String> params = prepareDataToPost();
 //                Token.getToken(getApplicationContext(), user);
@@ -273,6 +286,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }).execute();
     }
+
+    /**
+     * Metodo para actualizar los parametros fijos, muestra un dialog de espera durante el progreso
+     *
+     * @param view
+     */
 
     public void updateRate(final View view) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -318,6 +337,14 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
+    /**
+     * Metodo para procesar la respuesta del servidor en la descarga de lecturas, luego se guardan
+     * los datos en la base de datos
+     *
+     * @param result un string json con los datos de la descarga
+     * @return retorna true si se hay datos para guardar
+     * @throws JSONException lanza una excepcion si el formato del string result no es json
+     */
     private boolean processResponse(String result) throws JSONException {
         JSONArray results = new JSONArray(result);
         DBAdapter dbAdapter = new DBAdapter(this);
@@ -407,34 +434,36 @@ public class MainActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
             JSONObject historico = object.getJSONObject("historico");
-            ContentValues valuesH = new ContentValues();
-            valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
-            valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
-            valuesH.put(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()));
-            valuesH.put(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()));
-            valuesH.put(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()));
-            valuesH.put(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name()));
-            valuesH.put(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name()));
-            valuesH.put(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name()));
-            valuesH.put(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name()));
-            valuesH.put(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name()));
-            valuesH.put(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name()));
-            valuesH.put(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name()));
-            valuesH.put(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name()));
-            valuesH.put(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name()));
-            valuesH.put(Historico.Columns.ConKwh01.name(), historico.getInt(Historico.Columns.ConKwh01.name()));
-            valuesH.put(Historico.Columns.ConKwh02.name(), historico.getInt(Historico.Columns.ConKwh02.name()));
-            valuesH.put(Historico.Columns.ConKwh03.name(), historico.getInt(Historico.Columns.ConKwh03.name()));
-            valuesH.put(Historico.Columns.ConKwh04.name(), historico.getInt(Historico.Columns.ConKwh04.name()));
-            valuesH.put(Historico.Columns.ConKwh05.name(), historico.getInt(Historico.Columns.ConKwh05.name()));
-            valuesH.put(Historico.Columns.ConKwh06.name(), historico.getInt(Historico.Columns.ConKwh06.name()));
-            valuesH.put(Historico.Columns.ConKwh07.name(), historico.getInt(Historico.Columns.ConKwh07.name()));
-            valuesH.put(Historico.Columns.ConKwh08.name(), historico.getInt(Historico.Columns.ConKwh08.name()));
-            valuesH.put(Historico.Columns.ConKwh09.name(), historico.getInt(Historico.Columns.ConKwh09.name()));
-            valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
-            valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
-            valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
-            dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
+            if (historico != null) {
+                ContentValues valuesH = new ContentValues();
+                valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
+                valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
+                valuesH.put(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()));
+                valuesH.put(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()));
+                valuesH.put(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()));
+                valuesH.put(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name()));
+                valuesH.put(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name()));
+                valuesH.put(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name()));
+                valuesH.put(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name()));
+                valuesH.put(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name()));
+                valuesH.put(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name()));
+                valuesH.put(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name()));
+                valuesH.put(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name()));
+                valuesH.put(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name()));
+                valuesH.put(Historico.Columns.ConKwh01.name(), historico.getInt(Historico.Columns.ConKwh01.name()));
+                valuesH.put(Historico.Columns.ConKwh02.name(), historico.getInt(Historico.Columns.ConKwh02.name()));
+                valuesH.put(Historico.Columns.ConKwh03.name(), historico.getInt(Historico.Columns.ConKwh03.name()));
+                valuesH.put(Historico.Columns.ConKwh04.name(), historico.getInt(Historico.Columns.ConKwh04.name()));
+                valuesH.put(Historico.Columns.ConKwh05.name(), historico.getInt(Historico.Columns.ConKwh05.name()));
+                valuesH.put(Historico.Columns.ConKwh06.name(), historico.getInt(Historico.Columns.ConKwh06.name()));
+                valuesH.put(Historico.Columns.ConKwh07.name(), historico.getInt(Historico.Columns.ConKwh07.name()));
+                valuesH.put(Historico.Columns.ConKwh08.name(), historico.getInt(Historico.Columns.ConKwh08.name()));
+                valuesH.put(Historico.Columns.ConKwh09.name(), historico.getInt(Historico.Columns.ConKwh09.name()));
+                valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
+                valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
+                valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
+                dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
+            }
 
             JSONArray detalleFacturaArray = object.getJSONArray("detalle_factura");
             Log.e(TAG, "processResponse: " + detalleFacturaArray.toString());
@@ -453,6 +482,13 @@ public class MainActivity extends AppCompatActivity {
         return results.length() > 0;
     }
 
+    /**
+     * Metodo para preparar las lecturas que se van a enviar al servidor,  se envian las lecturas que no
+     * se han enviado y que no sean postergadas.
+     * Tambien se envian los medidores entre lineas
+     *
+     * @return retorna un hashtable para enviarlo en el endpoint
+     */
     public Hashtable<String, String> prepareDataToPost() {
         Hashtable<String, String> params = new Hashtable<>();
 
@@ -489,6 +525,9 @@ public class MainActivity extends AppCompatActivity {
         return params;
     }
 
+    /**
+     * Metodo para mostrar una alerta en parametros fijos, cuando sea un nuevo mes
+     */
     public void validDay() {
         Calendar calendar = Calendar.getInstance();
         int monthRate = UserPreferences.getInt(getApplicationContext(), KEY_RATE_MONTH);
@@ -502,6 +541,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Metodo para actualizar el panel de estado de las lecturas
+     */
     private void updateStates() {
         DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         int sizeData = dbAdapter.getSizeData();
@@ -539,7 +581,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startReading(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class));
@@ -547,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void statusReady(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_READY));
@@ -555,7 +597,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void statusMissing(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_MISSING));
@@ -563,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void statusPrint(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_PRINT));
@@ -571,7 +613,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void StatusPostponed(View view) {
         if (!wasDownload || !isRate) {
-            Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(view, "No se han descargado las lecturas", Snackbar.LENGTH_SHORT).show();
             return;
         }
         startActivity(new Intent(MainActivity.this, ReadingActivity.class).putExtra(KEY_FILTER, KEY_POSTPONED));
@@ -584,6 +626,12 @@ public class MainActivity extends AppCompatActivity {
     private EditText nroMed;
     private EditText lecMed;
 
+    /**
+     * Este metodo muestra un cuadro de dialogo donde se agrega un nuevo medidor entre lineas.
+     * Tambien verifica que el nuevo medidor no se haya guardado antes, y no estea en las lecturas
+     *
+     * @param view vista para mostrar mensajes al usuario
+     */
     public void newMedidor(final View view) {
         if (!wasDownload) {
             Snackbar.make(view, "No se han descargado las rutas", Snackbar.LENGTH_SHORT).show();

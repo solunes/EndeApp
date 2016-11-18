@@ -102,7 +102,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
         DBAdapter dbAdapter = new DBAdapter(this);
@@ -264,6 +263,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         try {
             connection.open();
             Log.e(TAG, "Connected");
+            Snackbar.make(viewPager, "Impresora conectada", Snackbar.LENGTH_SHORT).show();
         } catch (ConnectionException e) {
             Log.e(TAG, "Comm Error! Disconnecting");
             sleeper(500);

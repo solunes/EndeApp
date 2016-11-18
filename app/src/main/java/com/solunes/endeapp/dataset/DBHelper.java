@@ -42,6 +42,10 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * Aqui se crean las tablas de la base de datos
+     * Tambien se guarda un usuario para el admin
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE " + USER_TABLE + " (" +

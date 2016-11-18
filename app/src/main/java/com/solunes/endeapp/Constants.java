@@ -18,15 +18,6 @@ public class Constants {
     // MÁS CARGO POR CONEXIÓN (O RECONEXIÓN)
     public static final double CONEXION_RECONEXION = 0.0000;
 
-    // MÁS INTERESES POR MORA
-    public static final double MORA = 0.0000;
-
-    // MÁS DÉBITO APLICADO POR AJUSTE ANTERIOR
-    public static final double MAS_DEBITO = 0.0000;
-
-    // MENOS CRÉDITO APLICADO POR AJUSTE ANTERIOR
-    public static final double MENOS_CREDITO = 0.0000;
-
     // TASA ALUMBRADO PUBLICO
     public static final double ALUMBRADO_PUBLICO = 0.0615;
 
