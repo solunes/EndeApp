@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -15,7 +16,11 @@ import android.widget.Toast;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.UserPreferences;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -66,12 +71,12 @@ public class LoginActivity extends AppCompatActivity {
                     Cursor cursor = dbAdapter.checkUser(user.getText().toString(), pass.getText().toString());
                     if (cursor.getCount() > 0) {
                         User user = User.fromCursor(cursor);
-                        if (user.getLecNiv() == 1){
+                        if (user.getLecNiv() == 1) {
                             Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
                             intent.putExtra("id_user", user.getLecId());
                             startActivity(intent);
                         } else {
-                            if (user.getLecId() != UserPreferences.getInt(LoginActivity.this, KEY_LOGIN_ID)){
+                            if (user.getLecId() != UserPreferences.getInt(LoginActivity.this, KEY_LOGIN_ID)) {
                                 UserPreferences.putInt(LoginActivity.this, LoginActivity.KEY_LOGIN_ID, 0);
                                 UserPreferences.putLong(LoginActivity.this, MainActivity.KEY_DOWNLOAD, 0);
                                 UserPreferences.putBoolean(LoginActivity.this, MainActivity.KEY_WAS_UPLOAD, false);

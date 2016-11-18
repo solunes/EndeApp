@@ -251,6 +251,10 @@ public class DataModel {
         enviado
     }
 
+    public enum EstadoEnviado{
+        no_enviado, enviado
+    }
+
     public static String getTipoLectura(int idTipo) {
         if (idTipo == 0) {
             return "Lectura Normal";
@@ -389,7 +393,7 @@ public class DataModel {
         return dataModel;
     }
 
-    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList) {
+    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList, ArrayList<DetalleFactura> detalleFacturaArrayList) {
         JSONObject jsonObject = new JSONObject();
         try {
             if (dataModel.getTlxHorLec() == null) {
@@ -454,6 +458,12 @@ public class DataModel {
                 jsonArrayPrintObs.put(i, printObsData.toJson());
             }
             jsonObject.put("observaciones_imp", jsonArrayPrintObs);
+
+            JSONArray jsonArrayDetalleFactura = new JSONArray();
+            for (int i = 0; i < detalleFacturaArrayList.size(); i++) {
+                jsonArrayDetalleFactura.put(i, detalleFacturaArrayList.get(i).toJson());
+            }
+            jsonObject.put("detalle_factura", jsonArrayDetalleFactura);
         } catch (JSONException e) {
             Log.e(TAG, "getJsonToSend: ", e);
         }

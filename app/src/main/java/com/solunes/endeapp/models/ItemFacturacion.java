@@ -28,6 +28,8 @@ public class ItemFacturacion {
         return facturacion ;
     }
 
+
+
     public int getId() {
         return id;
     }

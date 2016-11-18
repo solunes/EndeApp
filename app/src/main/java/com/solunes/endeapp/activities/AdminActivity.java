@@ -35,6 +35,8 @@ import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
+import com.solunes.endeapp.networking.Token;
+import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 
@@ -43,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 
 public class AdminActivity extends AppCompatActivity {
@@ -50,8 +53,8 @@ public class AdminActivity extends AppCompatActivity {
     private static final String TAG = "AdminActivity";
     public static final String KEY_DOMAIN = "key_domain";
     public static final String KEY_PRINT_MANE = "key_print_name";
-    public static final String KEY_TOKEN = "key_token";
-    public static final String KEY_EXPIRATION_DATE = "key_expiration_date";
+
+    private User user;
 
     private EditText editDomain;
     private TextView nroDomain;
@@ -59,6 +62,9 @@ public class AdminActivity extends AppCompatActivity {
     private EditText editPrintName;
     private TextView printName;
     private String url;
+
+    private AlertDialog.Builder builder;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +90,7 @@ public class AdminActivity extends AppCompatActivity {
 
         int id_user = getIntent().getExtras().getInt("id_user");
         DBAdapter dbAdapter = new DBAdapter(this);
-        final User user = dbAdapter.getUser(id_user);
+        user = dbAdapter.getUser(id_user);
         dbAdapter.close();
         textUsername.setText(user.getLecNom());
         btnSaveDomain.setOnClickListener(new View.OnClickListener() {
@@ -94,38 +100,14 @@ public class AdminActivity extends AppCompatActivity {
                     url = editDomain.getText().toString();
                     UserPreferences.putString(getApplicationContext(), KEY_DOMAIN, url);
                     nroDomain.setText("Url: " + url);
-                    Hashtable<String, String> params = new Hashtable<>();
-                    params.put("LecCod", user.getLecCod());
-                    params.put("password", user.getLecPas());
-                    new PostRequest(params, null, Urls.urlauthenticate(getApplicationContext()), new CallbackAPI() {
-                        @Override
-                        public void onSuccess(String result, int statusCode) {
-                            JSONObject jsonObject = null;
-                            try {
-                                jsonObject = new JSONObject(result);
-                                Log.e(TAG, "onSuccess: token " + result);
-                                String token = jsonObject.getString("token");
-                                String expirationDate = jsonObject.getString("expirationDate");
-                                UserPreferences.putString(getApplicationContext(), KEY_TOKEN, token);
-                                UserPreferences.putString(getApplicationContext(), KEY_EXPIRATION_DATE, expirationDate);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailed(String reason, int statusCode) {
-                            Toast.makeText(AdminActivity.this, "Error inesperado", Toast.LENGTH_SHORT).show();
-                        }
-                    }).execute();
                 }
             }
         });
         btnFixParams.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(AdminActivity.this);
-                final ProgressDialog progressDialog = new ProgressDialog(AdminActivity.this);
+                builder = new AlertDialog.Builder(AdminActivity.this);
+                progressDialog = new ProgressDialog(AdminActivity.this);
                 builder.setTitle("Administrador");
                 builder.setPositiveButton("Aceptar", null);
                 progressDialog.setMessage("Descargando....");
@@ -134,29 +116,17 @@ public class AdminActivity extends AppCompatActivity {
                     Snackbar.make(view, "No hay url del servidor", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+                Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
                     @Override
-                    public void onSuccess(String result, int statusCode) {
-                        try {
-                            processResultFixParams(getApplicationContext(), result);
-                            progressDialog.dismiss();
-                            builder.setMessage("Los datos de tarifas, observaciones y usuarios han sido descargados");
-                            builder.show();
-                            UserPreferences.putLong(getApplicationContext(), MainActivity.KEY_RATE, Calendar.getInstance().getTimeInMillis());
-                            int month = Calendar.getInstance().get(Calendar.MONTH);
-                            UserPreferences.putInt(getApplicationContext(), MainActivity.KEY_RATE_MONTH, month);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onSuccessToken() {
+                        parametrosRequest();
                     }
 
                     @Override
-                    public void onFailed(String reason, int statusCode) {
-                        builder.setMessage("Error en descarga");
-                        builder.show();
+                    public void onFailToken() {
                         progressDialog.dismiss();
                     }
-                }).execute();
+                });
                 progressDialog.show();
             }
         });
@@ -344,5 +314,32 @@ public class AdminActivity extends AppCompatActivity {
             // guardar values
             dbAdapter.saveObject(DBHelper.TARIFA_ASEO_TABLE, values);
         }
+
+    }
+
+    private void parametrosRequest(){
+        new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+            @Override
+            public void onSuccess(String result, int statusCode) {
+                try {
+                    processResultFixParams(getApplicationContext(), result);
+                    progressDialog.dismiss();
+                    builder.setMessage("Los datos de tarifas, observaciones y usuarios han sido descargados");
+                    builder.show();
+                    UserPreferences.putLong(getApplicationContext(), MainActivity.KEY_RATE, Calendar.getInstance().getTimeInMillis());
+                    int month = Calendar.getInstance().get(Calendar.MONTH);
+                    UserPreferences.putInt(getApplicationContext(), MainActivity.KEY_RATE_MONTH, month);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailed(String reason, int statusCode) {
+                builder.setMessage("Error en descarga");
+                builder.show();
+                progressDialog.dismiss();
+            }
+        }).execute();
     }
 }

@@ -5,14 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Base64;
 import android.util.Log;
 
 import com.solunes.endeapp.activities.MainActivity;
 import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
+import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.Historico;
+import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
@@ -26,8 +29,15 @@ import com.solunes.endeapp.utils.StatisticsItem;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.spec.SecretKeySpec;
+
+import static com.solunes.endeapp.utils.Encrypt.methodEncrypt;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -45,6 +55,7 @@ public class DBAdapter {
 
     public Cursor checkUser(String username, String password) {
         open();
+        password = methodEncrypt(password);
         Cursor cursor = db.query(DBHelper.USER_TABLE, null,
                 User.Columns.LecCod.name() + " = '" + username + "' AND " + User.Columns.LecPas.name() + " = '" + password + "'",
                 null, null, null, null, null);
@@ -85,6 +96,7 @@ public class DBAdapter {
         db.delete(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null);
         db.delete(DBHelper.DATA_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
+        db.delete(DBHelper.DETALLE_FACTURA_TABLE, null, null);
     }
 
     public void saveObject(String table, ContentValues values) {
@@ -133,13 +145,6 @@ public class DBAdapter {
         }
         query.close();
         return dataModels;
-    }
-
-    public int deleteAllData() {
-        open();
-        int delete = db.delete(DBHelper.DATA_TABLE, null, null);
-        db.delete(DBHelper.HISTORICO_TABLE, null, null);
-        return delete;
     }
 
     public DataModel getData(int idData) {
@@ -194,13 +199,6 @@ public class DBAdapter {
 
     public void close() {
         dbHelper.close();
-    }
-
-    public static String SHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(text.getBytes("iso-8859-1"), 0, text.length());
-        byte[] sha1hash = md.digest();
-        return convertToHex(sha1hash);
     }
 
     private static String convertToHex(byte[] data) {
@@ -316,21 +314,18 @@ public class DBAdapter {
         return cursor;
     }
 
-    private static final int CONSUMO_ELEVADO = 1;
-    private static final int CONSUMO_BAJO = 2;
-
-    public double getConsumoElevado() {
+    public double getParametroValor(String codigo) {
         open();
-        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + CONSUMO_ELEVADO, null, null, null, null);
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + codigo + "'", null, null, null, null);
         query.moveToNext();
-        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
+        return query.getInt(Parametro.Columns.valor.ordinal());
     }
 
-    public double getConsumoBajo() {
+    public String getParametroTexto(String codigo) {
         open();
-        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + CONSUMO_BAJO, null, null, null, null);
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + codigo + "'", null, null, null, null);
         query.moveToNext();
-        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
+        return query.getString(Parametro.Columns.texto.ordinal());
     }
 
     public double getCargoFijo(int categoria) {
@@ -341,7 +336,6 @@ public class DBAdapter {
             cursor.moveToNext();
             return cursor.getDouble(Tarifa.Columns.importe.ordinal());
         }
-        Log.e(TAG, "getCargoFijo: 0");
         return 0;
     }
 
@@ -351,7 +345,7 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
         if (cursor.getCount() > 0) {
             cursor.moveToNext();
-            return cursor.getInt(Tarifa.Columns.kwh_desde.ordinal());
+            return cursor.getInt(Tarifa.Columns.kwh_hasta.ordinal());
         }
         return 0;
     }
@@ -388,26 +382,59 @@ public class DBAdapter {
     public ArrayList<PrintObsData> getPrintObsData(int idData) {
         open();
         ArrayList<PrintObsData> printObsDatas = new ArrayList<>();
-        Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, PrintObsData.Columns.general_id + " = " + idData, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null, PrintObsData.Columns.general_id.name() + " = " + idData, null, null, null, null);
         while (cursor.moveToNext()) {
             printObsDatas.add(PrintObsData.fromCursor(cursor));
         }
         return printObsDatas;
     }
 
+    public ArrayList<DetalleFactura> getDetalleFactura(int idData) {
+        open();
+        ArrayList<DetalleFactura> detalleFacturas = new ArrayList<>();
+        Cursor cursor = db.query(DBHelper.DETALLE_FACTURA_TABLE, null, DetalleFactura.Columns.general_id.name() + " = " + idData, null, null, null, null);
+        while (cursor.moveToNext()) {
+            detalleFacturas.add(DetalleFactura.fromCursor(cursor));
+        }
+        return detalleFacturas;
+    }
+
+    public double getDetalleFacturaImporte(int idData, int idItem) {
+        open();
+        Cursor cursor = db.query(DBHelper.DETALLE_FACTURA_TABLE, null,
+                DetalleFactura.Columns.general_id.name() + " = " + idData + " AND " +
+                        DetalleFactura.Columns.item_facturacion_id.name() + " = " + idItem, null, null, null, null);
+        cursor.moveToNext();
+        if (cursor.getCount() > 0) {
+            return DetalleFactura.fromCursor(cursor).getImporte();
+        }
+        return 0;
+    }
+
+    public DetalleFactura getDetalleFactura(int idData, int idItem) {
+        open();
+        Cursor cursor = db.query(DBHelper.DETALLE_FACTURA_TABLE, null,
+                DetalleFactura.Columns.general_id.name() + " = " + idData + " AND " +
+                        DetalleFactura.Columns.item_facturacion_id.name() + " = " + idItem, null, null, null, null);
+        cursor.moveToNext();
+        if (cursor.getCount() > 0) {
+            return DetalleFactura.fromCursor(cursor);
+        }
+        return null;
+    }
+
     public String[] getLeyenda() {
         open();
         String[] leyenda = new String[3];
-        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 3, null, null, null, null);
+        Cursor query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + Parametro.Values.leyenda_1.name() + "'", null, null, null, null);
         query.moveToNext();
         leyenda[0] = Parametro.fromCursor(query).getTexto();
-        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 4, null, null, null, null);
+        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + Parametro.Values.leyenda_2.name() + "'", null, null, null, null);
         query.moveToNext();
         leyenda[1] = Parametro.fromCursor(query).getTexto();
-        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.id.name() + " = " + 5, null, null, null, null);
+        query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + Parametro.Values.leyenda_3.name() + "'", null, null, null, null);
         query.moveToNext();
         leyenda[2] = Parametro.fromCursor(query).getTexto();
-//        return (query.getInt(Parametro.Columns.valor.ordinal()) / 100);
         return leyenda;
     }
 
@@ -513,5 +540,32 @@ public class DBAdapter {
         db.delete(DBHelper.DATA_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
         db.delete(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null);
+        db.delete(DBHelper.DETALLE_FACTURA_TABLE, null, null);
+    }
+
+    public ArrayList<DataModel> getAllDataToSend() {
+        open();
+        ArrayList<DataModel> dataModels = new ArrayList<>();
+        Cursor query = db.query(DBHelper.DATA_TABLE, null, "NOT " + DataModel.Columns.estado_lectura.name() + " = " + DataFragment.estados_lectura.Pendiente.ordinal() + " AND " +
+                DataModel.Columns.enviado.name() + " = " + DataModel.EstadoEnviado.no_enviado.ordinal(), null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
+        while (query.moveToNext()) {
+            dataModels.add(DataModel.fromCursor(query));
+        }
+        query.close();
+        return dataModels;
+    }
+
+    public void updateObject(String table, String colId ,int detalleFacturaId, ContentValues values) {
+        open();
+        db.update(table, values, colId + " = " + detalleFacturaId, null);
+    }
+
+    public String getItemDescription(int idItem) {
+        open();
+        Cursor query = db.query(DBHelper.ITEM_FACTURACION_TABLE, null, ItemFacturacion.Columns.id.name() + " = " + idItem, null, null, null, null);
+        query.moveToFirst();
+        String desc = query.getString(ItemFacturacion.Columns.descripcion.ordinal());
+        query.close();
+        return desc;
     }
 }

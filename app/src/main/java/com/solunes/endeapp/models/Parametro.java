@@ -11,11 +11,15 @@ public class Parametro {
     private int valor;
     private String texto;
 
-    public enum Columns{
+    public enum Columns {
         id, codigo, valor, texto
     }
 
-    public static Parametro fromCursor(Cursor cursor){
+    public enum Values {
+        consumo_elevado, consumo_bajo, leyenda_1, leyenda_2, leyenda_3, tiempo_envio
+    }
+
+    public static Parametro fromCursor(Cursor cursor) {
         Parametro parametro = new Parametro();
         parametro.setId(cursor.getInt(Columns.id.ordinal()));
         parametro.setCodigo(cursor.getString(Columns.codigo.ordinal()));

@@ -1,7 +1,11 @@
 package com.solunes.endeapp.networking;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.solunes.endeapp.utils.UserPreferences;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,14 +23,16 @@ public class PostRequest extends AsyncTask<String, Void, String> {
     private Hashtable<String, String> headers;
     private String urlEndpoint;
     private int statusCode;
+    private String token;
     private static final String TAG = "PostRequest";
     private CallbackAPI callbackAPI;
 
-    public PostRequest(Hashtable<String, String> params, Hashtable<String, String> headers, String urlEndpoint, CallbackAPI callbackAPI) {
+    public PostRequest(Context context, Hashtable<String, String> params, Hashtable<String, String> headers, String urlEndpoint, CallbackAPI callbackAPI) {
         this.params = params;
         this.urlEndpoint = urlEndpoint;
         this.headers = headers;
         this.callbackAPI = callbackAPI;
+        this.token = UserPreferences.getString(context, Token.KEY_TOKEN);
     }
 
     @Override
@@ -39,6 +45,9 @@ public class PostRequest extends AsyncTask<String, Void, String> {
             urlConnection = (HttpURLConnection) new URL(urlEndpoint).openConnection();
             urlConnection.setRequestMethod("POST");
             Log.e(TAG, "endpoint: " + urlEndpoint);
+
+            if (this.token != null)
+                urlConnection.setRequestProperty("Authorization", "Bearer " + this.token);
 
             if (headers != null && headers.size() > 0)
                 for (String key : headers.keySet())

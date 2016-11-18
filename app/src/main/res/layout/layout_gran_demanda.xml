@@ -19,7 +19,7 @@
         <EditText
             android:id="@+id/input_gd_reactiva"
             style="@style/EditTextGranDemanda"
-            android:hint="Energia Reactiva" />
+            android:hint="Energía Reactiva" />
     </LinearLayout>
 
     <LinearLayout
@@ -30,12 +30,30 @@
         <EditText
             android:id="@+id/input_gd_kwhbajo"
             style="@style/EditTextGranDemanda"
-            android:hint="Kwh Bloque bajo" />
+            android:hint="Kwh Bloque Bajo" />
+
+        <EditText
+            android:id="@+id/input_gd_dembajo"
+            style="@style/EditTextGranDemanda"
+            android:hint="Demanda Máxima A" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/input_gd_kwhmedio"
             style="@style/EditTextGranDemanda"
             android:hint="Kwh Bloque Medio" />
+
+
+        <EditText
+            android:id="@+id/input_gd_demmedio"
+            style="@style/EditTextGranDemanda"
+            android:hint="Demanda Máxima B" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -48,26 +66,11 @@
             style="@style/EditTextGranDemanda"
             android:hint="Kwh Bloque Alto" />
 
-        <EditText
-            android:id="@+id/input_gd_dembajo"
-            style="@style/EditTextGranDemanda"
-            android:hint="Demanda maxima A" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/input_gd_demmedio"
-            style="@style/EditTextGranDemanda"
-            android:hint="Demanda maxima B" />
 
         <EditText
             android:id="@+id/input_gd_demalto"
             style="@style/EditTextGranDemanda"
-            android:hint="Demanda Maxima C" />
+            android:hint="Demanda Máxima C" />
 
     </LinearLayout>
 

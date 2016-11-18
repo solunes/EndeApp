@@ -68,7 +68,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="@dimen/activity_horizontal_margin_half"
-                            android:text="Categoria: B2-PD-BT" />
+                            android:text="Categoría: B2-PD-BT" />
 
                         <TextView
                             android:id="@+id/data_client"
@@ -105,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                            android:text="Digitos: 5" />
+                            android:text="Dígitos: 5" />
 
                         <TextView
                             android:id="@+id/orden_client"
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:backgroundTint="@color/colorPrimary"
-                            android:hint="Lectura Energia"
+                            android:hint="Lectura Energía"
                             android:inputType="number" />
 
                         <EditText

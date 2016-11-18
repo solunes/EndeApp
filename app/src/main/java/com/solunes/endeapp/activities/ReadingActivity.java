@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -26,9 +27,15 @@ import android.widget.TextView;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.adapters.PagerAdapter;
 import com.solunes.endeapp.dataset.DBAdapter;
-import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.MedEntreLineas;
+import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.networking.CallbackAPI;
+import com.solunes.endeapp.networking.PostRequest;
+import com.solunes.endeapp.utils.StringUtils;
+import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
@@ -40,9 +47,20 @@ import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 import com.zebra.sdk.printer.ZebraPrinterLinkOs;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.Set;
+
+import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_GESTION;
+import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_MONTH;
+import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_REMESA;
+import static com.solunes.endeapp.activities.MainActivity.KEY_SEND;
+import static com.solunes.endeapp.activities.MainActivity.KEY_WAS_UPLOAD;
 
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener, SearchView.OnQueryTextListener {
 
@@ -68,6 +86,11 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     private int currentState = -1;
     private ArrayList<DataModel> datas;
+    private User user;
+
+    private int interval;
+    Handler handler = new Handler();
+    Runnable handlerTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +106,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
         DBAdapter dbAdapter = new DBAdapter(this);
+        user = dbAdapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
+        interval = (int) dbAdapter.getParametroValor(Parametro.Values.tiempo_envio.name());
         datas = new ArrayList<>();
         if (getIntent().getExtras() != null) {
             int filter = getIntent().getExtras().getInt(MainActivity.KEY_FILTER);
@@ -117,6 +142,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             }
             tabAt.setCustomView(inflate);
         }
+        handlerTask = new Runnable() {
+            @Override
+            public void run() {
+                Log.e(TAG, "run: enviado: mins " + interval);
+                sendEveryMinute();
+                handler.postDelayed(handlerTask, interval * 1000 * 60);
+            }
+        };
+        handlerTask.run();
         dbAdapter.close();
 
         new Thread(new Runnable() {
@@ -362,5 +396,59 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    private void sendEveryMinute() {
+        Hashtable<String, String> params = prepareDataToPost();
+        new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
+            @Override
+            public void onSuccess(String result, int statusCode) {
+                Log.e(TAG, "onSuccess: " + result);
+                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
+            }
+
+            @Override
+            public void onFailed(String reason, int statusCode) {
+                Log.e(TAG, "onFailed: " + reason);
+            }
+        }).execute();
+    }
+
+    public Hashtable<String, String> prepareDataToPost() {
+        Hashtable<String, String> params = new Hashtable<>();
+
+        DBAdapter dbAdapter = new DBAdapter(this);
+        ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
+
+        params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
+        params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
+        params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
+        params.put("RutaCod", String.valueOf(user.getRutaCod()));
+
+        for (DataModel dataModel : allData) {
+            String json = DataModel.getJsonToSend(dataModel,
+                    dbAdapter.getDataObsByCli(dataModel.getId()),
+                    dbAdapter.getPrintObsData(dataModel.getId()),
+                    dbAdapter.getDetalleFactura(dataModel.getId()));
+            Log.e(TAG, "prepareDataToPost json: " + json);
+            params.put("" + (dataModel.getTlxCli()), json);
+        }
+
+        try {
+            ArrayList<MedEntreLineas> entreLineasList = dbAdapter.getMedEntreLineas();
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < entreLineasList.size(); i++) {
+                MedEntreLineas entreLineas = entreLineasList.get(i);
+                jsonArray.put(i, entreLineas.toJson());
+            }
+            Log.e(TAG, "prepareDataToPost: mel: " + jsonArray.toString());
+            params.put("med_entre_lineas", jsonArray.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        dbAdapter.close();
+        return params;
     }
 }

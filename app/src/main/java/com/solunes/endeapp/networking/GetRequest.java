@@ -27,29 +27,28 @@ public class GetRequest extends AsyncTask<String, Void, String> {
     private String token;
     private CallbackAPI callbackAPI;
 
-
     public GetRequest(Context context, String urlEndpoint, CallbackAPI callbackAPI) {
         this.headers = new Hashtable<>();
         this.urlEndpoint = urlEndpoint;
         this.callbackAPI = callbackAPI;
-        this.token = UserPreferences.getString(context, AdminActivity.KEY_TOKEN);
+        this.token = UserPreferences.getString(context, Token.KEY_TOKEN);
+
     }
 
     @Override
     protected String doInBackground(String... urls) {
         HttpURLConnection urlConnection = null;
-        Log.e(TAG, "endPoint: " + urlEndpoint);
+        Log.e(TAG, "urlGET: " + urlEndpoint);
 
         try {
-            if (token != null) {
-                urlEndpoint += "?token=" + token;
-            }
             urlConnection = (HttpURLConnection) new URL(urlEndpoint).openConnection();
             int TIMEOUT_VALUE = 10000;
             urlConnection.setReadTimeout(TIMEOUT_VALUE);
             urlConnection.setConnectTimeout(TIMEOUT_VALUE);
             urlConnection.setRequestMethod("GET");
 
+            if (this.token != null)
+                urlConnection.setRequestProperty("Authorization", "Bearer " + this.token);
 
             urlConnection.setDoInput(true);
             urlConnection.connect();

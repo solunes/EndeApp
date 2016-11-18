@@ -24,7 +24,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:text="Asignar numero TPL al dispositivo."
+        android:text="Asignar URL del servidor."
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <android.support.design.widget.TextInputLayout

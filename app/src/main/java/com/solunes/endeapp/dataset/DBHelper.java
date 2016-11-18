@@ -3,11 +3,15 @@ package com.solunes.endeapp.dataset;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
+
+import static com.solunes.endeapp.utils.Encrypt.methodEncrypt;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -16,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 19;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -32,6 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String FACTURA_DOSIFICACION_TABLE = "factura_dosificacion_table";
     public static final String TARIFA_TAP_TABLE = "tarifa_tap_table";
     public static final String TARIFA_ASEO_TABLE = "tarifa_aseo_table";
+    public static final String DETALLE_FACTURA_TABLE = "detalle_factura_table";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -279,12 +284,21 @@ public class DBHelper extends SQLiteOpenHelper {
                 TarifaAseo.Columns.kwh_hasta.name() + " integer," +
                 TarifaAseo.Columns.importe.name() + " decimal(15, 2))");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + DETALLE_FACTURA_TABLE + " (" +
+                DetalleFactura.Columns.id.name() + " integer," +
+                DetalleFactura.Columns.general_id.name() + " integer," +
+                DetalleFactura.Columns.item_facturacion_id.name() + " integer," +
+                DetalleFactura.Columns.importe.name() + " decimal(15, 2)," +
+                DetalleFactura.Columns.imp_redondeo.name() + " decimal(15, 2))");
+
         // inserts
+        String encriptPass = methodEncrypt("1234");
+        Log.e(TAG, "encriptPass: " + encriptPass);
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
                 "'admin', " +
                 "'admin', " +
-                "'1234', " +
+                "'" + encriptPass + "', " +
                 "1, " +
                 "1, " +
                 "1, " +
@@ -308,6 +322,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FACTURA_DOSIFICACION_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_TAP_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_ASEO_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DETALLE_FACTURA_TABLE);
 
         onCreate(sqLiteDatabase);
     }

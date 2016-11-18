@@ -22,6 +22,10 @@ public class PrintGenerator {
                                  Historico historico,
                                  double importeTotalFactura,
                                  double importeMesCancelar,
+                                 String garantiaString,
+                                 double cardep,
+                                 String aseoTitle,
+                                 String tapTitle,
                                  String[] leyenda) {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
 //        String toLetter = NumberToLetterConverter.convertNumberToLetter(459.5);
@@ -56,7 +60,7 @@ public class PrintGenerator {
                 "|" + dataModel.getTlxCliNit() +
                 "|" + StringUtils.roundTwoDigits(tasas) +
                 "|0" +
-                "|" + StringUtils.roundTwoDigits(tasas + dataModel.getTlxCarDep()) +
+                "|" + StringUtils.roundTwoDigits(tasas + cardep) +
                 "|0";
 
         String cpclConfigLabel = "! 0 200 200 1570 1\r\n" +
@@ -185,7 +189,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 510 1430 " + dataModel.getTlxFacNro() + "\r\n" +
                 "T CONSO1.CPF 0 720 1430 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n";
 
-        cpclConfigLabel += detalleFacturacion(printTitles, printValues, dataModel.getTlxCarDep(), importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
+        cpclConfigLabel += detalleFacturacion(printTitles, printValues, cardep, importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse(), garantiaString, aseoTitle, tapTitle);
         cpclConfigLabel += "" +
                 "FORM\r\n" +
                 "PRINT\r\n";
@@ -253,7 +257,7 @@ public class PrintGenerator {
         return mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
     }
 
-    public static String detalleFacturacion(ArrayList<String> titles, ArrayList<Double> values, double garantia, double impTotFac, double importeMes, double tap, double impAse) {
+    public static String detalleFacturacion(ArrayList<String> titles, ArrayList<Double> values, double garantia, double impTotFac, double importeMes, double tap, double impAse, String garantiaString, String aseoTitle, String tapTitle) {
         String res = "";
 //        String[] strings = (String[]) list.keySet().toArray();
         int yValue = 480;
@@ -272,15 +276,15 @@ public class PrintGenerator {
         res += "T CONSO3.CPF 0 40 " + yValue + " Tasas para el Gobierno Municipal\r\n";
 
         yValue += 20;
-        res += "T CONSO3.CPF 0 40 " + yValue + " Por alumbrado público\r\n";
+        res += "T CONSO3.CPF 0 40 " + yValue + " " + tapTitle + "\r\n";
         res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
         res += "RIGHT 782\r\n";
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(tap) + "\r\n";
 
         yValue += 20;
         res += "LEFT\r\n";
+        res += "T CONSO3.CPF 0 40 " + yValue + " " + aseoTitle + "\r\n";
         res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " Por aseo urbano\r\n";
         res += "RIGHT 782\r\n";
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impAse) + "\r\n";
 
@@ -292,10 +296,11 @@ public class PrintGenerator {
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
 
         if (garantia > 0) {
+
             yValue += 20;
             res += "LEFT\r\n";
             res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-            res += "T CONSO3.CPF 0 40 " + yValue + " Más deposito de garantia\r\n";
+            res += "T CONSO3.CPF 0 40 " + yValue + " " + garantiaString + "\r\n";
             res += "RIGHT 782\r\n";
             res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(garantia) + "\r\n";
         }

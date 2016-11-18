@@ -23,12 +23,14 @@ import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.DataModel;
+import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
+import com.solunes.endeapp.networking.Token;
 import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
@@ -48,11 +50,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_RATE_MONTH = "update_rate_month";
     public static final String KEY_DOWNLOAD = "download";
     public static final String KEY_WAS_UPLOAD = "was_upload";
-    private static final String KEY_SEND = "send";
-    private static final String KEY_ENDPOINT_GESTION = "endpoint_gestion";
-    private static final String KEY_ENDPOINT_MONTH = "endpoint_month";
-    private static final String KEY_ENDPOINT_REMESA = "endpoint_remesa";
-    private static final String KEY_ENDPOINT_TPL = "endpoint_tpl";
+    public static final String KEY_SEND = "send";
+    public static final String KEY_ENDPOINT_GESTION = "endpoint_gestion";
+    public static final String KEY_ENDPOINT_MONTH = "endpoint_month";
+    public static final String KEY_ENDPOINT_REMESA = "endpoint_remesa";
 
     private boolean isRate;
     private boolean wasDownload;
@@ -82,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Log.e(TAG, "onCreate: " + StringUtils.roundTwoDigits(100));
 
         DBAdapter adapter = new DBAdapter(this);
         user = adapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
@@ -160,47 +159,59 @@ public class MainActivity extends AppCompatActivity {
         if (remesa.length() == 1) {
             remesa = "0" + remesa;
         }
-        String url = Urls.urlDescarga(getApplicationContext()) + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
+        final String url = Urls.urlDescarga(getApplicationContext()) + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
         final String finalRemesa = remesa;
-        new GetRequest(getApplicationContext(),url, new CallbackAPI() {
+        Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
             @Override
-            public void onSuccess(final String result, int statusCode) {
-                Runnable runSaveData = new Runnable() {
+            public void onSuccessToken() {
+                new GetRequest(getApplicationContext(), url, new CallbackAPI() {
+                    @Override
+                    public void onSuccess(final String result, int statusCode) {
+                        Runnable runSaveData = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                boolean response = false;
+                                try {
+                                    response = processResponse(result);
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "onSuccess: ", e);
+                                }
+                                if (response) {
+                                    wasDownload = true;
+                                    UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
+                                    UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
+                                    UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
+
+                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
+                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
+                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
+                                } else {
+                                    Snackbar.make(view, "No hay datos en la descarga", Snackbar.LENGTH_SHORT).show();
+                                }
+                                progressDialog.dismiss();
+                            }
+                        };
+                        new Thread(runSaveData).start();
+                    }
 
                     @Override
-                    public void run() {
-                        boolean response = false;
-                        try {
-                            response = processResponse(result);
-                        } catch (JSONException e) {
-                            Log.e(TAG, "onSuccess: ", e);
-                        }
-                        if (response) {
-                            wasDownload = true;
-                            UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
-                            UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
-                            UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
-
-                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
-                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
-                            UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
-                        } else {
-                            Snackbar.make(view, "No hay datos en la descarga", Snackbar.LENGTH_SHORT).show();
-                        }
+                    public void onFailed(String reason, int statusCode) {
+                        Log.e(TAG, "onFailed: " + reason);
+                        progressDialog.setOnDismissListener(null);
                         progressDialog.dismiss();
+                        Snackbar.make(view, "Error al descargar los datos", Snackbar.LENGTH_SHORT).show();
                     }
-                };
-                new Thread(runSaveData).start();
+                }).execute();
             }
 
             @Override
-            public void onFailed(String reason, int statusCode) {
-                Log.e(TAG, "onFailed: " + reason);
+            public void onFailToken() {
                 progressDialog.setOnDismissListener(null);
                 progressDialog.dismiss();
-                Snackbar.make(view, "Error al descargar los datos", Snackbar.LENGTH_SHORT).show();
             }
-        }).execute();
+        });
+
         progressDialog.show();
         progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -229,27 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                Hashtable<String, String> params = prepareDataToPost();
-                new PostRequest(params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
-                    @Override
-                    public void onSuccess(String result, int statusCode) {
-                        Log.e(TAG, "onSuccess: " + result);
-                        String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                        textSend.setText(humanDate);
-                        progressDialog.dismiss();
-
-                        Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
-                        UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
-                        UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
-                    }
-
-                    @Override
-                    public void onFailed(String reason, int statusCode) {
-                        Log.e(TAG, "onFailed: " + reason);
-                        progressDialog.dismiss();
-                        Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
-                    }
-                }).execute();
+                sendPostRequest(view, progressDialog);
             }
         };
         new Thread(runSaveData).start();
@@ -258,36 +249,72 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    public void updateRate(final View view) {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Descargando....");
-        progressDialog.setCancelable(false);
-        new GetRequest(getApplicationContext(),Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+    public void sendPostRequest(final View view, final ProgressDialog progressDialog) {
+        Hashtable<String, String> params = prepareDataToPost();
+//                Token.getToken(getApplicationContext(), user);
+        new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
-                try {
-                    AdminActivity.processResultFixParams(getApplicationContext(), result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                progressDialog.dismiss();
+                Log.e(TAG, "onSuccess: " + result);
                 String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
-                textTarifa.setText(humanDate);
-                UserPreferences.putLong(getApplicationContext(), KEY_RATE, Calendar.getInstance().getTimeInMillis());
-                int month = Calendar.getInstance().get(Calendar.MONTH);
-                UserPreferences.putInt(getApplicationContext(), KEY_RATE_MONTH, month);
-                cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
-                Snackbar.make(view, "Se ha actualizado los parametros fijos", Snackbar.LENGTH_SHORT).show();
-                isRate = true;
+                textSend.setText(humanDate);
+                progressDialog.dismiss();
+
+                Snackbar.make(view, "Datos enviados", Snackbar.LENGTH_SHORT).show();
+                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
+                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
             }
 
             @Override
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
-                Snackbar.make(view, "Error al descargar los parametros", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
             }
         }).execute();
+    }
+
+    public void updateRate(final View view) {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Descargando....");
+        progressDialog.setCancelable(false);
+
+        Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
+            @Override
+            public void onSuccessToken() {
+                new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
+                    @Override
+                    public void onSuccess(String result, int statusCode) {
+                        try {
+                            AdminActivity.processResultFixParams(getApplicationContext(), result);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        progressDialog.dismiss();
+                        String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
+                        textTarifa.setText(humanDate);
+                        UserPreferences.putLong(getApplicationContext(), KEY_RATE, Calendar.getInstance().getTimeInMillis());
+                        int month = Calendar.getInstance().get(Calendar.MONTH);
+                        UserPreferences.putInt(getApplicationContext(), KEY_RATE_MONTH, month);
+                        cardRate.setBackgroundTintList(getResources().getColorStateList(android.R.color.white));
+                        Snackbar.make(view, "Se ha actualizado los parametros fijos", Snackbar.LENGTH_SHORT).show();
+                        isRate = true;
+                    }
+
+                    @Override
+                    public void onFailed(String reason, int statusCode) {
+                        Log.e(TAG, "onFailed: " + reason);
+                        progressDialog.dismiss();
+                        Snackbar.make(view, "Error al descargar los parametros", Snackbar.LENGTH_SHORT).show();
+                    }
+                }).execute();
+            }
+
+            @Override
+            public void onFailToken() {
+                progressDialog.dismiss();
+            }
+        });
         progressDialog.show();
     }
 
@@ -408,16 +435,29 @@ public class MainActivity extends AppCompatActivity {
             valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
             valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
             dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
+
+            JSONArray detalleFacturaArray = object.getJSONArray("detalle_factura");
+            Log.e(TAG, "processResponse: " + detalleFacturaArray.toString());
+            for (int j = 0; j < detalleFacturaArray.length(); j++) {
+                JSONObject detalleFactura = detalleFacturaArray.getJSONObject(j);
+                ContentValues valuesDF = new ContentValues();
+                valuesDF.put(DetalleFactura.Columns.id.name(), detalleFactura.getInt(DetalleFactura.Columns.id.name()));
+                valuesDF.put(DetalleFactura.Columns.general_id.name(), detalleFactura.getInt(DetalleFactura.Columns.general_id.name()));
+                valuesDF.put(DetalleFactura.Columns.item_facturacion_id.name(), detalleFactura.getInt(DetalleFactura.Columns.item_facturacion_id.name()));
+                valuesDF.put(DetalleFactura.Columns.importe.name(), detalleFactura.getDouble(DetalleFactura.Columns.importe.name()));
+                valuesDF.put(DetalleFactura.Columns.imp_redondeo.name(), detalleFactura.getDouble(DetalleFactura.Columns.imp_redondeo.name()));
+                dbAdapter.saveObject(DBHelper.DETALLE_FACTURA_TABLE, valuesDF);
+            }
         }
         dbAdapter.close();
         return results.length() > 0;
     }
 
-    private Hashtable<String, String> prepareDataToPost() {
+    public Hashtable<String, String> prepareDataToPost() {
         Hashtable<String, String> params = new Hashtable<>();
 
         DBAdapter dbAdapter = new DBAdapter(this);
-        ArrayList<DataModel> allData = dbAdapter.getAllData();
+        ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
 
         params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
         params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
@@ -427,7 +467,8 @@ public class MainActivity extends AppCompatActivity {
         for (DataModel dataModel : allData) {
             String json = DataModel.getJsonToSend(dataModel,
                     dbAdapter.getDataObsByCli(dataModel.getId()),
-                    dbAdapter.getPrintObsData(dataModel.getId()));
+                    dbAdapter.getPrintObsData(dataModel.getId()),
+                    dbAdapter.getDetalleFactura(dataModel.getId()));
             Log.e(TAG, "prepareDataToPost json: " + json);
             params.put("" + (dataModel.getTlxCli()), json);
         }
