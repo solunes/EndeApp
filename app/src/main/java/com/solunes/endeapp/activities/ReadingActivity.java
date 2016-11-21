@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -34,14 +36,13 @@ import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.PostRequest;
-import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
+import com.zebra.sdk.printer.PrinterReconnectionHandler;
 import com.zebra.sdk.printer.PrinterStatus;
-import com.zebra.sdk.printer.SGD;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
@@ -65,9 +66,7 @@ import static com.solunes.endeapp.activities.MainActivity.KEY_WAS_UPLOAD;
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener, SearchView.OnQueryTextListener {
 
     private static final String TAG = "ReadingActivity";
-
     public static final String KEY_LAST_PAGER_PSOTION = "last_pager_position";
-    public static final String KEY_LAST_DATA_SAVED = "last_data_saved";
 
     private ZebraPrinter printer;
     private Connection connection;
@@ -75,29 +74,31 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private PagerAdapter adapter;
-
     private SearchView searchView;
     private MenuItem searchItem;
-
+    private Menu menu;
     private RadioGroup radioGroup;
     private RadioButton radioCli;
-
     private Snackbar snackbar;
+    private Toolbar toolbar;
 
-    private int currentState = -1;
     private ArrayList<DataModel> datas;
     private User user;
 
     private int interval;
+    private int currentState = -1;
+    private int printState;
+
     Handler handler = new Handler();
     Runnable handlerTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reading);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -218,6 +219,21 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 return true;
             case R.id.action_search:
                 return true;
+            case R.id.action_print:
+                Log.e(TAG, "print state: " + printState);
+                if (printState == 0) {
+                    new Thread(new Runnable() {
+                        public void run() {
+                            Looper.prepare();
+                            doConnection();
+                            Looper.loop();
+                            Looper.myLooper().quit();
+                        }
+                    }).start();
+                } else {
+                    Snackbar.make(viewPager, "Impresora ya conectada", Snackbar.LENGTH_SHORT).show();
+                }
+                return true;
         }
         return false;
     }
@@ -226,6 +242,12 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     protected void onPause() {
         super.onPause();
         UserPreferences.putInt(this, KEY_LAST_PAGER_PSOTION, datas.get(viewPager.getCurrentItem()).getId());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+            }
+        }).start();
     }
 
     private void doConnection() {
@@ -261,12 +283,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 //        SettingsHelper.saveBluetoothAddress(this, getMacAddressFieldText());
 
         try {
+            Log.e(TAG, "connect: " + connection);
+            Log.e(TAG, "connect: " + connection.isConnected());
             connection.open();
             Log.e(TAG, "Connected");
-            Snackbar.make(viewPager, "Impresora conectada", Snackbar.LENGTH_SHORT).show();
+            checkStatus(1);
         } catch (ConnectionException e) {
-            Log.e(TAG, "Comm Error! Disconnecting");
+            Log.e(TAG, "Comm Error! Disconnecting", e);
             sleeper(500);
+            checkStatus(0);
             disconnect();
         }
 
@@ -274,16 +299,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
         if (connection.isConnected()) {
             try {
-
                 printer = ZebraPrinterFactory.getInstance(connection);
-                Log.e(TAG, "Determining Printer Languag");
-                String pl = SGD.GET("device.languages", connection);
-                Log.e(TAG, "Printer Language " + pl);
-            } catch (ConnectionException e) {
-                printer = null;
-                sleeper(500);
-                disconnect();
-            } catch (ZebraPrinterLanguageUnknownException e) {
+            } catch (ConnectionException | ZebraPrinterLanguageUnknownException e) {
                 printer = null;
                 sleeper(500);
                 disconnect();
@@ -299,6 +316,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             if (connection != null) {
                 connection.close();
             }
+            checkStatus(0);
             Log.e(TAG, "Not Connected");
         } catch (ConnectionException e) {
             Log.e(TAG, "COMM Error! Disconnected");
@@ -316,7 +334,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                     Snackbar.make(viewPager, "Imprimiendo", Snackbar.LENGTH_LONG).show();
                 } else if (printerStatus.isHeadOpen) {
                     Log.e(TAG, "printer head open");
-                    Snackbar.make(viewPager, "Cabezal abierto", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(viewPager, "Cabezal abierto, cierrelo y vuelva a imprimir", Snackbar.LENGTH_LONG).show();
                 } else if (printerStatus.isPaused) {
                     Log.e(TAG, "printer is paused");
                     Snackbar.make(viewPager, "Impresora pausada", Snackbar.LENGTH_LONG).show();
@@ -324,19 +342,20 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                     Log.e(TAG, "printer media out");
                     Snackbar.make(viewPager, "Impresora sin papel", Snackbar.LENGTH_LONG).show();
                 }
-                sleeper(1500);
+                sleeper(500);
                 if (connection instanceof BluetoothConnection) {
                     String friendlyName = ((BluetoothConnection) connection).getFriendlyName();
                     Log.e(TAG, friendlyName);
                     sleeper(500);
                 }
             } catch (ConnectionException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, e.getMessage(), e);
+                checkStatus(0);
             } catch (UnsupportedEncodingException e) {
                 Log.e(TAG, "sendLabelToPrint: ", e);
             }
         } else {
-            Snackbar.make(viewPager, "Impresora desconectada", Snackbar.LENGTH_LONG).show();
+            checkStatus(0);
         }
     }
 
@@ -350,6 +369,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_search, menu);
         searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
@@ -404,7 +424,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             @Override
             public void onSuccess(String result, int statusCode) {
                 Log.e(TAG, "onSuccess: " + result);
-                String humanDate = StringUtils.getHumanDate(Calendar.getInstance().getTime());
                 UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
                 UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
             }
@@ -451,4 +470,28 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         dbAdapter.close();
         return params;
     }
+
+    private void checkStatus(int status) {
+        printState = status;
+
+        if (printState == 1) {
+            Snackbar.make(viewPager, "Impresora conectada", Snackbar.LENGTH_SHORT).show();
+        } else {
+            Snackbar.make(viewPager, "Impresora desconectada, intente reconectar", Snackbar.LENGTH_LONG).show();
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MenuItem item = menu.getItem(0);
+                if (printState == 0) {
+                    item.setIcon(getResources().getDrawable(R.drawable.ic_no_print_white_24dp));
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.ic_print_white_24dp));
+                }
+            }
+        });
+    }
+
+
 }

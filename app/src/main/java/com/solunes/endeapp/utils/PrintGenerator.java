@@ -62,6 +62,13 @@ public class PrintGenerator {
                 "|" + StringUtils.roundTwoDigits(tasas + cardep) +
                 "|0";
 
+        String carta;
+        if (dataModel.getTlxDebAuto() != null) {
+            carta = dataModel.getTlxDebAuto();
+        } else {
+            carta = String.valueOf(dataModel.getTlxCarFac());
+        }
+
         String cpclConfigLabel = "! 0 200 200 1570 1\r\n" +
                 "RIGHT 782\r\n" +
                 "T CONSO2.CPF 0 10 30 " + dataModel.getTlxFacNro() + "\r\n" +
@@ -85,7 +92,7 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 575 173 N° MEDIDOR:\r\n" +
                 "RIGHT 100\r\n" +
                 "T CONSO2.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
-                "T CONSO2.CPF 0 445 173 " + dataModel.getTlxCli() + "\r\n" +
+                "T CONSO2.CPF 0 445 173 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
                 "T CONSO2.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
 
                 "LEFT\r\n" +
@@ -95,7 +102,7 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 450 211 ACTIVIDAD: " + dataModel.getTlxActivi() + "\r\n" +
 
                 "T CONSO2.CPF 0 40 230 REMESA/RUTA: " + dataModel.getTlxRem() + "/" + dataModel.getTlxRutO() + "\r\n" +
-                "T CONSO2.CPF 0 450 230 CARTA FACTURA:  \r\n" +
+                "T CONSO2.CPF 0 450 230 CARTA FACTURA:  " + carta + "\r\n" +
 
                 // BLOQUE 2: DATOS DE MEDICION
                 "T CONSO2.CPF 0 45 260 MES DE LA FACTURA: " + mesString(dataModel.getTlxMes()).toUpperCase() + "-" + dataModel.getTlxAno() + "\r\n" +
@@ -146,7 +153,7 @@ public class PrintGenerator {
 
                 // BLOQUE 4: QR, control code
                 "LEFT\r\n" +
-                "B QR 485 1070 M 2 U 4\r\n" +
+                "B QR 485 1062 M 2 U 4\r\n" +
                 "MA," + qrData + "\r\n" +
                 "ENDQR\r\n" +
 
@@ -184,7 +191,7 @@ public class PrintGenerator {
                 "T CONSO0.CPF 0 710 1378 " + dataModel.getTlxFecproEmi() + "\r\n" +
 
                 "T CONSO1.CPF 0 135 1430 " + formatedDateSinDia(dataModel.getTlxFecLec()) + "\r\n" +
-                "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "\r\n" +
+                "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
                 "T CONSO1.CPF 0 510 1430 " + dataModel.getTlxFacNro() + "\r\n" +
                 "T CONSO1.CPF 0 720 1430 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n";
 

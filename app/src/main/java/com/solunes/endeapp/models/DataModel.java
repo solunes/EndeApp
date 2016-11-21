@@ -22,6 +22,7 @@ public class DataModel {
     private int TlxAno;
     private int TlxMes;
     private int TlxCli;
+    private int TlxDav;
     private int TlxOrdTpl;
     private String TlxNom;
     private String TlxDir;
@@ -141,6 +142,7 @@ public class DataModel {
         TlxAno,
         TlxMes,
         TlxCli,
+        TlxDav,
         TlxOrdTpl,
         TlxNom,
         TlxDir,
@@ -282,6 +284,7 @@ public class DataModel {
         dataModel.setTlxAno(cursor.getInt(Columns.TlxAno.ordinal()));
         dataModel.setTlxMes(cursor.getInt(Columns.TlxMes.ordinal()));
         dataModel.setTlxCli(cursor.getInt(Columns.TlxCli.ordinal()));
+        dataModel.setTlxDav(cursor.getInt(Columns.TlxDav.ordinal()));
         dataModel.setTlxOrdTpl(cursor.getInt(Columns.TlxOrdTpl.ordinal()));
         dataModel.setTlxNom(cursor.getString(Columns.TlxNom.ordinal()));
         dataModel.setTlxDir(cursor.getString(Columns.TlxDir.ordinal()));
@@ -470,6 +473,14 @@ public class DataModel {
             Log.e(TAG, "getJsonToSend: ", e);
         }
         return jsonObject.toString();
+    }
+
+    public int getTlxDav() {
+        return TlxDav;
+    }
+
+    public void setTlxDav(int tlxDav) {
+        TlxDav = tlxDav;
     }
 
     public double getTlxCarCon() {

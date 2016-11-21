@@ -43,9 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by jhonlimaster on 01-12-15.
- */
 public class DataFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private static final String TAG = "DataFragment";
     public static final String KEY_ID_DATA = "id_data";
@@ -95,6 +92,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private int positionPrintObs;
     private int positionFecha;
     private int positionHora;
+    private ArrayList<Integer> autoObs;
 
     public DataFragment() {
         printTitles = new ArrayList<>();
@@ -379,6 +377,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
         DBAdapter dbAdapter = new DBAdapter(getContext());
         final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
+        Log.e(TAG, "obs: " + obs.getId() + " - " + obs.getObsLec());
 
         // obtener lectura de energia y verificar digitos
         String input = inputReading.getText().toString();
@@ -398,9 +397,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         int nuevaLectura = 0;
         int lecturaKwh;
         boolean giro = false;
+        boolean indiceIgualado = false;
         if (obs.getId() != 104) {
             tipoLectura = obs.getObsLec();
         }
+        Log.e(TAG, "tipo lectura: " + tipoLectura);
         if (tipoLectura == 3 || tipoLectura == 9) {
             lecturaKwh = dataModel.getTlxConPro();
         } else if (input.isEmpty()) {
@@ -414,44 +415,58 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
             nuevaLectura = correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
             if (nuevaLectura < dataModel.getTlxUltInd()) {
-                giro = true;
+                if ((dataModel.getTlxUltInd() - nuevaLectura) <= 10) {
+                    nuevaLectura = dataModel.getTlxUltInd();
+                    indiceIgualado = true;
+                } else {
+                    giro = true;
+                }
             }
             lecturaKwh = GenLecturas.lecturaNormal(dataModel.getTlxUltInd(), nuevaLectura, dataModel.getTlxNroDig());
         }
         int conPro = dataModel.getTlxConPro();
 
+        autoObs = new ArrayList<>();
         // Alertas de consumo bajo, consumo elevado y giro de medidor
         boolean isAlert = false;
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Alerta!");
         String message = "Se ha detectado:";
         if (lecturaKwh > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
-            message = message + "\n- Consumo elevado";
+            message += "\n- Consumo elevado";
             isAlert = true;
+            autoObs.add(80);
         } else if (lecturaKwh < (conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_bajo.name()) / 100))) {
-            message = message + "\n- Consumo bajo";
+            message += "\n- Consumo bajo";
             isAlert = true;
+            autoObs.add(81);
         }
         if (giro) {
-            message = message + "\n- Giro de medidor";
+            message += "\n- Giro de medidor";
             isAlert = true;
         }
+        if (indiceIgualado) {
+            message += "\n- Índice igualado";
+            isAlert = true;
+            autoObs.add(50);
+        }
+        message += "\n\n¿Es correcto el índice " + nuevaLectura + "?";
         builder.setMessage(message);
         builder.setNegativeButton("Cancelar", null);
         final int finalLecturaKwh = lecturaKwh;
         final int finalNuevaLectura = nuevaLectura;
         final int finalTipoLectura = tipoLectura;
+        Log.e(TAG, "final: " + finalTipoLectura);
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 confirmarLectura(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, obs, view);
             }
         });
-        if (isAlert) {
+        if (isAlert && tipoLectura != 5) {
             builder.show();
         } else {
             confirmarLectura(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, obs, view);
-
         }
         dbAdapter.close();
     }
@@ -655,16 +670,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataObs.Columns.observacion_id.name(), obs.getId());
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
 
-        int conPro = dataModel.getTlxConPro();
-        if (dataModel.getTlxConsumo() > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
+        for (Integer idObs : autoObs) {
             cv = new ContentValues();
             cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
-            cv.put(DataObs.Columns.observacion_id.name(), 80);
-            dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
-        } else if (dataModel.getTlxConsumo() < (conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_bajo.name()) / 100))) {
-            cv = new ContentValues();
-            cv.put(DataObs.Columns.general_id.name(), dataModel.getId());
-            cv.put(DataObs.Columns.observacion_id.name(), 81);
+            cv.put(DataObs.Columns.observacion_id.name(), idObs);
             dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
         }
 
@@ -682,6 +691,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      * @param obs
      */
     private void calculo(int tipoLectura, int nuevaLectura, int lectura, boolean reprint, Obs obs) {
+        Log.e(TAG, "calculo: " + tipoLectura);
         DBAdapter dbAdapter = new DBAdapter(getContext());
 
         // revisar si no es reimpresion, para no realizar el calculo de nuevo
@@ -697,6 +707,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     potenciaLeida = correccionDeDigitos(potenciaLeida, dataModel.getTlxDecPot());
                     dataModel.setTlxPotLei(potenciaLeida);
                 }
+                dataModel.setTlxTipLec(tipoLectura);
                 return;
             }
 
@@ -704,10 +715,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (tipoLectura == 3 || tipoLectura == 9) {
                 dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
                 dataModel.setTlxKwhDev(lectura);
+            } else {
+                dataModel.setTlxNvaLec(nuevaLectura);
             }
-
             dataModel.setTlxTipLec(tipoLectura);
-            dataModel.setTlxNvaLec(nuevaLectura);
+            Log.e(TAG, "calculo: " + dataModel.getTlxTipLec());
             dataModel.setTlxConsumo(lectura);
 
             // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
@@ -817,6 +829,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         double cargoExtraTotal = 0;
         for (Integer itemId : integers) {
             double cargoExtra = dbAdapter.getDetalleFacturaImporte(dataModel.getId(), itemId);
+            cargoExtra = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), itemId, cargoExtra);
             cargoExtraTotal += cargoExtra;
             if (cargoExtra > 0) {
                 printTitles.add(dbAdapter.getItemDescription(itemId));

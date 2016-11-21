@@ -20,7 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 20;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -83,6 +83,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxAno integer, " +
                 "TlxMes integer, " +
                 "TlxCli integer, " +
+                "TlxDav integer, " +
                 "TlxOrdTpl integer, " +
                 "TlxNom text, " +
                 "TlxDir text, " +
@@ -252,7 +253,6 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("CREATE TABLE " + MED_ENTRE_LINEAS_TABLE + " (" +
                 "id integer," +
                 "MelRem integer," +
-                "MelAre integer," +
                 "MelMed integer," +
                 "MelLec integer)");
 

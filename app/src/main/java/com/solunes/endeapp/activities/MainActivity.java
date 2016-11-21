@@ -361,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxAno.name(), object.getInt(DataModel.Columns.TlxAno.name()));
             values.put(DataModel.Columns.TlxMes.name(), object.getInt(DataModel.Columns.TlxMes.name()));
             values.put(DataModel.Columns.TlxCli.name(), object.getDouble(DataModel.Columns.TlxCli.name()));
+//            values.put(DataModel.Columns.TlxDav.name(), object.getInt(DataModel.Columns.TlxDav.name()));
             values.put(DataModel.Columns.TlxOrdTpl.name(), object.getInt(DataModel.Columns.TlxOrdTpl.name()));
             values.put(DataModel.Columns.TlxNom.name(), object.getString(DataModel.Columns.TlxNom.name()));
             values.put(DataModel.Columns.TlxDir.name(), object.getString(DataModel.Columns.TlxDir.name()));
@@ -373,7 +374,6 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxFacMul.name(), object.getDouble(DataModel.Columns.TlxFacMul.name()));
             values.put(DataModel.Columns.TlxFecAnt.name(), object.getString(DataModel.Columns.TlxFecAnt.name()));
             values.put(DataModel.Columns.TlxFecLec.name(), object.getString(DataModel.Columns.TlxFecLec.name()));
-//            values.put(DataModel.Columns.TlxHorLec.name(), object.getString(DataModel.Columns.TlxHorLec.name()));
             values.put(DataModel.Columns.TlxUltInd.name(), object.getInt(DataModel.Columns.TlxUltInd.name()));
             values.put(DataModel.Columns.TlxConPro.name(), object.getInt(DataModel.Columns.TlxConPro.name()));
             values.put(DataModel.Columns.TlxTipLec.name(), object.getInt(DataModel.Columns.TlxTipLec.name()));
@@ -653,7 +653,6 @@ public class MainActivity extends AppCompatActivity {
                     boolean valid = dbAdapter.validNewMedidor(Integer.parseInt(nroMed.getText().toString()));
                     if (valid) {
                         ContentValues cv = new ContentValues();
-                        cv.put(MedEntreLineas.Columns.MelAre.name(), nroArea);
                         cv.put(MedEntreLineas.Columns.MelRem.name(), nroRemesa);
                         cv.put(MedEntreLineas.Columns.MelMed.name(), Integer.parseInt(nroMed.getText().toString()));
                         cv.put(MedEntreLineas.Columns.MelLec.name(), Integer.parseInt(lecMed.getText().toString()));
@@ -665,8 +664,6 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(MainActivity.this, "El número de medidor ya existe", Toast.LENGTH_SHORT).show();
                     }
-
-
                 }
             }
         });

@@ -12,14 +12,12 @@ import org.json.JSONObject;
 public class MedEntreLineas {
     private int id;
     private int melRem;
-    private int melAre;
     private int melMed;
     private int melLec;
 
     public static MedEntreLineas fromCursor(Cursor cursor) {
         MedEntreLineas entreLineas = new MedEntreLineas();
         entreLineas.setMelRem(cursor.getInt(Columns.MelRem.ordinal()));
-        entreLineas.setMelAre(cursor.getInt(Columns.MelAre.ordinal()));
         entreLineas.setMelMed(cursor.getInt(Columns.MelMed.ordinal()));
         entreLineas.setMelLec(cursor.getInt(Columns.MelLec.ordinal()));
         return entreLineas;
@@ -29,7 +27,6 @@ public class MedEntreLineas {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(Columns.MelRem.name(), getMelRem());
-            jsonObject.put(Columns.MelAre.name(), getMelAre());
             jsonObject.put(Columns.MelMed.name(), getMelMed());
             jsonObject.put(Columns.MelLec.name(), getMelLec());
         } catch (JSONException e) {
@@ -41,7 +38,6 @@ public class MedEntreLineas {
 
     public enum Columns {
         MelRem,
-        MelAre,
         MelMed,
         MelLec
     }
@@ -60,14 +56,6 @@ public class MedEntreLineas {
 
     public void setMelRem(int melRem) {
         this.melRem = melRem;
-    }
-
-    public int getMelAre() {
-        return melAre;
-    }
-
-    public void setMelAre(int melAre) {
-        this.melAre = melAre;
     }
 
     public int getMelMed() {
