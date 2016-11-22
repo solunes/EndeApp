@@ -33,7 +33,7 @@ public class PrintGenerator {
 
         if (dataModel.getTlxDeuEneC() > 0) {
             deudasEnergia = "LEFT\r\n";
-            deudasEnergia += "T CONSO2.CPF 0 45 925 Mas deuda(s) pendiente(s) de energia  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
+            deudasEnergia += "T CONSO2.CPF 0 45 925 Más deuda(s) pendiente(s) de energía  (" + dataModel.getTlxDeuEneC() + ") Bs\r\n";
             deudasEnergia += "RIGHT 782\r\n";
             deudasEnergia += "T CONSO2.CPF 0 45 925 " + StringUtils.roundTwoDigits(dataModel.getTlxDeuEneI()) + "\r\n";
             deudas += dataModel.getTlxDeuEneI();

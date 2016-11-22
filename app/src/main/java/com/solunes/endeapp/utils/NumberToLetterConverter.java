@@ -6,8 +6,8 @@ import java.text.DecimalFormat;
 public abstract class NumberToLetterConverter {
     private static final String[] UNIDADES = {"", "UN ", "DOS ", "TRES ",
             "CUATRO ", "CINCO ", "SEIS ", "SIETE ", "OCHO ", "NUEVE ", "DIEZ ",
-            "ONCE ", "DOCE ", "TRECE ", "CATORCE ", "QUINCE ", "DIECISEIS",
-            "DIECISIETE", "DIECIOCHO", "DIECINUEVE", "VEINTE"};
+            "ONCE ", "DOCE ", "TRECE ", "CATORCE ", "QUINCE ", "DIECISEIS ",
+            "DIECISIETE ", "DIECIOCHO ", "DIECINUEVE ", "VEINTE "};
 
     private static final String[] DECENAS = {"VENTI", "TREINTA ", "CUARENTA ",
             "CINCUENTA ", "SESENTA ", "SETENTA ", "OCHENTA ", "NOVENTA ",
@@ -116,7 +116,7 @@ public abstract class NumberToLetterConverter {
         // Descompone los centavos
         String valor = splitNumber[1];
         if (valor.length() == 1) {
-            converted.append(splitNumber[1]).append("0").append("/100 ");
+            converted.append(splitNumber[1]).append("0").append("/100. ");
         } else {
             converted.append(splitNumber[1]).append("/100. ");
         }
