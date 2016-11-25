@@ -16,6 +16,7 @@ import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.ItemFacturacion;
+import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
@@ -108,6 +109,7 @@ public class DBAdapter {
         db.delete(DBHelper.PARAMETRO_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
+        db.delete(DBHelper.LIMITES_MAXIMOS_TABLE, null, null);
     }
 
     /**
@@ -686,5 +688,12 @@ public class DBAdapter {
         String desc = query.getString(ItemFacturacion.Columns.descripcion.ordinal());
         query.close();
         return desc;
+    }
+
+    public int getMaxKwh(int categoriaTarifa) {
+        open();
+        Cursor cursor = db.query(DBHelper.LIMITES_MAXIMOS_TABLE, null, LimitesMaximos.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa, null, null, null, null);
+        cursor.moveToFirst();
+        return cursor.getInt(LimitesMaximos.Columns.max_kwh.ordinal());
     }
 }

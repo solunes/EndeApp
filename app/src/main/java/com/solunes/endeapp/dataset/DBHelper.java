@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
+import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
@@ -20,7 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
     private static final String DATABASE_NAME = "endeapp.db";
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";
@@ -37,6 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TARIFA_TAP_TABLE = "tarifa_tap_table";
     public static final String TARIFA_ASEO_TABLE = "tarifa_aseo_table";
     public static final String DETALLE_FACTURA_TABLE = "detalle_factura_table";
+    public static final String LIMITES_MAXIMOS_TABLE = "limites_maximos_table";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -56,8 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "LecNiv integer, " +
                 "LecAsi integer, " +
                 "LecAct integer, " +
-                "AreaCod integer, " +
-                "RutaCod integer)");
+                "AreaCod integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TARIFA_TABLE + " (" +
                 "id integer, " +
@@ -84,6 +85,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxMes integer, " +
                 "TlxCli integer, " +
                 "TlxDav integer, " +
+                "TlxEstCli integer, " +
                 "TlxOrdTpl integer, " +
                 "TlxNom text, " +
                 "TlxDir text, " +
@@ -295,9 +297,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 DetalleFactura.Columns.importe.name() + " decimal(15, 2)," +
                 DetalleFactura.Columns.imp_redondeo.name() + " decimal(15, 2))");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + LIMITES_MAXIMOS_TABLE + " (" +
+                LimitesMaximos.Columns.id.name() + " integer," +
+                LimitesMaximos.Columns.categoria_tarifa_id.name() + " integer," +
+                LimitesMaximos.Columns.max_kwh.name() + " integer," +
+                LimitesMaximos.Columns.max_bs.name() + " integer)");
+
         // inserts
         String encriptPass = methodEncrypt("1234");
-        Log.e(TAG, "encriptPass: " + encriptPass);
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
                 "'admin', " +
@@ -306,8 +313,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "1, " +
                 "1, " +
                 "1, " +
-                "1, " +
-                "12345)");
+                "1)");
     }
 
     @Override
@@ -327,6 +333,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_TAP_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_ASEO_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DETALLE_FACTURA_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LIMITES_MAXIMOS_TABLE);
 
         onCreate(sqLiteDatabase);
     }

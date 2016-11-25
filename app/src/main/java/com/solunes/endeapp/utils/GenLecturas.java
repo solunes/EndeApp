@@ -1,9 +1,7 @@
 package com.solunes.endeapp.utils;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.solunes.endeapp.Constants;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DetalleFactura;

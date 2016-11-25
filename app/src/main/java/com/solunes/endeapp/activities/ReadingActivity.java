@@ -4,8 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -41,7 +39,6 @@ import com.solunes.endeapp.utils.UserPreferences;
 import com.zebra.sdk.comm.BluetoothConnection;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.printer.PrinterReconnectionHandler;
 import com.zebra.sdk.printer.PrinterStatus;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
@@ -57,9 +54,6 @@ import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Set;
 
-import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_GESTION;
-import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_MONTH;
-import static com.solunes.endeapp.activities.MainActivity.KEY_ENDPOINT_REMESA;
 import static com.solunes.endeapp.activities.MainActivity.KEY_SEND;
 import static com.solunes.endeapp.activities.MainActivity.KEY_WAS_UPLOAD;
 
@@ -129,7 +123,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         } else {
             datas = dbAdapter.getAllData();
         }
-        adapter = new PagerAdapter(getSupportFragmentManager(), datas.size(), datas);
+        adapter = new PagerAdapter(getSupportFragmentManager(), datas.size(), datas, user.getLecId());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
         for (int i = 0; i < adapter.getCount(); i++) {
@@ -150,7 +144,9 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 handler.postDelayed(handlerTask, interval * 1000 * 60);
             }
         };
-        handlerTask.run();
+        if (user.getLecNiv() != 3) {
+            handlerTask.run();
+        }
         dbAdapter.close();
 
         new Thread(new Runnable() {
@@ -441,10 +437,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         DBAdapter dbAdapter = new DBAdapter(this);
         ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
 
-        params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
-        params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
-        params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
-        params.put("RutaCod", String.valueOf(user.getRutaCod()));
+        params.put("UsrCod", String.valueOf(user.getLecCod()));
 
         for (DataModel dataModel : allData) {
             String json = DataModel.getJsonToSend(dataModel,

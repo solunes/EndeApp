@@ -25,6 +25,7 @@ import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.ItemFacturacion;
+import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
@@ -176,8 +177,9 @@ public class AdminActivity extends AppCompatActivity {
 
     /**
      * Metodo para procesar lo obtenido de los parametros fijos
+     *
      * @param context contexto de la aplicacion para hacer consultas a la base de datos
-     * @param result es una cadena json que contiene de los datos de parametros fijos
+     * @param result  es una cadena json que contiene de los datos de parametros fijos
      * @throws JSONException excepcion si el string result no tiene formato json
      */
     public static void processResultFixParams(Context context, String result) throws JSONException {
@@ -221,7 +223,6 @@ public class AdminActivity extends AppCompatActivity {
             values.put(User.Columns.LecAsi.name(), object.getInt(User.Columns.LecAsi.name()));
             values.put(User.Columns.LecAct.name(), object.getInt(User.Columns.LecAct.name()));
             values.put(User.Columns.AreaCod.name(), object.getInt(User.Columns.AreaCod.name()));
-            values.put(User.Columns.RutaCod.name(), object.getInt(User.Columns.RutaCod.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.USER_TABLE, values);
         }
@@ -340,12 +341,24 @@ public class AdminActivity extends AppCompatActivity {
             dbAdapter.saveObject(DBHelper.TARIFA_ASEO_TABLE, values);
         }
 
+        // guarda los limites maximos
+        JSONArray limitesMaximos = jsonObject.getJSONArray("limites_maximos");
+        for (int i = 0; i < limitesMaximos.length(); i++) {
+            JSONObject object = limitesMaximos.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(LimitesMaximos.Columns.id.name(), object.getInt(LimitesMaximos.Columns.id.name()));
+            values.put(LimitesMaximos.Columns.categoria_tarifa_id.name(), object.getInt(LimitesMaximos.Columns.categoria_tarifa_id.name()));
+            values.put(LimitesMaximos.Columns.max_kwh.name(), object.getInt(LimitesMaximos.Columns.max_kwh.name()));
+            values.put(LimitesMaximos.Columns.max_bs.name(), object.getInt(LimitesMaximos.Columns.max_bs.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.LIMITES_MAXIMOS_TABLE, values);
+        }
     }
 
     /**
      * Este metodo hacer la consulta el servidor para obtener los paratros fijos
      */
-    private void parametrosRequest(){
+    private void parametrosRequest() {
         new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {
@@ -364,7 +377,7 @@ public class AdminActivity extends AppCompatActivity {
 
             @Override
             public void onFailed(String reason, int statusCode) {
-                builder.setMessage("Error en descarga");
+                builder.setMessage(reason);
                 builder.show();
                 progressDialog.dismiss();
             }

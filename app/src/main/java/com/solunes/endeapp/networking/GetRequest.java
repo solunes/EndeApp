@@ -9,6 +9,7 @@ import com.solunes.endeapp.utils.UserPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Hashtable;
-
 
 public class GetRequest extends AsyncTask<String, Void, String> {
     private String TAG = GetRequest.class.getSimpleName();
@@ -84,14 +84,17 @@ public class GetRequest extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        if (result == null) {
-            callbackAPI.onFailed("", 404);
-        }
-
         if (isSuccessStatusCode()) {
             callbackAPI.onSuccess(result, getStatusCode());
         } else {
-            callbackAPI.onFailed(result, getStatusCode());
+            String messageError = "";
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                messageError += jsonObject.getString("message");
+                messageError += " (" + jsonObject.getString("status_code") + ")";
+            } catch (JSONException e) {
+            }
+            callbackAPI.onFailed(messageError, getStatusCode());
         }
 
     }

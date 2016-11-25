@@ -18,16 +18,18 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "PagerAdapter";
     private int size;
     private ArrayList<DataModel> dataModels;
+    private int lecId;
 
-    public PagerAdapter(FragmentManager fm, int sizeTable, ArrayList<DataModel> dataModels) {
+    public PagerAdapter(FragmentManager fm, int sizeTable, ArrayList<DataModel> dataModels, int lecId) {
         super(fm);
         this.size = sizeTable;
         this.dataModels = dataModels;
+        this.lecId = lecId;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return DataFragment.newInstance(dataModels.get(position).getId());
+        return DataFragment.newInstance(dataModels.get(position).getId(), lecId);
     }
 
     @Override

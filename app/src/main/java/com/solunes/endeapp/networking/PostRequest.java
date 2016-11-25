@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.solunes.endeapp.utils.UserPreferences;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -100,7 +103,14 @@ public class PostRequest extends AsyncTask<String, Void, String> {
         if (getStatusCode() >= 200 && getStatusCode() <= 250) {
             callbackAPI.onSuccess(result, getStatusCode());
         } else {
-            callbackAPI.onFailed(result, getStatusCode());
+            String messageError = "";
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                messageError += jsonObject.getString("message");
+                messageError += " (" + jsonObject.getString("status_code") + ")";
+            } catch (JSONException e) {
+            }
+            callbackAPI.onFailed(messageError, getStatusCode());
         }
     }
 

@@ -7,4 +7,6 @@
     <color name="colorPrint">#3D5AFE</color>
     <color name="colorPostponed">#FFEA00</color>
     <color name="colorPendiente">#ff3d00</color>
+
+    <color name="colorConectado">#64dd17</color>
 </resources>

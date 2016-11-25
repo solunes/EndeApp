@@ -84,7 +84,7 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 50 135 " + dataModel.getTlxCiudad() + " " + getFechaEmi(dataModel.getTlxFecEmi()) + "\r\n" +
 
                 "LEFT\r\n" +
-                "T CONSO2.CPF 0 40 154 Nombre: " + dataModel.getTlxNom() + " \r\n" +
+                "T CONSO2.CPF 0 40 154 NOMBRE: " + dataModel.getTlxNom().toUpperCase() + " \r\n" +
 
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 40 173 NIT/CI:\r\n" +

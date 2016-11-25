@@ -14,10 +14,9 @@ public class User {
     private int lecAsi;
     private int lecAct;
     private int areaCod;
-    private int rutaCod;
 
     public enum Columns {
-        LecId, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod, RutaCod
+        LecId, LecNom, LecCod, LecPas, LecNiv, LecAsi, LecAct, AreaCod
     }
 
     public static User fromCursor(Cursor cursor){
@@ -30,16 +29,7 @@ public class User {
         user.setLecAsi(cursor.getInt(Columns.LecAsi.ordinal()));
         user.setLecAct(cursor.getInt(Columns.LecAct.ordinal()));
         user.setAreaCod(cursor.getInt(Columns.AreaCod.ordinal()));
-        user.setRutaCod(cursor.getInt(Columns.RutaCod.ordinal()));
         return user;
-    }
-
-    public int getRutaCod() {
-        return rutaCod;
-    }
-
-    public void setRutaCod(int rutaCod) {
-        this.rutaCod = rutaCod;
     }
 
     public int getLecId() {

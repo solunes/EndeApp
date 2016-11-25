@@ -98,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
         statePostponed = (TextView) findViewById(R.id.state_postponed);
         cardRate = (CardView) findViewById(R.id.card_rate);
 
+        View layoutSend = findViewById(R.id.layout_send_reading);
+        if (user.getLecNiv() == 3){
+            layoutSend.setEnabled(false);
+        }
+
         // se verifican las fechas de las accciones como descarga, envio y parametros fijos
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
@@ -158,16 +163,8 @@ public class MainActivity extends AppCompatActivity {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Descargando....");
         progressDialog.setCancelable(false);
-        final Calendar calendar = Calendar.getInstance();
 
-        final String gestion = calendar.get(Calendar.YEAR) + "";
-        final String month = (calendar.get(Calendar.MONTH) + 1) + "";
-        String remesa = (calendar.get(Calendar.DAY_OF_MONTH) - 1) + "";
-        if (remesa.length() == 1) {
-            remesa = "0" + remesa;
-        }
-        final String url = Urls.urlDescarga(getApplicationContext()) + gestion + "/" + month + "/" + remesa + "/" + user.getRutaCod();
-        final String finalRemesa = remesa;
+        final String url = Urls.urlDescarga(getApplicationContext()) + user.getLecCod();
         Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
             @Override
             public void onSuccessToken() {
@@ -189,10 +186,6 @@ public class MainActivity extends AppCompatActivity {
                                     UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, false);
                                     UserPreferences.putInt(getApplicationContext(), ReadingActivity.KEY_LAST_PAGER_PSOTION, 0);
                                     UserPreferences.putLong(MainActivity.this, KEY_DOWNLOAD, Calendar.getInstance().getTimeInMillis());
-
-                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_GESTION, gestion);
-                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_MONTH, month);
-                                    UserPreferences.putString(MainActivity.this, KEY_ENDPOINT_REMESA, finalRemesa);
                                 } else {
                                     Snackbar.make(view, "No hay datos en la descarga", Snackbar.LENGTH_SHORT).show();
                                 }
@@ -207,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "onFailed: " + reason);
                         progressDialog.setOnDismissListener(null);
                         progressDialog.dismiss();
-                        Snackbar.make(view, "Error al descargar los datos", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, reason, Snackbar.LENGTH_SHORT).show();
                     }
                 }).execute();
             }
@@ -282,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailed(String reason, int statusCode) {
                 Log.e(TAG, "onFailed: " + reason);
                 progressDialog.dismiss();
-                Snackbar.make(view, "Error al enviar datos", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, reason, Snackbar.LENGTH_SHORT).show();
             }
         }).execute();
     }
@@ -324,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailed(String reason, int statusCode) {
                         Log.e(TAG, "onFailed: " + reason);
                         progressDialog.dismiss();
-                        Snackbar.make(view, "Error al descargar los parametros", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, reason, Snackbar.LENGTH_SHORT).show();
                     }
                 }).execute();
             }
@@ -362,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxMes.name(), object.getInt(DataModel.Columns.TlxMes.name()));
             values.put(DataModel.Columns.TlxCli.name(), object.getDouble(DataModel.Columns.TlxCli.name()));
             values.put(DataModel.Columns.TlxDav.name(), object.getInt(DataModel.Columns.TlxDav.name()));
+            values.put(DataModel.Columns.TlxEstCli.name(), object.getInt(DataModel.Columns.TlxEstCli.name()));
             values.put(DataModel.Columns.TlxOrdTpl.name(), object.getInt(DataModel.Columns.TlxOrdTpl.name()));
             values.put(DataModel.Columns.TlxNom.name(), object.getString(DataModel.Columns.TlxNom.name()));
             values.put(DataModel.Columns.TlxDir.name(), object.getString(DataModel.Columns.TlxDir.name()));
@@ -421,20 +415,19 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxEntPot.name(), object.getInt(DataModel.Columns.TlxEntPot.name()));
             values.put(DataModel.Columns.TlxDecPot.name(), object.getInt(DataModel.Columns.TlxDecPot.name()));
             values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
-            values.put(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name()));
-            values.put(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name()));
-            values.put(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name()));
-            values.put(DataModel.Columns.TlxPreAnt4.name(), object.getString(DataModel.Columns.TlxPreAnt4.name()));
-            values.put(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()));
-
-            values.put(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name())));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name())));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name())));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt4.name(), object.getString(DataModel.Columns.TlxPreAnt4.name())));
+            values.putAll(stringNull(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name())));
+            values.putAll(stringNull(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name())));
             values.put(DataModel.Columns.estado_lectura.name(), 0);
             values.put(DataModel.Columns.enviado.name(), 0);
             values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
             dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
 
-            JSONObject historico = object.getJSONObject("historico");
-            if (historico != null) {
+            try {
+                JSONObject historico = object.getJSONObject("historico");
                 ContentValues valuesH = new ContentValues();
                 valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
                 valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
@@ -463,6 +456,8 @@ public class MainActivity extends AppCompatActivity {
                 valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
                 valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
                 dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
+            } catch (Exception e) {
+                Log.e(TAG, "historico nulo");
             }
 
             JSONArray detalleFacturaArray = object.getJSONArray("detalle_factura");
@@ -495,10 +490,7 @@ public class MainActivity extends AppCompatActivity {
         DBAdapter dbAdapter = new DBAdapter(this);
         ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
 
-        params.put("gestion", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_GESTION));
-        params.put("mes", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_MONTH));
-        params.put("remesa", UserPreferences.getString(getApplicationContext(), KEY_ENDPOINT_REMESA));
-        params.put("RutaCod", String.valueOf(user.getRutaCod()));
+        params.put("UsrCod", String.valueOf(user.getLecCod()));
 
         for (DataModel dataModel : allData) {
             String json = DataModel.getJsonToSend(dataModel,
@@ -669,5 +661,15 @@ public class MainActivity extends AppCompatActivity {
         });
         newMedidor.setNegativeButton("Cancelar", null);
         newMedidor.show();
+    }
+
+    private ContentValues stringNull(String key, String string) {
+        ContentValues values = new ContentValues();
+        if (string.equalsIgnoreCase("null")) {
+            values.putNull(key);
+        } else {
+            values.put(key, string);
+        }
+        return values;
     }
 }
