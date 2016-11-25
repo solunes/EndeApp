@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.UserPreferences;
 
 public class LoginActivity extends AppCompatActivity {
@@ -37,6 +39,10 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
+
+        String seedValue = "I AM UNBREAKABLEI AM UNBREAKABLE";
+        String MESSAGE = "1234";
+
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
@@ -66,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (valid) {
                     // obtiene un usuario de la base de datos
                     DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
-                    Cursor cursor = dbAdapter.checkUser(user.getText().toString(), pass.getText().toString());
+                    Cursor cursor = dbAdapter.checkUser(getResources().getString(R.string.seed), user.getText().toString(), pass.getText().toString());
                     // hay usuario
                     if (cursor.getCount() > 0) {
                         User user = User.fromCursor(cursor);

@@ -31,6 +31,7 @@ import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.networking.Token;
+import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         cardRate = (CardView) findViewById(R.id.card_rate);
 
         View layoutSend = findViewById(R.id.layout_send_reading);
-        if (user.getLecNiv() == 3){
+        if (user.getLecNiv() == 3) {
             layoutSend.setEnabled(false);
         }
 

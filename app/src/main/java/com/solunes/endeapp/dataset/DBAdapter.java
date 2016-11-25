@@ -25,6 +25,7 @@ import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
 import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.StatisticsItem;
 
 import java.io.UnsupportedEncodingException;
@@ -37,8 +38,6 @@ import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
-
-import static com.solunes.endeapp.utils.Encrypt.methodEncrypt;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -70,9 +69,14 @@ public class DBAdapter {
      * @param password contraseña del usuario
      * @return retorna un cursor para su posterior manejo
      */
-    public Cursor checkUser(String username, String password) {
+    public Cursor checkUser(String seed,String username, String password) {
         open();
-        password = methodEncrypt(password);
+        // TODO: 25-11-16 encriptacion
+        try {
+            password = Encrypt.encrypt(seed,password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Cursor cursor = db.query(DBHelper.USER_TABLE, null,
                 User.Columns.LecCod.name() + " = '" + username + "' AND " + User.Columns.LecPas.name() + " = '" + password + "'",
                 null, null, null, null, null);

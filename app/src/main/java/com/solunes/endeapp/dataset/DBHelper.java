@@ -5,14 +5,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.solunes.endeapp.R;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
+import com.solunes.endeapp.utils.Encrypt;
 
-import static com.solunes.endeapp.utils.Encrypt.methodEncrypt;
 
 /**
  * Created by jhonlimaster on 11-08-16.
@@ -304,7 +305,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 LimitesMaximos.Columns.max_bs.name() + " integer)");
 
         // inserts
-        String encriptPass = methodEncrypt("1234");
+        // TODO: 25-11-16 encriptacion
+        String encriptPass = null;
+        try {
+            encriptPass = Encrypt.encrypt("0123456789abcdef","1234");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
                 "'admin', " +
