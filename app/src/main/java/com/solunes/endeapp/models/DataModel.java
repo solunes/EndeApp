@@ -259,6 +259,10 @@ public class DataModel {
         no_enviado, enviado
     }
 
+    /**
+     * Este metodo devuelve el tipo de lectura
+     * @param idTipo id del tipo de lectura
+     */
     public static String getTipoLectura(int idTipo) {
         if (idTipo == 0) {
             return "Lectura normal";
@@ -401,7 +405,18 @@ public class DataModel {
         return dataModel;
     }
 
-    public static String getJsonToSend(DataModel dataModel, ArrayList<DataObs> obsArray, ArrayList<PrintObsData> printObsDataArrayList, ArrayList<DetalleFactura> detalleFacturaArrayList) {
+    /**
+     * Este metodo crea un json para enviarlo al servidor
+     * @param dataModel objeto con los datos para llenar
+     * @param obsArray un array de objetos tipo DataObs
+     * @param printObsDataArrayList un array de objetos tipo PrintObsData
+     * @param detalleFacturaArrayList un array de objetos tipo DetalleFactura
+     * @return retorna un objeto listo para enviarlo al servidor
+     */
+    public static String getJsonToSend(DataModel dataModel,
+                                       ArrayList<DataObs> obsArray,
+                                       ArrayList<PrintObsData> printObsDataArrayList,
+                                       ArrayList<DetalleFactura> detalleFacturaArrayList) {
         JSONObject jsonObject = new JSONObject();
         try {
             if (dataModel.getTlxHorLec() == null) {

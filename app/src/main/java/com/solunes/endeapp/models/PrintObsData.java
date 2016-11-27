@@ -15,6 +15,10 @@ public class PrintObsData {
     private int idData;
     private int oigObs;
 
+    /**
+     * Convierte el objeto actual en un objeto json
+     * @return un json del objeto
+     */
     public String toJson() {
         JSONObject jsonObject = new JSONObject();
         try {

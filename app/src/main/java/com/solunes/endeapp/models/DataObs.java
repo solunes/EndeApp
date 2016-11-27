@@ -25,6 +25,9 @@ public class DataObs {
         return dataObs;
     }
 
+    /**
+     * COnvierte el objeto en json
+     */
     public JSONObject toJson() {
         JSONObject jsonObject = new JSONObject();
         try {

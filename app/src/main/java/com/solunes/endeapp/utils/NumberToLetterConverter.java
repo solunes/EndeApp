@@ -3,6 +3,9 @@ package com.solunes.endeapp.utils;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
+/**
+ * Clase para convertir los numero en letras para la factura
+ */
 public abstract class NumberToLetterConverter {
     private static final String[] UNIDADES = {"", "UN ", "DOS ", "TRES ",
             "CUATRO ", "CINCO ", "SEIS ", "SIETE ", "OCHO ", "NUEVE ", "DIEZ ",

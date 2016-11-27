@@ -5,9 +5,8 @@ import android.content.Context;
 import com.solunes.endeapp.activities.AdminActivity;
 
 /**
- * Created by jhonlimaster on 24-10-16.
+ * Esta clase hacer el manejo de las url de los endpoints
  */
-
 public class Urls {
 
     public static String endpointBase(Context context) {

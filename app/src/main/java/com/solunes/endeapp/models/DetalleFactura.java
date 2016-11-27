@@ -39,6 +39,9 @@ public class DetalleFactura {
         return detalleFactura;
     }
 
+    /**
+     * Convierte el objeto en json
+     */
     public String toJson() {
         JSONObject jsonObject = new JSONObject();
         try {

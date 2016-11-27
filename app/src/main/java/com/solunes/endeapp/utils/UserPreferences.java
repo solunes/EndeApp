@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+/**
+ * Esta clase hacer el manejo para los SharedPreferences
+ */
 public class UserPreferences {
 
     private static SharedPreferences.Editor getEditor(Context context) {

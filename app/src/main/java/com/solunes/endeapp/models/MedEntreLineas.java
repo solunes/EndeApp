@@ -35,7 +35,6 @@ public class MedEntreLineas {
         return jsonObject;
     }
 
-
     public enum Columns {
         MelRem,
         MelMed,

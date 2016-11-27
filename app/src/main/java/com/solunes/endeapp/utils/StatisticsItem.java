@@ -4,6 +4,9 @@ package com.solunes.endeapp.utils;
  * Created by jhonlimaster on 10-10-16.
  */
 
+/**
+ * Clase para las listas de estadisticas
+ */
 public class StatisticsItem {
     private String value;
     private int count;

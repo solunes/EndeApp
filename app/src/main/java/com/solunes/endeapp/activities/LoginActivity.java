@@ -40,8 +40,18 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
-        String seedValue = "I AM UNBREAKABLEI AM UNBREAKABLE";
+        String seedValue = getResources().getString(R.string.seed);
         String MESSAGE = "1234";
+
+        try {
+            String encryptedData = Encrypt.encrypt(seedValue, MESSAGE);
+            Log.e("EncryptDecrypt", "Encoded String " + encryptedData);
+            String decryptedData = Encrypt.decrypt(seedValue, encryptedData);
+            Log.e("EncryptDecrypt", "Decoded String " + decryptedData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

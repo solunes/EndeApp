@@ -21,6 +21,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+/**
+ * Esta clase hace el manejo completo de las peticiones de tipo Post
+ */
 public class PostRequest extends AsyncTask<String, Void, String> {
     private Hashtable<String, String> params;
     private Hashtable<String, String> headers;
@@ -30,6 +33,14 @@ public class PostRequest extends AsyncTask<String, Void, String> {
     private static final String TAG = "PostRequest";
     private CallbackAPI callbackAPI;
 
+    /**
+     * Constructor de la clase
+     * @param context contexto de la aplicacion
+     * @param params un hashtable con los parametros para la consulta
+     * @param headers un hashtable con header para la consulta
+     * @param urlEndpoint un string con la url para la consulta
+     * @param callbackAPI interface para hacer las respuestas
+     */
     public PostRequest(Context context, Hashtable<String, String> params, Hashtable<String, String> headers, String urlEndpoint, CallbackAPI callbackAPI) {
         this.params = params;
         this.urlEndpoint = urlEndpoint;

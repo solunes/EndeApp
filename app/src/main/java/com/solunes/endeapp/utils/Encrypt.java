@@ -13,9 +13,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by jhonlimaster on 17-11-16.
+ * Esta clase tiene los metodos para emcriptar y desencriptar
+ * Tiene dos metodos, Un algoritmo de Hash MD5 y otro de encriptacion AES-256
  */
-
 public class Encrypt {
 
     private static final String TAG = "Encrypt";

@@ -10,7 +10,7 @@ import com.solunes.endeapp.models.Tarifa;
 import java.util.ArrayList;
 
 /**
- * Created by jhonlimaster on 15-08-16.
+ * Esta clase tiene metodos para obtener importes y hace calculos de los subtotales y otros importes
  */
 public class GenLecturas {
 
@@ -18,7 +18,6 @@ public class GenLecturas {
 
     public static int lecturaNormal(int lecturaAnterior, int lecturaActual, int nroDig) {
         if (lecturaActual < lecturaAnterior) {
-
             String.valueOf(lecturaAnterior).length();
             double pow = Math.pow(10, nroDig);
             return (int) (lecturaActual + (pow - lecturaAnterior));

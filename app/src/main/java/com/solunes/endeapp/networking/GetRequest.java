@@ -19,6 +19,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Hashtable;
 
+/**
+ * Esta clase hace el manejo de las peticiones de tipo GET
+ */
 public class GetRequest extends AsyncTask<String, Void, String> {
     private String TAG = GetRequest.class.getSimpleName();
     private Hashtable<String, String> headers;
@@ -27,6 +30,12 @@ public class GetRequest extends AsyncTask<String, Void, String> {
     private String token;
     private CallbackAPI callbackAPI;
 
+    /**
+     * Contructor para la clase
+     * @param context contexto de la aplicacion
+     * @param urlEndpoint url del endpoint para hacer la consulta
+     * @param callbackAPI interface para las respuestas
+     */
     public GetRequest(Context context, String urlEndpoint, CallbackAPI callbackAPI) {
         this.headers = new Hashtable<>();
         this.urlEndpoint = urlEndpoint;
