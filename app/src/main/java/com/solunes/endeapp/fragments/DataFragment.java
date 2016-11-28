@@ -44,6 +44,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Este fragmento muestra los detalles de cada una de las lecturas
+ */
 public class DataFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
     private static final String TAG = "DataFragment";
     public static final String KEY_ID_DATA = "id_data";

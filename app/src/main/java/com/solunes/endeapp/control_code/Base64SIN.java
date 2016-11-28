@@ -1,7 +1,9 @@
 package com.solunes.endeapp.control_code;
 
 /**
- * Created by jhonlimaster on 19-09-16.
+ * El algoritmo de Base 64, se trata sencillamente de pasar un número en base 10 a base 64, manteniendo
+ * una relación de equivalencia entre número y carácter,
+ * por ejemplo A=10, B=11, ../=63
  */
 public class Base64SIN {
     public static String convert(int value){

@@ -16,6 +16,9 @@ import android.view.MenuItem;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.fragments.StatisticFragment;
 
+/**
+ * Esta clase muestra las listas de estadisticas de la aplicacion
+ */
 public class AnalyticsActivity extends AppCompatActivity {
 
     private static final String TAG = "AnalyticsActivity";

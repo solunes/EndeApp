@@ -16,13 +16,18 @@ import com.solunes.endeapp.utils.Encrypt;
 
 
 /**
- * Created by jhonlimaster on 11-08-16.
+ * Esta clase hace la creacion de las tablas de la base de datos
  */
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHelper";
+    // este es el nombre de la base de datos
     private static final String DATABASE_NAME = "endeapp.db";
+    // este es el numero de version de la base de datos,
+    // cuando se hace un cambio en la base de datos se debe incrementar el numero
     private static final int DATABASE_VERSION = 21;
+
+    // nombres de las tablas de la base de datos
 
     public static final String USER_TABLE = "user_table";
     public static final String DATA_TABLE = "data_table";

@@ -44,6 +44,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 
+/**
+ * Esta es la actividad principal de la aplicacion
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";

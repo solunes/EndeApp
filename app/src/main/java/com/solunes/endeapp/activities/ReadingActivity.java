@@ -57,6 +57,9 @@ import java.util.Set;
 import static com.solunes.endeapp.activities.MainActivity.KEY_SEND;
 import static com.solunes.endeapp.activities.MainActivity.KEY_WAS_UPLOAD;
 
+/**
+ * Esta actividad muestra las lecturas de la aplicacion
+ */
 public class ReadingActivity extends AppCompatActivity implements DataFragment.OnFragmentListener, SearchView.OnQueryTextListener {
 
     private static final String TAG = "ReadingActivity";

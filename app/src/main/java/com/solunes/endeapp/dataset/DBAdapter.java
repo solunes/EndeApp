@@ -40,7 +40,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by jhonlimaster on 11-08-16.
+ * Esta clase contiene funciones de consulta a la base de datos
  */
 public class DBAdapter {
 

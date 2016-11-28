@@ -49,6 +49,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 
+/**
+ * Esta activity controla el login del usuario
+ */
 public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
@@ -356,7 +359,7 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     /**
-     * Este metodo hacer la consulta el servidor para obtener los paratros fijos
+     * Este metodo hace la consulta el servidor para obtener los paratros fijos
      */
     private void parametrosRequest() {
         new GetRequest(getApplicationContext(), Urls.urlParametros(getApplicationContext()), new CallbackAPI() {

@@ -14,6 +14,9 @@ import com.solunes.endeapp.R;
 import com.solunes.endeapp.adapters.StatisticsRecyclerViewAdapter;
 import com.solunes.endeapp.dataset.DBAdapter;
 
+/**
+ * Este es un fragmento para mostrar las estadisticas de la aplicacion
+ */
 public class StatisticFragment extends Fragment {
     private static final String TAG = "StatisticFragment";
     private static final String ARG_PARAM1 = "param1";

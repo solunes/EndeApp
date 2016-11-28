@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
- * Created by jhonlimaster on 19-09-16.
+ * Esta clase hace el calculo y el retorno del codigo de control
  */
 public class ControlCode {
     //datos para generar codigo de control
@@ -65,7 +65,8 @@ public class ControlCode {
         // java7 i=1
         // java8 i=0
         for(int i=1;i<ary.length;i++){
-            numbers[i-1] = Integer.parseInt(ary[i]) + 1;
+            numbers[i-1] = Integer.parseInt(ary[i]) + 1; // java7
+            //numbers[i] = Integer.parseInt(ary[i]) + 1; java8
         }
 
         String string1 = dosageKey.substring(0, numbers[0] );

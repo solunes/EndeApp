@@ -1,7 +1,9 @@
 package com.solunes.endeapp.control_code;
 
 /**
- * Created by jhonlimaster on 19-09-16.
+ * Algoritmo de dígito verificador que trabaja con cadenas de dígitos decimales de cualquier tamaño.
+ * Además de detectar una amplia gama de errores en datos numéricos, este algoritmo también detecta
+ * casos de transposición de dígitos adyacentes.
  */
 public class Verhoeff {
 

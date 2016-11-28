@@ -19,6 +19,9 @@ import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.UserPreferences;
 
+/**
+ * En esta actividad se muesta el login de inicio de sesion
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";

@@ -1,7 +1,8 @@
 package com.solunes.endeapp.control_code;
 
 /**
- * Created by jhonlimaster on 19-09-16.
+ * Un algoritmo de criptografía simétrica, basado en cifrado de flujo (stream cipher), muy utilizado
+ * por su rendimiento y simplicidad. Para efectos de la implementación del Código de Control.
  */
 public class AllegedRC4 {
     /**
