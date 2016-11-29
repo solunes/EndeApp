@@ -5,17 +5,18 @@ import android.util.Log;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Esta clase tiene los metodos para emcriptar y desencriptar
- * Tiene dos metodos, Un algoritmo de Hash MD5 y otro de encriptacion AES-256
+ * Esta clase tiene los métodos para encriptar y desencriptar
+ * Tiene dos métodos, Un algoritmo de Hash SHA-1 y otro de encriptacion AES-256-CBC
  */
+
 public class Encrypt {
 
     private static final String TAG = "Encrypt";
@@ -41,59 +42,58 @@ public class Encrypt {
         return convertToHex(sha1hash);
     }
 
-    public static String encrypt(String seed, String cleartext) throws Exception {
-        byte[] rawKey = getRawKey(seed.getBytes());
-        byte[] result = encrypt(rawKey, cleartext.getBytes());
-        return toHex(result);
+    public static String encrypt(String privateKey, String data) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        byte[] dataBytes = data.getBytes("UTF-8");
+        SecretKeySpec keyspec = getKeySpec(privateKey);
+        IvParameterSpec ivspec = getIvSpec();
+
+        cipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
+        byte[] encrypted = cipher.doFinal(dataBytes);
+        String finalEncrypted = toHex(encrypted);
+        return finalEncrypted;
     }
 
-    public static String decrypt(String seed, String encrypted) throws Exception {
-        byte[] rawKey = getRawKey(seed.getBytes());
-        byte[] enc = toByte(encrypted);
-        byte[] result = decrypt(rawKey, enc);
-        return new String(result);
+    public static String decrypt(String privateKey, String data) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        byte[] dataBytes = toByte(data);
+        SecretKeySpec keyspec = getKeySpec(privateKey);
+        IvParameterSpec ivspec = getIvSpec();
+
+        cipher.init(Cipher.DECRYPT_MODE, keyspec, ivspec);
+        byte[] decrypted = cipher.doFinal(dataBytes);
+        String finalDecrypted = new String(decrypted, "UTF-8");
+        return finalDecrypted;
     }
 
-    private static byte[] getRawKey(byte[] seed) throws Exception {
-        KeyGenerator kgen = KeyGenerator.getInstance("AES");
-        SecureRandom sr = SecureRandom.getInstance("SHA1PRNG","Crypto");
-        sr.setSeed(seed);
-        kgen.init(256, sr); // 192 and 256 bits may not be available
-        SecretKey skey = kgen.generateKey();
-        byte[] raw = skey.getEncoded();
-        return raw;
+    private static SecretKeySpec getKeySpec(String privateKey) throws Exception {
+        SecretKeySpec keyspec = new SecretKeySpec(privateKey.getBytes(), "AES");
+        return keyspec;
     }
 
-
-    private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-        byte[] encrypted = cipher.doFinal(clear);
-        return encrypted;
+    private static IvParameterSpec getIvSpec() throws Exception {
+        String iv = "0123456789ABCDEF";
+        IvParameterSpec ivspec = new IvParameterSpec(iv.getBytes());
+        return ivspec;
     }
 
-    private static byte[] decrypt(byte[] raw, byte[] encrypted) throws Exception {
-        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
-        byte[] decrypted = cipher.doFinal(encrypted);
-        return decrypted;
-    }
-
-    public static String toHex(String txt) {
-        return toHex(txt.getBytes());
-    }
-    public static String fromHex(String hex) {
-        return new String(toByte(hex));
-    }
-
-    public static byte[] toByte(String hexString) {
-        int len = hexString.length()/2;
-        byte[] result = new byte[len];
-        for (int i = 0; i < len; i++)
-            result[i] = Integer.valueOf(hexString.substring(2*i, 2*i+2), 16).byteValue();
-        return result;
+    public static byte[] toByte(String str) {
+        if (str==null) {
+            return null;
+        }
+        else if (str.length() < 2) {
+            return null;
+        }
+        else {
+            int len = str.length() / 2;
+            byte[] buffer = new byte[len];
+            for (int i=0; i<len; i++) {
+                buffer[i] = (byte) Integer.parseInt(str.substring(i*2,i*2+2),16);
+            }
+            return buffer;
+        }
     }
 
     public static String toHex(byte[] buf) {
@@ -109,4 +109,5 @@ public class Encrypt {
     private static void appendHex(StringBuffer sb, byte b) {
         sb.append(HEX.charAt((b>>4)&0x0f)).append(HEX.charAt(b&0x0f));
     }
+
 }
