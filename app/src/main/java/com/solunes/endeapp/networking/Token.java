@@ -76,7 +76,7 @@ public class Token {
 
             @Override
             public void onFailed(String reason, int statusCode) {
-                Toast.makeText(context, "Error inesperado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, reason, Toast.LENGTH_SHORT).show();
                 callbackToken.onFailToken();
             }
         }).execute();

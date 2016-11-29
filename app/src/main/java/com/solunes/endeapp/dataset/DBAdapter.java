@@ -69,11 +69,11 @@ public class DBAdapter {
      * @param password contraseña del usuario
      * @return retorna un cursor para su posterior manejo
      */
-    public Cursor checkUser(String seed,String username, String password) {
+    public Cursor checkUser(String seed, String username, String password) {
         open();
         // TODO: 25-11-16 encriptacion
         try {
-            password = Encrypt.encrypt(seed,password);
+            password = Encrypt.encrypt(seed, password);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -143,7 +143,8 @@ public class DBAdapter {
 
     /**
      * Guarda un nuevo registro en la base de datos
-     * @param table nombre de la tabla a la que se van a guardar datos
+     *
+     * @param table  nombre de la tabla a la que se van a guardar datos
      * @param values los valores que se van a guardar
      */
     public void saveObject(String table, ContentValues values) {
@@ -153,7 +154,8 @@ public class DBAdapter {
 
     /**
      * Metodo para actualizar un registro de data_table
-     * @param client id del data_table
+     *
+     * @param client        id del data_table
      * @param contentValues valores que se van a guardar
      */
     public void updateData(int client, ContentValues contentValues) {
@@ -163,6 +165,7 @@ public class DBAdapter {
 
     /**
      * Metodo para obtener todos los datos
+     *
      * @return Una lista con todos los datos ordenados ascendentemente
      */
     public ArrayList<DataModel> getAllData() {
@@ -179,6 +182,7 @@ public class DBAdapter {
     /**
      * Metodo que devuelve todos los datos que tengan estado de lectura 1
      * o estado de lectura 2, ordenados ascendentemente
+     *
      * @return Una lista con todos los datos ordenados ascendentemente
      */
     public ArrayList<DataModel> getReady() {
@@ -197,6 +201,7 @@ public class DBAdapter {
 
     /**
      * Metodo que devuelve datos que tengan cierto tipo de estado de lectura
+     *
      * @param state Es el tipo de lectura que va venir como parametro para la consulta
      * @return retorna una lista de DataModel
      */
@@ -215,6 +220,7 @@ public class DBAdapter {
 
     /**
      * Metodo para obtener un solo dato
+     *
      * @param idData id del dato
      * @return retorna un objeto DataModel
      */
@@ -229,6 +235,7 @@ public class DBAdapter {
 
     /**
      * Obtiene el primer data
+     *
      * @return Retorna un objeto DataModel
      */
     public DataModel getFirstData() {
@@ -315,6 +322,7 @@ public class DBAdapter {
 
     /**
      * Metodo que obtiene una lista de tipo DataObs
+     *
      * @param data Es el id data para obtener la lista
      */
     public ArrayList<DataObs> getDataObsByCli(int data) {
@@ -329,6 +337,7 @@ public class DBAdapter {
 
     /**
      * Obtiene una observacion
+     *
      * @param data Es el id data para para buscar la observacion
      * @return
      */
@@ -377,8 +386,9 @@ public class DBAdapter {
 
     /**
      * Metodo para buscar en data_table por numero de cliente o numero de medidor
-     * @param filter filtro de busqueda
-     * @param isCli booleano para que se busque entre cliente o medidor
+     *
+     * @param filter       filtro de busqueda
+     * @param isCli        booleano para que se busque entre cliente o medidor
      * @param currentState un filtro extra para obtener un grupo de estados
      * @return retorna on cursor para su porterior manipulacion
      */
@@ -449,6 +459,7 @@ public class DBAdapter {
 
     /**
      * Metodo que obtiene el cargo fijo de cierta categoria
+     *
      * @return retorna el campo kwh_hasta del cargo fijo para el primer descuento
      */
     public int getCargoFijoDescuento(int categoria) {
@@ -464,6 +475,7 @@ public class DBAdapter {
 
     /**
      * Metodo para obtener las estadisticas item con dos tipos de consulta diferente para cada tipo
+     *
      * @return una lista de StatisticsItem dependiendo del param
      */
     public List<StatisticsItem> getSt(int param) {
@@ -600,7 +612,10 @@ public class DBAdapter {
         open();
         Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.general_id.name() + " = " + idData, null, null, null, null);
         cursor.moveToNext();
-        return Historico.fromCursor(cursor);
+        if (cursor.getCount() > 0){
+            return Historico.fromCursor(cursor);
+        }
+        return null;
     }
 
     public double getCargoPotencia(int categoria) {
@@ -608,7 +623,10 @@ public class DBAdapter {
         Cursor cursor = db.query(DBHelper.TARIFA_TABLE, null, Tarifa.Columns.categoria_tarifa_id + " = " + categoria
                 + " AND " + Tarifa.Columns.item_facturacion_id + " = 41", null, null, null, null);
         cursor.moveToNext();
-        return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+        if (cursor.getCount() > 0) {
+            return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+        }
+        return -1;
     }
 
     public String getLlaveDosificacion(int are) {
@@ -626,7 +644,10 @@ public class DBAdapter {
                 " AND " + TarifaTap.Columns.mes.name() + " = " + mes +
                 " AND " + TarifaTap.Columns.anio.name() + " = " + anio, null, null, null, null);
         cursor.moveToFirst();
-        return cursor.getDouble(TarifaTap.Columns.valor.ordinal());
+        if (cursor.getCount() > 0) {
+            return cursor.getDouble(TarifaTap.Columns.valor.ordinal());
+        }
+        return -1;
     }
 
     public double getImporteAseo(int categoriaTarifa, int mes, int anio, int kwhConsumo) {
@@ -637,7 +658,10 @@ public class DBAdapter {
                 " AND " + TarifaAseo.Columns.kwh_desde.name() + " <= " + kwhConsumo +
                 " AND " + TarifaAseo.Columns.kwh_hasta.name() + " >= " + kwhConsumo, null, null, null, null);
         cursor.moveToFirst();
-        return cursor.getDouble(TarifaAseo.Columns.importe.ordinal());
+        if (cursor.getCount() > 0) {
+            return cursor.getDouble(TarifaAseo.Columns.importe.ordinal());
+        }
+        return -1;
     }
 
     public DataModel getLastSaved() {
@@ -696,8 +720,13 @@ public class DBAdapter {
 
     public int getMaxKwh(int categoriaTarifa) {
         open();
-        Cursor cursor = db.query(DBHelper.LIMITES_MAXIMOS_TABLE, null, LimitesMaximos.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.LIMITES_MAXIMOS_TABLE, null,
+                LimitesMaximos.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa,
+                null, null, null, null);
         cursor.moveToFirst();
-        return cursor.getInt(LimitesMaximos.Columns.max_kwh.ordinal());
+        if (cursor.getCount() > 0) {
+            return cursor.getInt(LimitesMaximos.Columns.max_kwh.ordinal());
+        }
+        return -1;
     }
 }

@@ -6,12 +6,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.solunes.endeapp.R;
+import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
+import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.LimitesMaximos;
+import com.solunes.endeapp.models.MedEntreLineas;
+import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.PrintObs;
+import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
+import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.Encrypt;
 
 
@@ -46,8 +53,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DETALLE_FACTURA_TABLE = "detalle_factura_table";
     public static final String LIMITES_MAXIMOS_TABLE = "limites_maximos_table";
 
+    private Context context;
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     /**
@@ -57,29 +67,29 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE " + USER_TABLE + " (" +
-                "LecId integer, " +
-                "LecNom text, " +
-                "LecCod text, " +
-                "LecPas text, " +
-                "LecNiv integer, " +
-                "LecAsi integer, " +
-                "LecAct integer, " +
-                "AreaCod integer)");
+                User.Columns.LecId.name() + " integer, " +
+                User.Columns.LecNom.name() + " text, " +
+                User.Columns.LecCod.name() + " text, " +
+                User.Columns.LecPas.name() + " text, " +
+                User.Columns.LecNiv.name() + " integer, " +
+                User.Columns.LecAsi.name() + " integer, " +
+                User.Columns.LecAct.name() + " integer, " +
+                User.Columns.AreaCod.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TARIFA_TABLE + " (" +
-                "id integer, " +
-                "categoria_tarifa_id integer, " +
-                "item_facturacion_id integer, " +
-                "kwh_desde integer, " +
-                "kwh_hasta integer, " +
-                "importe numeric)");
+                Tarifa.Columns.id.name() + " integer, " +
+                Tarifa.Columns.categoria_tarifa_id.name() + " integer, " +
+                Tarifa.Columns.item_facturacion_id.name() + " integer, " +
+                Tarifa.Columns.kwh_desde.name() + " integer, " +
+                Tarifa.Columns.kwh_hasta.name() + " integer, " +
+                Tarifa.Columns.importe.name() + " numeric)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + OBS_TABLE + " (" +
-                "id integer, " +
-                "ObsDes text, " +
-                "ObsTip integer, " +
-                "ObsLec integer, " +
-                "ObsFac integer)");
+                Obs.Columns.id.name() + " integer, " +
+                Obs.Columns.ObsDes.name() + " text, " +
+                Obs.Columns.ObsTip.name() + " integer, " +
+                Obs.Columns.ObsLec.name() + " integer, " +
+                Obs.Columns.ObsFac.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_TABLE + " (" +
                 "id INTEGER, " +
@@ -230,9 +240,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "ConKwh12 integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
-                "id integer," +
-                "general_id integer," +
-                "observacion_id integer)");
+                DataObs.Columns.id.name() + " integer," +
+                DataObs.Columns.general_id.name() + " integer," +
+                DataObs.Columns.observacion_id.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PARAMETRO_TABLE + " (" +
                 Parametro.Columns.id.name() + " integer," +
@@ -241,13 +251,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 Parametro.Columns.texto.name() + " text)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + ITEM_FACTURACION_TABLE + " (" +
-                "id integer," +
-                "codigo  integer," +
-                "concepto integer," +
-                "descripcion text," +
-                "estado integer," +
-                "credito_fiscal integer)");
-
+                ItemFacturacion.Columns.id.name() + " integer," +
+                ItemFacturacion.Columns.codigo.name() + " integer," +
+                ItemFacturacion.Columns.concepto.name() + " integer," +
+                ItemFacturacion.Columns.descripcion.name() + " text," +
+                ItemFacturacion.Columns.estado.name() + " integer," +
+                ItemFacturacion.Columns.credito_fiscal.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_DATA_TABLE + " (" +
                 "_id integer PRIMARY KEY," +
@@ -255,14 +264,14 @@ public class DBHelper extends SQLiteOpenHelper {
                 "observacion_imp_id integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
-                "id integer," +
-                "ObiDes text)");
+                PrintObs.Columns.id.name() + " integer," +
+                PrintObs.Columns.ObiDes.name() + " text)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + MED_ENTRE_LINEAS_TABLE + " (" +
                 "id integer," +
-                "MelRem integer," +
-                "MelMed integer," +
-                "MelLec integer)");
+                MedEntreLineas.Columns.MelRem + " integer," +
+                MedEntreLineas.Columns.MelMed + " integer," +
+                MedEntreLineas.Columns.MelLec + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + FACTURA_DOSIFICACION_TABLE + " (" +
                 FacturaDosificacion.Columns.id.name() + " integer," +
@@ -313,14 +322,14 @@ public class DBHelper extends SQLiteOpenHelper {
         // TODO: 25-11-16 encriptacion
         String encriptPass = null;
         try {
-            encriptPass = Encrypt.encrypt("0123456789abcdef","1234");
+            encriptPass = Encrypt.encrypt(context.getResources().getString(R.string.seed), context.getResources().getString(R.string.admin_password));
         } catch (Exception e) {
             e.printStackTrace();
         }
         sqLiteDatabase.execSQL("INSERT INTO " + USER_TABLE + " VALUES(" +
                 "1, " +
-                "'admin', " +
-                "'admin', " +
+                "'" + context.getResources().getString(R.string.admin_nombre) + "', " +
+                "'" + context.getResources().getString(R.string.admin_nombre) + "', " +
                 "'" + encriptPass + "', " +
                 "1, " +
                 "1, " +

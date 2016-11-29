@@ -43,19 +43,6 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
-        String seedValue = getResources().getString(R.string.seed);
-        String MESSAGE = "1234";
-
-        try {
-            String encryptedData = Encrypt.encrypt(seedValue, MESSAGE);
-            Log.e("EncryptDecrypt", "Encoded String " + encryptedData);
-            String decryptedData = Encrypt.decrypt(seedValue, "7110eda4d09e062aa5e4a390b0a572ac0d2c0220");
-            Log.e("EncryptDecrypt", "Decoded String " + decryptedData);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));

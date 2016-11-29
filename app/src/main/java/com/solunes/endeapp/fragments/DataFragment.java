@@ -21,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.control_code.ControlCode;
@@ -136,8 +137,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel = dbAdapter.getData(arguments.getInt(KEY_ID_DATA));
         Log.e(TAG, "onCreateView: " +
                 "\n " + dataModel.getTlxNom() +
-                "\n max: " + dbAdapter.getMaxKwh(dataModel.getTlxCtg()) +
-                "\n ordtpl: " + dataModel.getTlxDebAuto());
+                "\n consumo promedio: " + dataModel.getTlxConPro());
         dbAdapter.close();
         setupUI(view, dataModel);
         actionButtons();
@@ -535,11 +535,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      * @param view
      */
     private void confirmarLectura(int finalTipoLectura, int finalNuevaLectura, int finalLecturaKwh, Obs obs, View view) {
-        calculo(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, false, obs);
-        hidingViews(obs);
-        onFragmentListener.onAjusteOrden(dataModel.getId());
-        saveLectura(obs);
-        printFactura(view);
+        Log.e(TAG, "confirmarLectura: calculo");
+        boolean isCalculo = calculo(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, false, obs);
+        if (isCalculo) {
+            hidingViews(obs);
+            onFragmentListener.onAjusteOrden(dataModel.getId());
+            saveLectura(obs);
+            printFactura(view);
+        }
     }
 
     /**
@@ -551,7 +554,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      * @param reprint      un booleano para saber si se va a imprimir
      * @param obs          la observacion de la lectura
      */
-    private void calculo(int tipoLectura, int nuevaLectura, int lectura, boolean reprint, Obs obs) {
+    private boolean calculo(int tipoLectura, int nuevaLectura, int lectura, boolean reprint, Obs obs) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
 
         // revisar si no es reimpresion, para no realizar el calculo de nuevo
@@ -561,9 +564,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
 
             // verificacion de limites maximos para consumos muy elevados
-            if (lectura >= dbAdapter.getMaxKwh(dataModel.getTlxCtg())) {
+            int maxKwh = dbAdapter.getMaxKwh(dataModel.getTlxCtg());
+            if (maxKwh == -1) {
+                Toast.makeText(getContext(), "No hay un límite máximo para el consumo", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            if (lectura >= maxKwh) {
                 tipoLectura = 5;
-                Log.e(TAG, "calculo: postergado" );
+                Log.e(TAG, "calculo: postergado");
             }
 
             if (tipoLectura == 5) {
@@ -575,7 +583,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 }
                 dataModel.setTlxTipLec(tipoLectura);
                 dataModel.setTlxImpAvi(0);
-                return;
+                return false;
             }
 
             // correccion para consumo promedio
@@ -636,7 +644,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 // maximo entre potencia anterior y potencia leida
                 int potMax = Math.max(potenciaLeida, dataModel.getTlxPotFac());
                 // calculo del importe por potencia
-                importePotencia = potMax * dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
+                double cargoPotencia = dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
+                if (cargoPotencia == -1) {
+                    Toast.makeText(getContext(), "No hay cargo de potencia", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+                importePotencia = potMax * cargoPotencia;
                 importePotencia = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 41, importePotencia);
                 dataModel.setTlxImpPot(importePotencia);
             }
@@ -710,8 +723,16 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         // calculo de suministro tap y suministro por aseo
         if (!reprint) {
             double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), totalConsumo);
+            if (totalSuministroTap < 0) {
+                Toast.makeText(getContext(), "No hay tarifa para el TAP", Toast.LENGTH_LONG).show();
+                return false;
+            }
             totalSuministroTap = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 153, totalSuministroTap);
             double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), lectura);
+            if (totalSuministroAseo == -1) {
+                Toast.makeText(getContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
+                return false;
+            }
             totalSuministroAseo = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 171, totalSuministroAseo);
             dataModel.setTlxImpFac(totalSuministro);
             dataModel.setTlxImpTap(totalSuministroTap);
@@ -735,6 +756,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
         }
         dbAdapter.close();
+        return true;
     }
 
     /**
@@ -886,6 +908,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         DBAdapter dbAdapter = new DBAdapter(getContext());
         String[] leyenda = dbAdapter.getLeyenda();
         Historico historico = dbAdapter.getHistorico(dataModel.getId());
+        if (historico == null) {
+            Toast.makeText(getContext(), "No hay histórico", Toast.LENGTH_LONG).show();
+            return;
+        }
         String garantiaString = dbAdapter.getItemDescription(427);
         String aseoTitle = dbAdapter.getItemDescription(171);
         String tapTitle = dbAdapter.getItemDescription(153);
