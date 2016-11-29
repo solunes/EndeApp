@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
             String encryptedData = Encrypt.encrypt(seedValue, MESSAGE);
             Log.e("EncryptDecrypt", "Encoded String " + encryptedData);
-            String decryptedData = Encrypt.decrypt(seedValue, encryptedData);
+            String decryptedData = Encrypt.decrypt(seedValue, "7110eda4d09e062aa5e4a390b0a572ac0d2c0220");
             Log.e("EncryptDecrypt", "Decoded String " + decryptedData);
 
         } catch (Exception e) {
