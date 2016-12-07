@@ -260,7 +260,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
             if (pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
-                    if (device.getName().equalsIgnoreCase(UserPreferences.getString(getApplicationContext(), AdminActivity.KEY_PRINT_MANE))) {
+                    String printerName = UserPreferences.getString(getApplicationContext(), AdminActivity.KEY_PRINT_MANE);
+                    if (device.getName().equalsIgnoreCase(printerName)) {
                         Log.e(TAG, "onBluetooth: " + device.getName() + " - " + device.getAddress());
                         return device.getAddress();
                     }

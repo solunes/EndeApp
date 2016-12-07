@@ -101,7 +101,8 @@ public class GetRequest extends AsyncTask<String, Void, String> {
                 JSONObject jsonObject = new JSONObject(result);
                 messageError += jsonObject.getString("message");
                 messageError += " (" + jsonObject.getString("status_code") + ")";
-            } catch (JSONException e) {
+            } catch (Exception e) {
+                callbackAPI.onFailed(messageError, getStatusCode());
             }
             callbackAPI.onFailed(messageError, getStatusCode());
         }

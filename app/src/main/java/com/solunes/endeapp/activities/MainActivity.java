@@ -394,9 +394,6 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxKwhAdi.name(), object.getInt(DataModel.Columns.TlxKwhAdi.name()));
             values.put(DataModel.Columns.TlxImpAvi.name(), object.getInt(DataModel.Columns.TlxImpAvi.name()));
             values.put(DataModel.Columns.TlxCarFac.name(), object.getInt(DataModel.Columns.TlxCarFac.name()));
-            values.put(DataModel.Columns.TlxCarCon.name(), object.getInt(DataModel.Columns.TlxCarCon.name()));
-            values.put(DataModel.Columns.TlxCarRec.name(), object.getInt(DataModel.Columns.TlxCarRec.name()));
-            values.put(DataModel.Columns.TlxCarDep.name(), object.getInt(DataModel.Columns.TlxCarDep.name()));
             values.put(DataModel.Columns.TlxDeuEneC.name(), object.getInt(DataModel.Columns.TlxDeuEneC.name()));
             values.put(DataModel.Columns.TlxDeuEneI.name(), object.getDouble(DataModel.Columns.TlxDeuEneI.name()));
             values.put(DataModel.Columns.TlxDeuAseC.name(), object.getInt(DataModel.Columns.TlxDeuAseC.name()));
@@ -418,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDecEne.name(), object.getInt(DataModel.Columns.TlxDecEne.name()));
             values.put(DataModel.Columns.TlxEntPot.name(), object.getInt(DataModel.Columns.TlxEntPot.name()));
             values.put(DataModel.Columns.TlxDecPot.name(), object.getInt(DataModel.Columns.TlxDecPot.name()));
+            values.put(DataModel.Columns.TlxDemPot.name(), object.getString(DataModel.Columns.TlxDemPot.name()));
             values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
             values.putAll(stringNull(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name())));
             values.putAll(stringNull(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name())));
@@ -432,21 +430,22 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 JSONObject historico = object.getJSONObject("historico");
+                Log.e(TAG, "processResponse: " + historico.toString());
                 ContentValues valuesH = new ContentValues();
                 valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
                 valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
-                valuesH.put(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()));
-                valuesH.put(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()));
-                valuesH.put(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()));
-                valuesH.put(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name()));
-                valuesH.put(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name()));
-                valuesH.put(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name()));
-                valuesH.put(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name()));
-                valuesH.put(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name()));
-                valuesH.put(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name()));
-                valuesH.put(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name()));
-                valuesH.put(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name()));
-                valuesH.put(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name())));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name())));
                 valuesH.put(Historico.Columns.ConKwh01.name(), historico.getInt(Historico.Columns.ConKwh01.name()));
                 valuesH.put(Historico.Columns.ConKwh02.name(), historico.getInt(Historico.Columns.ConKwh02.name()));
                 valuesH.put(Historico.Columns.ConKwh03.name(), historico.getInt(Historico.Columns.ConKwh03.name()));
@@ -461,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
                 valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
                 dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
             } catch (Exception e) {
-                Log.e(TAG, "historico nulo");
+                Log.e(TAG, "historico nulo",e);
             }
 
             JSONArray detalleFacturaArray = object.getJSONArray("detalle_factura");

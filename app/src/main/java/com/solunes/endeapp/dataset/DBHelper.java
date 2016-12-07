@@ -9,12 +9,14 @@ import com.solunes.endeapp.R;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
+import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.ItemFacturacion;
 import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
+import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
@@ -32,7 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "endeapp.db";
     // este es el numero de version de la base de datos,
     // cuando se hace un cambio en la base de datos se debe incrementar el numero
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 22;
 
     // nombres de las tablas de la base de datos
 
@@ -166,13 +168,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxKwhDev integer, " +
                 "TlxUltTipL integer, " +
                 "TlxCliNew integer, " +
-                "TlxCarCon decimal(15, 2), " +
-                "TlxCarRec decimal(15, 2), " +
-                "TlxCarDep decimal(15, 2), " +
                 "TlxEntEne integer, " +
                 "TlxDecEne integer, " +
                 "TlxEntPot integer, " +
                 "TlxDecPot integer, " +
+                "TlxDemPot text, " +
                 "TlxPotFacM integer, " +
                 "TlxPotTag integer, " +
                 "TlxPreAnt1 text, " +
@@ -212,32 +212,32 @@ public class DBHelper extends SQLiteOpenHelper {
                 "enviado integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + HISTORICO_TABLE + " (" +
-                "id integer," +
-                "general_id integer," +
-                "ConMes01 text," +
-                "ConKwh01 integer," +
-                "ConMes02 text," +
-                "ConKwh02 integer," +
-                "ConMes03 text," +
-                "ConKwh03 integer," +
-                "ConMes04 text," +
-                "ConKwh04 integer," +
-                "ConMes05 text," +
-                "ConKwh05 integer," +
-                "ConMes06 text," +
-                "ConKwh06 integer," +
-                "ConMes07 text," +
-                "ConKwh07 integer," +
-                "ConMes08 text," +
-                "ConKwh08 integer," +
-                "ConMes09 text," +
-                "ConKwh09 integer," +
-                "ConMes10 text," +
-                "ConKwh10 integer," +
-                "ConMes11 text," +
-                "ConKwh11 integer," +
-                "ConMes12 text," +
-                "ConKwh12 integer)");
+                Historico.Columns.id.name()+" integer," +
+                Historico.Columns.general_id.name()+" integer," +
+                Historico.Columns.ConMes01.name()+" text," +
+                Historico.Columns.ConKwh01.name()+" integer," +
+                Historico.Columns.ConMes02.name()+" text," +
+                Historico.Columns.ConKwh02.name()+" integer," +
+                Historico.Columns.ConMes03.name()+" text," +
+                Historico.Columns.ConKwh03.name()+" integer," +
+                Historico.Columns.ConMes04.name()+" text," +
+                Historico.Columns.ConKwh04.name()+" integer," +
+                Historico.Columns.ConMes05.name()+" text," +
+                Historico.Columns.ConKwh05.name()+" integer," +
+                Historico.Columns.ConMes06.name()+" text," +
+                Historico.Columns.ConKwh06.name()+" integer," +
+                Historico.Columns.ConMes07.name()+" text," +
+                Historico.Columns.ConKwh07.name()+" integer," +
+                Historico.Columns.ConMes08.name()+" text," +
+                Historico.Columns.ConKwh08.name()+" integer," +
+                Historico.Columns.ConMes09.name()+" text," +
+                Historico.Columns.ConKwh09.name()+" integer," +
+                Historico.Columns.ConMes10.name()+" text," +
+                Historico.Columns.ConKwh10.name()+" integer," +
+                Historico.Columns.ConMes11.name()+" text," +
+                Historico.Columns.ConKwh11.name()+" integer," +
+                Historico.Columns.ConMes12.name()+" text," +
+                Historico.Columns.ConKwh12.name()+" integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
                 DataObs.Columns.id.name() + " integer," +
@@ -260,8 +260,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_DATA_TABLE + " (" +
                 "_id integer PRIMARY KEY," +
-                "general_id integer," +
-                "observacion_imp_id integer)");
+                PrintObsData.Columns.general_id.name() + " integer," +
+                PrintObsData.Columns.observacion_imp_id.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
                 PrintObs.Columns.id.name() + " integer," +

@@ -18,17 +18,18 @@ public class PrintGenerator {
 
     /**
      * Este metodo es el encargado de crear el string para la impresion.
-     * @param dataModel objeto tipo DataModel con todos los datos para la impresion
-     * @param printTitles un array con titulos de campos personalizados
-     * @param printValues un array con valores de los campos personalizados
-     * @param historico objeto Historico para esta impresion
+     *
+     * @param dataModel           objeto tipo DataModel con todos los datos para la impresion
+     * @param printTitles         un array con titulos de campos personalizados
+     * @param printValues         un array con valores de los campos personalizados
+     * @param historico           objeto Historico para esta impresion
      * @param importeTotalFactura es el importe total de factura generado anteriormente
-     * @param importeMesCancelar importe del mes a cancelar generado anteriormente
-     * @param garantiaString deposito de garantia, si no hay es null
-     * @param cardep cargo por deposito
-     * @param aseoTitle titulo de la tarifa de aseo
-     * @param tapTitle titulo de la tarifa de alumbrado publico
-     * @param leyenda un string array de la leyenda
+     * @param importeMesCancelar  importe del mes a cancelar generado anteriormente
+     * @param garantiaString      deposito de garantia, si no hay es null
+     * @param cardep              cargo por deposito
+     * @param aseoTitle           titulo de la tarifa de aseo
+     * @param tapTitle            titulo de la tarifa de alumbrado publico
+     * @param leyenda             un string array de la leyenda
      * @return devuelve un string generado listo para mandarlo a la impresora
      */
     public static String creator(DataModel dataModel,
@@ -41,6 +42,7 @@ public class PrintGenerator {
                                  double cardep,
                                  String aseoTitle,
                                  String tapTitle,
+                                 String nit,
                                  String[] leyenda) {
         calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
         String deudasEnergia = "";
@@ -61,7 +63,7 @@ public class PrintGenerator {
 
         String tipoLectura = DataModel.getTipoLectura(dataModel.getTlxTipLec());
         double tasas = dataModel.getTlxImpTap() + dataModel.getTlxImpAse();
-        String qrData = "1020613020" +
+        String qrData = nit +
                 "|" + dataModel.getTlxFacNro() +
                 "|" + dataModel.getTlxNroAut() +
                 "|" + dataModel.getTlxFecEmi() +
@@ -207,6 +209,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 510 1430 " + dataModel.getTlxFacNro() + "\r\n" +
                 "T CONSO1.CPF 0 720 1430 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n";
 
+        // Bloque 3
         cpclConfigLabel += detalleFacturacion(printTitles, printValues, cardep, importeTotalFactura, importeMesCancelar, dataModel.getTlxImpTap(), dataModel.getTlxImpAse(), garantiaString, aseoTitle, tapTitle);
         cpclConfigLabel += "" +
                 "FORM\r\n" +
@@ -218,6 +221,7 @@ public class PrintGenerator {
 
     /**
      * Calculo de dias para el consumo de energia
+     *
      * @param dateAnt fecha anterior
      * @param dateLec fecha actual
      * @return retorna la camtidad de dias entre 27 a 33 dias, si esta fuera de ese intervalo retorna '--'
@@ -238,6 +242,7 @@ public class PrintGenerator {
 
     /**
      * Este metodo tiene los meses del año en español
+     *
      * @param mes numero del mes
      * @return retorna el nombre del mes segun su numero
      */
@@ -273,6 +278,7 @@ public class PrintGenerator {
 
     /**
      * Este metodo le da un formato especifico para la factura. Por ejemplo: 21-JUN-16
+     *
      * @param fecha la fecha a ser procesada
      * @return retorna la fecha en el formato dd-MM-yy
      */
@@ -286,6 +292,7 @@ public class PrintGenerator {
 
     /**
      * Este metodo le da un formato a la fecha para la factura sin el dia. Por ejemplo: JUN-16
+     *
      * @param fecha la fecha para ser procesada
      * @return retorna la fecha en el formato MM-yy
      */
@@ -298,16 +305,17 @@ public class PrintGenerator {
 
     /**
      * Este metodo genera el bloque de detalle de facturacion
-     * @param titles Es un array de titulos para generar
-     * @param values Es un array de valores para generar
-     * @param garantia Es el deposito de garantia
-     * @param impTotFac importe total a facturar
-     * @param importeMes importe del mes a facturar
-     * @param tap importe de alumbrado publico
-     * @param impAse importe de aseo
+     *
+     * @param titles         Es un array de titulos para generar
+     * @param values         Es un array de valores para generar
+     * @param garantia       Es el deposito de garantia
+     * @param impTotFac      importe total a facturar
+     * @param importeMes     importe del mes a facturar
+     * @param tap            importe de alumbrado publico
+     * @param impAse         importe de aseo
      * @param garantiaString es el titulo para el deposito de garantia
-     * @param aseoTitle titulo para la tarifa de aseo
-     * @param tapTitle titulo para la tarifa del alumbrado publico
+     * @param aseoTitle      titulo para la tarifa de aseo
+     * @param tapTitle       titulo para la tarifa del alumbrado publico
      * @return retorna un string para concatenarlo al string principal que se va enviar a la impresora
      */
     private static String detalleFacturacion(ArrayList<String> titles,
@@ -377,40 +385,42 @@ public class PrintGenerator {
 
     /**
      * Este metodo crea el string para el historico de la factura
-     * @param historico un objeto Historico para generar el string
+     *
+     * @param hist un objeto Historico para generar el string
      * @return retorna un string para concatenarlo al string principal para la impresion
      */
-    private static String createHistorico(Historico historico) {
+    private static String createHistorico(Historico hist) {
         String res = "" +
-                "T CONSO1.CPF 0 40 1328 " + historico.getConMes01() + "\r\n" +
-                "T CONSO1.CPF 0 160 1328 " + historico.getConKwh01() + "\r\n" +
-                "T CONSO1.CPF 0 40 1343 " + historico.getConMes02() + "\r\n" +
-                "T CONSO1.CPF 0 160 1343 " + historico.getConKwh02() + "\r\n" +
-                "T CONSO1.CPF 0 40 1358 " + historico.getConMes03() + "\r\n" +
-                "T CONSO1.CPF 0 160 1358 " + historico.getConKwh03() + "\r\n" +
-                "T CONSO1.CPF 0 235 1328 " + historico.getConMes04() + "\r\n" +
-                "T CONSO1.CPF 0 360 1328 " + historico.getConKwh04() + "\r\n" +
-                "T CONSO1.CPF 0 235 1343 " + historico.getConMes05() + "\r\n" +
-                "T CONSO1.CPF 0 360 1343 " + historico.getConKwh05() + "\r\n" +
-                "T CONSO1.CPF 0 235 1358 " + historico.getConMes06() + "\r\n" +
-                "T CONSO1.CPF 0 360 1358 " + historico.getConKwh06() + "\r\n" +
-                "T CONSO1.CPF 0 435 1328 " + historico.getConMes07() + "\r\n" +
-                "T CONSO1.CPF 0 560 1328 " + historico.getConKwh07() + "\r\n" +
-                "T CONSO1.CPF 0 435 1343 " + historico.getConMes08() + "\r\n" +
-                "T CONSO1.CPF 0 560 1343 " + historico.getConKwh08() + "\r\n" +
-                "T CONSO1.CPF 0 435 1358 " + historico.getConMes09() + "\r\n" +
-                "T CONSO1.CPF 0 560 1358 " + historico.getConKwh09() + "\r\n" +
-                "T CONSO1.CPF 0 635 1328 " + historico.getConMes10() + "\r\n" +
-                "T CONSO1.CPF 0 755 1328 " + historico.getConKwh10() + "\r\n" +
-                "T CONSO1.CPF 0 635 1343 " + historico.getConMes11() + "\r\n" +
-                "T CONSO1.CPF 0 755 1343 " + historico.getConKwh11() + "\r\n" +
-                "T CONSO1.CPF 0 635 1358 " + historico.getConMes12() + "\r\n" +
-                "T CONSO1.CPF 0 755 1358 " + historico.getConKwh12() + "\r\n";
+                "T CONSO1.CPF 0 40 1328 " + (hist.getConMes01() == null ? "" : hist.getConMes01()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1328 " + (hist.getConKwh01() == 0 ? "" : hist.getConKwh01()) + "\r\n" +
+                "T CONSO1.CPF 0 40 1343 " + (hist.getConMes02() == null ? "" : hist.getConMes02()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1343 " + (hist.getConKwh02() == 0 ? "" : hist.getConKwh02()) + "\r\n" +
+                "T CONSO1.CPF 0 40 1358 " + (hist.getConMes03() == null ? "" : hist.getConMes03()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1358 " + (hist.getConKwh03() == 0 ? "" : hist.getConKwh03()) + "\r\n" +
+                "T CONSO1.CPF 0 235 1328 " + (hist.getConMes04() == null ? "" : hist.getConMes04()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1328 " + (hist.getConKwh04() == 0 ? "" : hist.getConKwh04()) + "\r\n" +
+                "T CONSO1.CPF 0 235 1343 " + (hist.getConMes05() == null ? "" : hist.getConMes05()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1343 " + (hist.getConKwh05() == 0 ? "" : hist.getConKwh05()) + "\r\n" +
+                "T CONSO1.CPF 0 235 1358 " + (hist.getConMes06() == null ? "" : hist.getConMes06()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1358 " + (hist.getConKwh06() == 0 ? "" : hist.getConKwh06()) + "\r\n" +
+                "T CONSO1.CPF 0 435 1328 " + (hist.getConMes07() == null ? "" : hist.getConMes07()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1328 " + (hist.getConKwh07() == 0 ? "" : hist.getConKwh07()) + "\r\n" +
+                "T CONSO1.CPF 0 435 1343 " + (hist.getConMes08() == null ? "" : hist.getConMes08()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1343 " + (hist.getConKwh08() == 0 ? "" : hist.getConKwh08()) + "\r\n" +
+                "T CONSO1.CPF 0 435 1358 " + (hist.getConMes09() == null ? "" : hist.getConMes09()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1358 " + (hist.getConKwh09() == 0 ? "" : hist.getConKwh09()) + "\r\n" +
+                "T CONSO1.CPF 0 635 1328 " + (hist.getConMes10() == null ? "" : hist.getConMes10()) + "\r\n" +
+                "T CONSO1.CPF 0 755 1328 " + (hist.getConKwh10() == 0 ? "" : hist.getConKwh10()) + "\r\n" +
+                "T CONSO1.CPF 0 635 1343 " + (hist.getConMes11() == null ? "" : hist.getConMes11()) + "\r\n" +
+                "T CONSO1.CPF 0 755 1343 " + (hist.getConKwh11() == 0 ? "" : hist.getConKwh11()) + "\r\n" +
+                "T CONSO1.CPF 0 635 1358 " + (hist.getConMes12() == null ? "" : hist.getConMes12()) + "\r\n" +
+                "T CONSO1.CPF 0 755 1358 " + (hist.getConKwh12() == 0 ? "" : hist.getConKwh12()) + "\r\n";
         return res;
     }
 
     /**
      * Este metodo genera una parte del detalle de consumo
+     *
      * @param dataModel un objeto DataModel para generar el string
      * @return retorna el string generado para la impresion
      */
@@ -450,6 +460,7 @@ public class PrintGenerator {
 
     /**
      * Este metodo formatea la fecha de emision para agregarlo a la impresion
+     *
      * @param fecemi un string con la fecha de emision
      * @return retorna la fecha de emision con el siguiente formato: 25 de Octubre de 2016
      */

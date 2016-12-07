@@ -139,6 +139,7 @@ public class DBAdapter {
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
         db.delete(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null);
         db.delete(DBHelper.DETALLE_FACTURA_TABLE, null, null);
+        db.delete(DBHelper.HISTORICO_TABLE, null, null);
     }
 
     /**

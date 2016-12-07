@@ -87,9 +87,6 @@ public class DataModel {
     private int TlxKwhDev;
     private int TlxUltTipL;
     private int TlxCliNew;
-    private double TlxCarCon;
-    private double TlxCarRec;
-    private double TlxCarDep;
     private int TlxEntEne;
     private int TlxEntPot;
     private int TlxPotFacM;
@@ -132,6 +129,7 @@ public class DataModel {
     private int TlxPotLei;
     private int TlxDecEne;
     private int TlxDecPot;
+    private String TlxDemPot;
     private String TlxRecordatorio;
 
     public enum Columns {
@@ -209,13 +207,11 @@ public class DataModel {
         TlxKwhDev,
         TlxUltTipL,
         TlxCliNew,
-        TlxCarCon,
-        TlxCarRec,
-        TlxCarDep,
         TlxEntEne,
         TlxDecEne,
         TlxEntPot,
         TlxDecPot,
+        TlxDemPot,
         TlxPotFacM,
         TlxPotTag,
         TlxPreAnt1,
@@ -368,6 +364,7 @@ public class DataModel {
         dataModel.setEnviado(cursor.getInt(Columns.enviado.ordinal()));
         dataModel.setTlxPotLei(cursor.getInt(Columns.TlxPotLei.ordinal()));
         dataModel.setTlxDecPot(cursor.getInt(Columns.TlxDecPot.ordinal()));
+        dataModel.setTlxDemPot(cursor.getString(Columns.TlxDemPot.ordinal()));
         dataModel.setTlxDecEne(cursor.getInt(Columns.TlxDecEne.ordinal()));
         dataModel.setTlxRecordatorio(cursor.getString(Columns.TlxRecordatorio.ordinal()));
 
@@ -399,9 +396,6 @@ public class DataModel {
         dataModel.setTlxFechaAlto(cursor.getString(Columns.TlxFechaAlto.ordinal()));
         dataModel.setTlxFechaMedio(cursor.getString(Columns.TlxFechaMedio.ordinal()));
         dataModel.setTlxFechaBajo(cursor.getString(Columns.TlxFechaBajo.ordinal()));
-        dataModel.setTlxCarCon(cursor.getDouble(Columns.TlxCarCon.ordinal()));
-        dataModel.setTlxCarRec(cursor.getDouble(Columns.TlxCarRec.ordinal()));
-        dataModel.setTlxCarDep(cursor.getDouble(Columns.TlxCarDep.ordinal()));
         return dataModel;
     }
 
@@ -509,30 +503,6 @@ public class DataModel {
         TlxDav = tlxDav;
     }
 
-    public double getTlxCarCon() {
-        return TlxCarCon;
-    }
-
-    public void setTlxCarCon(double tlxCarCon) {
-        TlxCarCon = tlxCarCon;
-    }
-
-    public double getTlxCarRec() {
-        return TlxCarRec;
-    }
-
-    public void setTlxCarRec(double tlxCarRec) {
-        TlxCarRec = tlxCarRec;
-    }
-
-    public double getTlxCarDep() {
-        return TlxCarDep;
-    }
-
-    public void setTlxCarDep(double tlxCarDep) {
-        TlxCarDep = tlxCarDep;
-    }
-
     public int getId() {
         return id;
     }
@@ -543,6 +513,14 @@ public class DataModel {
 
     public int getTlxRem() {
         return TlxRem;
+    }
+
+    public String getTlxDemPot() {
+        return TlxDemPot;
+    }
+
+    public void setTlxDemPot(String tlxDemPot) {
+        TlxDemPot = tlxDemPot;
     }
 
     public void setTlxRem(int tlxRem) {
