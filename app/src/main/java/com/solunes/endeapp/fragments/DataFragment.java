@@ -914,7 +914,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         Historico historico = dbAdapter.getHistorico(dataModel.getId());
         if (historico == null) {
             historico = new Historico();
-            Toast.makeText(getContext(), "No hay histórico", Toast.LENGTH_LONG).show();
         }
         String garantiaString = dbAdapter.getItemDescription(427);
         String aseoTitle = dbAdapter.getItemDescription(171);

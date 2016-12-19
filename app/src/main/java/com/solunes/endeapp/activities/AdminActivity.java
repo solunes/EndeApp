@@ -219,9 +219,9 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = usuarios.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(User.Columns.LecId.name(), object.getInt(User.Columns.LecId.name()));
-            values.put(User.Columns.LecNom.name(), object.getString(User.Columns.LecNom.name()));
-            values.put(User.Columns.LecCod.name(), object.getString(User.Columns.LecCod.name()));
-            values.put(User.Columns.LecPas.name(), object.getString(User.Columns.LecPas.name()));
+            values.put(User.Columns.LecNom.name(), object.getString(User.Columns.LecNom.name()).trim());
+            values.put(User.Columns.LecCod.name(), object.getString(User.Columns.LecCod.name()).trim());
+            values.put(User.Columns.LecPas.name(), object.getString(User.Columns.LecPas.name()).trim());
             values.put(User.Columns.LecNiv.name(), object.getInt(User.Columns.LecNiv.name()));
             values.put(User.Columns.LecAsi.name(), object.getInt(User.Columns.LecAsi.name()));
             values.put(User.Columns.LecAct.name(), object.getInt(User.Columns.LecAct.name()));
@@ -236,7 +236,7 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = observaciones.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(Obs.Columns.id.name(), object.getInt(Obs.Columns.id.name()));
-            values.put(Obs.Columns.ObsDes.name(), object.getString(Obs.Columns.ObsDes.name()));
+            values.put(Obs.Columns.ObsDes.name(), object.getString(Obs.Columns.ObsDes.name()).trim());
             values.put(Obs.Columns.ObsTip.name(), object.getInt(Obs.Columns.ObsTip.name()));
             values.put(Obs.Columns.ObsLec.name(), object.getInt(Obs.Columns.ObsLec.name()));
             values.put(Obs.Columns.ObsFac.name(), object.getInt(Obs.Columns.ObsFac.name()));
@@ -250,14 +250,14 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = parametros.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(Parametro.Columns.id.name(), object.getInt(Parametro.Columns.id.name()));
-            values.put(Parametro.Columns.codigo.name(), object.getString(Parametro.Columns.codigo.name()));
+            values.put(Parametro.Columns.codigo.name(), object.getString(Parametro.Columns.codigo.name()).trim());
             try {
                 values.put(Parametro.Columns.valor.name(), object.getInt(Parametro.Columns.valor.name()));
             } catch (JSONException e) {
                 values.put(Parametro.Columns.valor.name(), 0);
             }
             try {
-                values.put(Parametro.Columns.texto.name(), object.getString(Parametro.Columns.texto.name()));
+                values.put(Parametro.Columns.texto.name(), object.getString(Parametro.Columns.texto.name()).trim());
             } catch (JSONException e) {
                 values.put(Parametro.Columns.texto.name(), "");
             }
@@ -273,7 +273,7 @@ public class AdminActivity extends AppCompatActivity {
             values.put(ItemFacturacion.Columns.id.name(), object.getInt(ItemFacturacion.Columns.id.name()));
             values.put(ItemFacturacion.Columns.codigo.name(), object.getInt(ItemFacturacion.Columns.codigo.name()));
             values.put(ItemFacturacion.Columns.concepto.name(), object.getInt(ItemFacturacion.Columns.concepto.name()));
-            values.put(ItemFacturacion.Columns.descripcion.name(), object.getString(ItemFacturacion.Columns.descripcion.name()));
+            values.put(ItemFacturacion.Columns.descripcion.name(), object.getString(ItemFacturacion.Columns.descripcion.name()).trim());
             values.put(ItemFacturacion.Columns.estado.name(), object.getInt(ItemFacturacion.Columns.estado.name()));
             values.put(ItemFacturacion.Columns.credito_fiscal.name(), object.getInt(ItemFacturacion.Columns.credito_fiscal.name()));
             // guardar values
@@ -286,7 +286,7 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = observacionesImp.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(PrintObs.Columns.id.name(), object.getInt(PrintObs.Columns.id.name()));
-            values.put(PrintObs.Columns.ObiDes.name(), object.getString(PrintObs.Columns.ObiDes.name()));
+            values.put(PrintObs.Columns.ObiDes.name(), object.getString(PrintObs.Columns.ObiDes.name()).trim());
             // guardar values
             dbAdapter.saveObject(DBHelper.PRINT_OBS_TABLE, values);
         }
@@ -303,12 +303,12 @@ public class AdminActivity extends AppCompatActivity {
             values.put(FacturaDosificacion.Columns.numero_autorizacion.name(), object.getInt(FacturaDosificacion.Columns.numero_autorizacion.name()));
             values.put(FacturaDosificacion.Columns.numero_factura.name(), object.getInt(FacturaDosificacion.Columns.numero_factura.name()));
             values.put(FacturaDosificacion.Columns.estado.name(), object.getInt(FacturaDosificacion.Columns.estado.name()));
-            values.put(FacturaDosificacion.Columns.fecha_inicial.name(), object.getString(FacturaDosificacion.Columns.fecha_inicial.name()));
-            values.put(FacturaDosificacion.Columns.fecha_limite_emision.name(), object.getString(FacturaDosificacion.Columns.fecha_limite_emision.name()));
-            values.put(FacturaDosificacion.Columns.llave_dosificacion.name(), object.getString(FacturaDosificacion.Columns.llave_dosificacion.name()));
-            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()));
-            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()));
-            values.put(FacturaDosificacion.Columns.actividad_economica.name(), object.getString(FacturaDosificacion.Columns.actividad_economica.name()));
+            values.put(FacturaDosificacion.Columns.fecha_inicial.name(), object.getString(FacturaDosificacion.Columns.fecha_inicial.name()).trim());
+            values.put(FacturaDosificacion.Columns.fecha_limite_emision.name(), object.getString(FacturaDosificacion.Columns.fecha_limite_emision.name()).trim());
+            values.put(FacturaDosificacion.Columns.llave_dosificacion.name(), object.getString(FacturaDosificacion.Columns.llave_dosificacion.name()).trim());
+            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()).trim());
+            values.put(FacturaDosificacion.Columns.leyenda1.name(), object.getString(FacturaDosificacion.Columns.leyenda1.name()).trim());
+            values.put(FacturaDosificacion.Columns.actividad_economica.name(), object.getString(FacturaDosificacion.Columns.actividad_economica.name()).trim());
             // guardar values
             dbAdapter.saveObject(DBHelper.FACTURA_DOSIFICACION_TABLE, values);
         }

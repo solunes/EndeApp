@@ -82,13 +82,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     private ArrayList<DataModel> datas;
     private User user;
 
-    private int interval;
     private int currentState = -1;
     private int printState;
-
-    Handler handler = new Handler();
-    Runnable handlerTask;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +99,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
 
         DBAdapter dbAdapter = new DBAdapter(this);
         user = dbAdapter.getUser(UserPreferences.getInt(this, LoginActivity.KEY_LOGIN_ID));
-        interval = (int) dbAdapter.getParametroValor(Parametro.Values.tiempo_envio.name());
         datas = new ArrayList<>();
         if (getIntent().getExtras() != null) {
             int filter = getIntent().getExtras().getInt(MainActivity.KEY_FILTER);
@@ -138,17 +132,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
             tabAt.setCustomView(inflate);
-        }
-        handlerTask = new Runnable() {
-            @Override
-            public void run() {
-                Log.e(TAG, "run: enviado: mins " + interval);
-                sendEveryMinute();
-                handler.postDelayed(handlerTask, interval * 1000 * 60);
-            }
-        };
-        if (user.getLecNiv() != 3) {
-            handlerTask.run();
         }
         dbAdapter.close();
 
@@ -416,23 +399,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
-    }
-
-    private void sendEveryMinute() {
-        Hashtable<String, String> params = prepareDataToPost();
-        new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
-            @Override
-            public void onSuccess(String result, int statusCode) {
-                Log.e(TAG, "onSuccess: " + result);
-                UserPreferences.putLong(getApplicationContext(), KEY_SEND, Calendar.getInstance().getTimeInMillis());
-                UserPreferences.putBoolean(getApplicationContext(), KEY_WAS_UPLOAD, true);
-            }
-
-            @Override
-            public void onFailed(String reason, int statusCode) {
-                Log.e(TAG, "onFailed: " + reason);
-            }
-        }).execute();
     }
 
     public Hashtable<String, String> prepareDataToPost() {
