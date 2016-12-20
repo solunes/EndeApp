@@ -156,17 +156,17 @@ public class GenLecturas {
      *
      * @param dataModel      objeto DataModel para consultar a la base de datos
      * @param context        contexto de la aplicacion
-     * @param importeConsumo importe por consumo
+     * @param importeEnergia importe por energia
      * @return si hay TAP busca el valor del TAP, y sino devuelve 0
      */
-    public static double totalSuministroTap(DataModel dataModel, Context context, double importeConsumo) {
+    public static double totalSuministroTap(DataModel dataModel, Context context, double importeEnergia) {
         DBAdapter dbAdapter = new DBAdapter(context);
         double valorTAP = 0;
         if (dataModel.getTlxTap() != 0) {
             valorTAP = dbAdapter.getValorTAP(dataModel.getTlxAre(), dataModel.getTlxCtgTap(), dataModel.getTlxMes(), dataModel.getTlxAno());
         }
         dbAdapter.close();
-        return round(importeConsumo * valorTAP);
+        return round(importeEnergia * valorTAP);
     }
 
     /**

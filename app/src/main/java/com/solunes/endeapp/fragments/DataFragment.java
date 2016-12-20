@@ -725,7 +725,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         // calculo de suministro tap y suministro por aseo
         if (!reprint) {
-            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), totalConsumo);
+            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), dataModel.getTlxImpEn());
             if (totalSuministroTap < 0) {
                 Toast.makeText(getContext(), "No hay tarifa para el TAP", Toast.LENGTH_LONG).show();
                 return false;
