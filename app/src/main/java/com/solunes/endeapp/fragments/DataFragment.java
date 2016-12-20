@@ -261,7 +261,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
                     // obtener lectura de energia y verificar digitos
-                    String input = inputReading.getText().toString();
+                    final String input = inputReading.getText().toString();
                     if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
                         Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                     }
@@ -300,11 +300,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                         dialog.setTitle("Advertencia");
                         dialog.setMessage("La lectura va ser 0 de consumo.\n¿Esta seguro?");
                         dialog.setNegativeButton("Cancelar", null);
+                        final int finalTipoLectura = tipoLectura;
                         dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 inputReading.setText("0");
-                                methodPequeñaMedianaDemanda(view, input, tipoLectura, obs);
+                                methodPequeñaMedianaDemanda(view, input, finalTipoLectura, obs);
                             }
                         });
                         dialog.show();
@@ -379,7 +380,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      *
      * @param view
      */
-    private void methodPequeñaMedianaDemanda(final View view, String input, int tipoLectura, Obs obs) {
+    private void methodPequeñaMedianaDemanda(final View view, String input, int tipoLectura, final Obs obs) {
 
         int nuevaLectura = 0;
         int lecturaKwh;
@@ -727,14 +728,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         // calculo de suministro tap y suministro por aseo
         if (!reprint) {
-            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), dataModel.getTlxImpEn());
+            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getContext(), dataModel.getTlxConsumo());
             if (totalSuministroTap < 0) {
                 Toast.makeText(getContext(), "No hay tarifa para el TAP", Toast.LENGTH_LONG).show();
                 return false;
             }
             totalSuministroTap = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 153, totalSuministroTap);
 
-            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), lectura);
+            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), dataModel.getTlxConsumo());
             if (totalSuministroAseo == -1) {
                 Toast.makeText(getContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
                 return false;
