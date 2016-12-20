@@ -261,10 +261,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
                     // obtener lectura de energia y verificar digitos
-                    final String input = inputReading.getText().toString();
+                    String input = inputReading.getText().toString();
                     if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
                         Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                     }
+                    if(input.isEmpty()){
+                        input = "0";
+                    }
+                    final String finalInput = input;
 
                     // obtener tipo de lectura
                     int tipoLectura = dataModel.getTlxTipLec();
@@ -304,8 +308,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                         dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                inputReading.setText("0");
-                                methodPequeñaMedianaDemanda(view, input, finalTipoLectura, obs);
+                                methodPequeñaMedianaDemanda(view, finalInput, finalTipoLectura, obs);
                             }
                         });
                         dialog.show();
@@ -584,7 +587,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (tipoLectura == 5) {
                 dataModel.setTlxNvaLec(nuevaLectura);
                 if (dataModel.getTlxTipDem() == 2) {
-                    int potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+                    int potenciaLeida = 0;
+                    if(!inputPotenciaReading.getText().toString().isEmpty()){
+                        potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+                    }
                     potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
                     dataModel.setTlxPotLei(potenciaLeida);
                 }
@@ -644,7 +650,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getTlxTipDem() == 2) {
             if (!reprint) {
                 // correccion de digitos para la potencia leida
-                int potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+                int potenciaLeida = 0;
+                if(!inputPotenciaReading.getText().toString().isEmpty()){
+                    potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
+                }
                 potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
                 dataModel.setTlxPotLei(potenciaLeida);
                 // maximo entre potencia anterior y potencia leida
