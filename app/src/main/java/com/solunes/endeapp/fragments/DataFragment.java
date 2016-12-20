@@ -251,27 +251,51 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 if (dataModel.getEstadoLectura() == estados_lectura.Leido.ordinal()) {
                     rePrint();
                 } else {
+
+                    // detectar si una observacion existe
+                    int obsCod = 104;
+                    if (!inputObsCode.getText().toString().isEmpty()) {
+                        obsCod = Integer.parseInt(inputObsCode.getText().toString());
+                    }
+                    DBAdapter dbAdapter = new DBAdapter(getContext());
+                    final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
+
+                    // obtener lectura de energia y verificar digitos
+                    String input = inputReading.getText().toString();
+                    if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
+                        Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    // obtener tipo de lectura
+                    int tipoLectura = dataModel.getTlxTipLec();
+                    if (obs.getId() != 104) {
+                        tipoLectura = obs.getObsLec();
+                    }
+
                     // Precintos
                     if (dataModel.getTlxPotTag() == 1) {
                         String sPreNue1 = inputPreNue1.getText().toString();
                         String sPreNue2 = inputPreNue2.getText().toString();
-                        if (!sPreNue1.isEmpty()) {
-                            dataModel.setTlxPreNue1(sPreNue1);
-                            dataModel.setTlxPreNue2(sPreNue2);
-                        } else {
+                        if (sPreNue1.isEmpty()  && tipoLectura != 3 && tipoLectura != 9) {
                             Snackbar.make(view, "Ingrese un precinto", Snackbar.LENGTH_SHORT).show();
                             return;
+                        }
+                        if(!sPreNue1.isEmpty()) {
+                            dataModel.setTlxPreNue1(sPreNue1);
+                        }
+                        if(!sPreNue2.isEmpty()) {
+                            dataModel.setTlxPreNue2(sPreNue2);
                         }
                     }
 
                     // se procede a gran demanda
                     if (dataModel.getTlxTipDem() == 3) {
-                        methodGranDemanda(view);
+                        methodGranDemanda(view, input, tipoLectura, obs);
                         return;
                     }
 
                     // advertencia de lectura 0, luego se procede al calculo de pequeña y gran demanda
-                    if (inputReading.getText().toString().isEmpty()) {
+                    if (input.isEmpty()) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
                         dialog.setTitle("Advertencia");
                         dialog.setMessage("La lectura va ser 0 de consumo.\n¿Esta seguro?");
@@ -280,12 +304,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 inputReading.setText("0");
-                                methodPequeñaMedianaDemanda(view);
+                                methodPequeñaMedianaDemanda(view, input, tipoLectura, obs);
                             }
                         });
                         dialog.show();
                     } else {
-                        methodPequeñaMedianaDemanda(view);
+                        methodPequeñaMedianaDemanda(view, input, tipoLectura, obs);
                     }
                 }
             }
@@ -355,36 +379,20 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      *
      * @param view
      */
-    private void methodPequeñaMedianaDemanda(final View view) {
-        // detectar si una observacion existe
-        int obsCod = 104;
-        if (!inputObsCode.getText().toString().isEmpty()) {
-            obsCod = Integer.parseInt(inputObsCode.getText().toString());
-        }
-        DBAdapter dbAdapter = new DBAdapter(getContext());
-        final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
+    private void methodPequeñaMedianaDemanda(final View view, String input, int tipoLectura, Obs obs) {
 
-        // obtener lectura de energia y verificar digitos
-        String input = inputReading.getText().toString();
-        if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
-            Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
-        }
-
-        // si es mediana demanda se verifica que tiene potencia
-        if (dataModel.getTlxTipDem() == 2) {
-            if (inputPotenciaReading.getText().toString().isEmpty()) {
-                Snackbar.make(view, "Ingresar indice de potencia", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        int tipoLectura = dataModel.getTlxTipLec();
         int nuevaLectura = 0;
         int lecturaKwh;
         boolean giro = false;
         boolean indiceIgualado = false;
-        if (obs.getId() != 104) {
-            tipoLectura = obs.getObsLec();
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+
+        // si es mediana demanda se verifica que tiene potencia
+        if (dataModel.getTlxTipDem() == 2 && tipoLectura != 3 && tipoLectura != 9) {
+            if (inputPotenciaReading.getText().toString().isEmpty()) {
+                Snackbar.make(view, "Ingresar indice de potencia", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         // Verificar y obtener la lectura inicial cuando sea requerida
@@ -481,7 +489,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     /**
      * Este metodo guarda los datos de gran demanda
      */
-    private void methodGranDemanda(View view) {
+    private void methodGranDemanda(View view, String input, int tipoLectura, Obs obs) {
         if (!kwInst.getText().toString().isEmpty()) {
             dataModel.setTlxKwInst(Integer.parseInt(kwInst.getText().toString()));
         }
@@ -513,15 +521,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel.setTlxHoraMedio(labelHoraMedio.getText().toString());
         dataModel.setTlxHoraBajo(labelHoraBajo.getText().toString());
 
-        String input = inputReading.getText().toString().isEmpty() ? "" : inputReading.getText().toString();
+        dataModel.setTlxTipLec(tipoLectura);
         dataModel.setTlxNvaLec(Integer.parseInt(input));
-        int obsCod = 104;
-        if (!inputObsCode.getText().toString().isEmpty()) {
-            obsCod = Integer.parseInt(inputObsCode.getText().toString());
-        }
         dataModel.setTlxImpAvi(0);
-        DBAdapter dbAdapter = new DBAdapter(getContext());
-        final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
 
         hidingViews(obs);
         onFragmentListener.onAjusteOrden(dataModel.getId());
