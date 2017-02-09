@@ -10,4 +10,6 @@
 
     <string name="admin_nombre">admin</string>
     <string name="admin_password">1234</string>
+    <string name="action_import">Importar</string>
+    <string name="action_export">Exportar</string>
 </resources>

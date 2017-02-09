@@ -137,6 +137,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel = dbAdapter.getData(arguments.getInt(KEY_ID_DATA));
         Log.e(TAG, "onCreateView: " +
                 "\n " + dataModel.getTlxNom() +
+                "\n ultimo indice: " + dataModel.getTlxUltInd() +
                 "\n consumo promedio: " + dataModel.getTlxConPro());
         dbAdapter.close();
         setupUI(view, dataModel);

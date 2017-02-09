@@ -37,6 +37,7 @@ import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.networking.Token;
+import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
@@ -173,6 +174,10 @@ public class AdminActivity extends AppCompatActivity {
             case R.id.action_logout:
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
+                return true;
+            case R.id.action_import:
+                Log.e(TAG, "onOptionsItemSelected: importar");
+                FileUtils.importDB();
                 return true;
         }
         return super.onOptionsItemSelected(item);
