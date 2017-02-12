@@ -260,6 +260,15 @@ public class DBAdapter {
         return size;
     }
 
+    public int getSizeUser() {
+        open();
+        Cursor query = db.rawQuery("select count(*) from " + DBHelper.USER_TABLE, null);
+        query.moveToNext();
+        int size = query.getInt(0);
+        query.close();
+        return size;
+    }
+
     /**
      * Devuelve la cantidad de datos guardados
      */

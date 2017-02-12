@@ -35,9 +35,10 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
     /**
      * Constructor de la clase
-     * @param context contexto de la aplicacion
-     * @param params un hashtable con los parametros para la consulta
-     * @param headers un hashtable con header para la consulta
+     *
+     * @param context     contexto de la aplicacion
+     * @param params      un hashtable con los parametros para la consulta
+     * @param headers     un hashtable con header para la consulta
      * @param urlEndpoint un string con la url para la consulta
      * @param callbackAPI interface para hacer las respuestas
      */
@@ -110,6 +111,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        Log.e(TAG, "onPostExecute: " + result);
 
         if (getStatusCode() >= 200 && getStatusCode() <= 250) {
             callbackAPI.onSuccess(result, getStatusCode());

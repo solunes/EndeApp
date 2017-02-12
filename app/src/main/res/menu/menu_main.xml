@@ -4,16 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.xiberty.jiwakiapp.ui.fragments.ProfileFragment">
     <item
-        android:id="@+id/action_export"
-        android:icon="@drawable/ic_power_settings_new_white_24dp"
-        android:title="@string/action_export"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_import"
-        android:icon="@drawable/ic_power_settings_new_white_24dp"
-        android:title="@string/action_import"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_power_settings_new_white_24dp"
         android:title="@string/action_logout"

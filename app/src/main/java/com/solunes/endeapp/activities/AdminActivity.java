@@ -1,11 +1,17 @@
 package com.solunes.endeapp.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,6 +55,7 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Esta activity controla el login del usuario
@@ -82,6 +89,14 @@ public class AdminActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        Map<String, ?> all = preferences.getAll();
+        for (String key : all.keySet()) {
+            Log.e(TAG, "onCreate: key "+ key +" : "+ all.get(key));
+        }
+        Log.e(TAG, "onCreate: " + all.toString());
+
         editDomain = (EditText) findViewById(R.id.edit_domain);
         TextView textUsername = (TextView) findViewById(R.id.text_username);
         Button btnSaveDomain = (Button) findViewById(R.id.btn_save_domain);
@@ -95,7 +110,7 @@ public class AdminActivity extends AppCompatActivity {
 
         // obtener usuario
         int id_user = getIntent().getExtras().getInt("id_user");
-        DBAdapter dbAdapter = new DBAdapter(this);
+        final DBAdapter dbAdapter = new DBAdapter(this);
         user = dbAdapter.getUser(id_user);
         dbAdapter.close();
         textUsername.setText(user.getLecNom());
@@ -140,6 +155,25 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        Button btnImport = (Button) findViewById(R.id.btn_import);
+        btnImport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                isExport = false;
+                Log.e(TAG, "onClick: request permossion method");
+                requestPermissions();
+            }
+        });
+        Button btnExport = (Button) findViewById(R.id.btn_export);
+        btnExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                isExport = true;
+                requestPermissions();
+            }
+        });
+
+
         // se muestra el nombre de la impresora
         printName = (TextView) findViewById(R.id.label_print_name);
         String string = UserPreferences.getString(getApplicationContext(), KEY_PRINT_MANE);
@@ -174,10 +208,6 @@ public class AdminActivity extends AppCompatActivity {
             case R.id.action_logout:
                 finish();
                 startActivity(new Intent(this, LoginActivity.class));
-                return true;
-            case R.id.action_import:
-                Log.e(TAG, "onOptionsItemSelected: importar");
-                FileUtils.importDB();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -390,5 +420,97 @@ public class AdminActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         }).execute();
+    }
+
+    private void exportDB(final View view) {
+        Map<String, ?> all = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getAll();
+        JSONObject jsonObject = new JSONObject(all);
+        FileUtils.exportDB(jsonObject.toString() ,new FileUtils.FileUtilsCallback() {
+            @Override
+            public void suceess() {
+                Snackbar.make(view, "Copia excitosa", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void error() {
+                Snackbar.make(view, "Error al copiar", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void importDB(final View view) {
+        FileUtils.importDB(getApplicationContext(), new FileUtils.FileUtilsCallback() {
+            @Override
+            public void suceess() {
+                Snackbar.make(view, "Copia excitosa. ", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void error() {
+                Snackbar.make(view, "Error al copiar", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean isExport;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 7;
+
+    private void requestPermissions() {
+        Log.e(TAG, "requestPermissions: " + ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                Log.e(TAG, "requestPermissions: show an explanation");
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+                Log.e(TAG, "requestPermissions: no show a explanation");
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_WRITE_EXTERNAL_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            if (isExport) {
+                exportDB(nroDomain);
+            } else {
+                importDB(nroDomain);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Log.e(TAG, "onRequestPermissionsResult: garantizado");
+                    if (isExport) {
+                        exportDB(nroDomain);
+                    } else {
+                        importDB(nroDomain);
+                    }
+
+                } else {
+                    finish();
+                }
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 }

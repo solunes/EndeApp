@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.User;
-import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.UserPreferences;
 
 /**

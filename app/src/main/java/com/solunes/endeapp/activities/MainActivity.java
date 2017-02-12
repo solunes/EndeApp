@@ -124,11 +124,6 @@ public class MainActivity extends AppCompatActivity {
             layoutSend.setEnabled(false);
         }
 
-        String path = getFilesDir().getAbsolutePath();
-        Log.e(TAG, "onCreate: " + path);
-        String out= Environment.getExternalStorageDirectory().getAbsolutePath();
-        Log.e(TAG, "onCreate: " +out );
-
         // se verifican las fechas de las accciones como descarga, envio y parametros fijos
         Calendar calendar = Calendar.getInstance();
         long dateDownload = UserPreferences.getLong(this, KEY_DOWNLOAD);
@@ -177,12 +172,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_export:
-                FileUtils.exportDB();
-                return true;
-            case R.id.action_import:
-                FileUtils.importDB();
-                return true;
             case R.id.action_logout:
                 // opcion del menu para cerrar sesion
                 UserPreferences.putBoolean(this, LoginActivity.KEY_LOGIN, false);

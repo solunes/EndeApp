@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -36,14 +37,18 @@ import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.PrintGenerator;
 import com.solunes.endeapp.utils.StringUtils;
+
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 
 /**
  * Este fragmento muestra los detalles de cada una de las lecturas
@@ -266,7 +271,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     if (input.length() >= String.valueOf(Integer.MAX_VALUE).length()) {
                         Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
                     }
-                    if(input.isEmpty()){
+                    if (input.isEmpty()) {
                         input = "0";
                     }
                     final String finalInput = input;
@@ -281,14 +286,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     if (dataModel.getTlxPotTag() == 1) {
                         String sPreNue1 = inputPreNue1.getText().toString();
                         String sPreNue2 = inputPreNue2.getText().toString();
-                        if (sPreNue1.isEmpty()  && tipoLectura != 3 && tipoLectura != 9) {
+                        if (sPreNue1.isEmpty() && tipoLectura != 3 && tipoLectura != 9) {
                             Snackbar.make(view, "Ingrese un precinto", Snackbar.LENGTH_SHORT).show();
                             return;
                         }
-                        if(!sPreNue1.isEmpty()) {
+                        if (!sPreNue1.isEmpty()) {
                             dataModel.setTlxPreNue1(sPreNue1);
                         }
-                        if(!sPreNue2.isEmpty()) {
+                        if (!sPreNue2.isEmpty()) {
                             dataModel.setTlxPreNue2(sPreNue2);
                         }
                     }
@@ -589,7 +594,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 dataModel.setTlxNvaLec(nuevaLectura);
                 if (dataModel.getTlxTipDem() == 2) {
                     int potenciaLeida = 0;
-                    if(!inputPotenciaReading.getText().toString().isEmpty()){
+                    if (!inputPotenciaReading.getText().toString().isEmpty()) {
                         potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
                     }
                     potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
@@ -652,7 +657,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (!reprint) {
                 // correccion de digitos para la potencia leida
                 int potenciaLeida = 0;
-                if(!inputPotenciaReading.getText().toString().isEmpty()){
+                if (!inputPotenciaReading.getText().toString().isEmpty()) {
                     potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
                 }
                 potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
@@ -901,6 +906,19 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         dbAdapter.close();
         onFragmentListener.onTabListener();
+        Map<String, ?> all = PreferenceManager.getDefaultSharedPreferences(getActivity()).getAll();
+        JSONObject jsonObject = new JSONObject(all);
+        FileUtils.exportDB(jsonObject.toString(), new FileUtils.FileUtilsCallback() {
+            @Override
+            public void suceess() {
+                Snackbar.make(inputPotenciaReading, "Copia excitosa", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void error() {
+                Snackbar.make(inputPotenciaReading, "Error al copiar", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
