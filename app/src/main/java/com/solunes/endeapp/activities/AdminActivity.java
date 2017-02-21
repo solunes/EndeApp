@@ -93,7 +93,7 @@ public class AdminActivity extends AppCompatActivity {
 
         Map<String, ?> all = preferences.getAll();
         for (String key : all.keySet()) {
-            Log.e(TAG, "onCreate: key "+ key +" : "+ all.get(key));
+            Log.e(TAG, "onCreate: key " + key + " : " + all.get(key));
         }
         Log.e(TAG, "onCreate: " + all.toString());
 
@@ -107,6 +107,7 @@ public class AdminActivity extends AppCompatActivity {
             nroDomain.setText("Url: " + url);
             editDomain.setText(url);
         }
+        Log.e(TAG, "onCreate: " + getExternalFilesDir(null));
 
         // obtener usuario
         int id_user = getIntent().getExtras().getInt("id_user");
@@ -159,20 +160,10 @@ public class AdminActivity extends AppCompatActivity {
         btnImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                isExport = false;
                 Log.e(TAG, "onClick: request permossion method");
                 requestPermissions();
             }
         });
-        Button btnExport = (Button) findViewById(R.id.btn_export);
-        btnExport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                isExport = true;
-                requestPermissions();
-            }
-        });
-
 
         // se muestra el nombre de la impresora
         printName = (TextView) findViewById(R.id.label_print_name);
@@ -422,37 +413,25 @@ public class AdminActivity extends AppCompatActivity {
         }).execute();
     }
 
-    private void exportDB(final View view) {
-        Map<String, ?> all = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getAll();
-        JSONObject jsonObject = new JSONObject(all);
-        FileUtils.exportDB(jsonObject.toString() ,new FileUtils.FileUtilsCallback() {
-            @Override
-            public void suceess() {
-                Snackbar.make(view, "Copia excitosa", Snackbar.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void error() {
-                Snackbar.make(view, "Error al copiar", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void importDB(final View view) {
         FileUtils.importDB(getApplicationContext(), new FileUtils.FileUtilsCallback() {
             @Override
             public void suceess() {
-                Snackbar.make(view, "Copia excitosa. ", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, "Se importó correctamente", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void error() {
-                Snackbar.make(view, "Error al copiar", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(view, "Hubo un error al importar", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void noSD() {
+                Snackbar.make(view, "No se encuentra una tarjeta SD", Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
-    private boolean isExport;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 7;
 
     private void requestPermissions() {
@@ -481,11 +460,7 @@ public class AdminActivity extends AppCompatActivity {
                 // result of the request.
             }
         } else {
-            if (isExport) {
-                exportDB(nroDomain);
-            } else {
-                importDB(nroDomain);
-            }
+            importDB(nroDomain);
         }
     }
 
@@ -499,11 +474,7 @@ public class AdminActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Log.e(TAG, "onRequestPermissionsResult: garantizado");
-                    if (isExport) {
-                        exportDB(nroDomain);
-                    } else {
-                        importDB(nroDomain);
-                    }
+                    importDB(nroDomain);
 
                 } else {
                     finish();

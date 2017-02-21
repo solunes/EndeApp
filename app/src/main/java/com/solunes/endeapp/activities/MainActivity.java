@@ -52,6 +52,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,9 +70,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_DOWNLOAD = "download";
     public static final String KEY_WAS_UPLOAD = "was_upload";
     public static final String KEY_SEND = "send";
-    public static final String KEY_ENDPOINT_GESTION = "endpoint_gestion";
-    public static final String KEY_ENDPOINT_MONTH = "endpoint_month";
-    public static final String KEY_ENDPOINT_REMESA = "endpoint_remesa";
 
     private boolean isRate;
     private boolean wasDownload;
@@ -123,6 +122,12 @@ public class MainActivity extends AppCompatActivity {
         if (user.getLecNiv() == 3) {
             layoutSend.setEnabled(false);
         }
+
+        for (File f : getExternalFilesDirs(null)) {
+            Log.e(TAG, "onCreate: " + f);
+        }
+
+        Log.e(TAG, "onCreate: " + getExternalFilesDir(null));
 
         // se verifican las fechas de las accciones como descarga, envio y parametros fijos
         Calendar calendar = Calendar.getInstance();

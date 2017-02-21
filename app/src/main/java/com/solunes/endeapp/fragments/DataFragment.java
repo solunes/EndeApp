@@ -908,15 +908,19 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         onFragmentListener.onTabListener();
         Map<String, ?> all = PreferenceManager.getDefaultSharedPreferences(getActivity()).getAll();
         JSONObject jsonObject = new JSONObject(all);
-        FileUtils.exportDB(jsonObject.toString(), new FileUtils.FileUtilsCallback() {
+        FileUtils.exportDB(getActivity(), jsonObject.toString(), new FileUtils.FileUtilsCallback() {
             @Override
             public void suceess() {
-                Snackbar.make(inputPotenciaReading, "Copia excitosa", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void error() {
-                Snackbar.make(inputPotenciaReading, "Error al copiar", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(inputPotenciaReading, "Error al exportar a SD", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void noSD() {
+                Snackbar.make(inputPotenciaReading, "No se encuentra una tarjeta SD", Snackbar.LENGTH_SHORT).show();
             }
         });
     }

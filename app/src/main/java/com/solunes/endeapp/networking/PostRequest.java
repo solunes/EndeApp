@@ -121,7 +121,8 @@ public class PostRequest extends AsyncTask<String, Void, String> {
                 JSONObject jsonObject = new JSONObject(result);
                 messageError += jsonObject.getString("message");
                 messageError += " (" + jsonObject.getString("status_code") + ")";
-            } catch (JSONException e) {
+            } catch (JSONException | NullPointerException e) {
+                Log.e(TAG, "onPostExecute: ", e);
             }
             callbackAPI.onFailed(messageError, getStatusCode());
         }

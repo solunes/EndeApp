@@ -1,6 +1,7 @@
 package com.solunes.endeapp.utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -29,31 +30,35 @@ public class FileUtils {
 
     private static final String TAG = "FileUtils";
     private static final String SHARED_PREFERENCES_NAME = "com.solunes.endeapp_preferences.xml";
-    private static final String INTERNAL_STORAGE = "/storage/emulated/0/endeapp";
     private static final String DATABSE_STORAGE = "/data/data/com.solunes.endeapp/databases";
-    private static final String SHARED_PREFERENCES_STORAGE = "/data/data/com.solunes.endeapp/shared_prefs";
 
-    public static void exportDB(String data, FileUtilsCallback fileUtilsCallback) {
-        File file = new File(INTERNAL_STORAGE);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        boolean copyDB = copyFile(DATABSE_STORAGE + "/" + DBHelper.DATABASE_NAME, INTERNAL_STORAGE, DBHelper.DATABASE_NAME);
-        boolean copySP = copyFile(INTERNAL_STORAGE + "/" + SHARED_PREFERENCES_NAME, data);
-        if (copyDB && copySP) {
-            fileUtilsCallback.suceess();
+    public static void exportDB(Context context, String data, FileUtilsCallback fileUtilsCallback) {
+        String internalStorage = getExternalPath(context);
+        if (internalStorage != null) {
+            boolean copyDB = copyFile(DATABSE_STORAGE + "/" + DBHelper.DATABASE_NAME, internalStorage, DBHelper.DATABASE_NAME);
+            boolean copySP = copyFile(internalStorage + "/" + SHARED_PREFERENCES_NAME, data);
+            if (copyDB && copySP) {
+                fileUtilsCallback.suceess();
+            } else {
+                fileUtilsCallback.error();
+            }
         } else {
-            fileUtilsCallback.error();
+            fileUtilsCallback.noSD();
         }
     }
 
     public static void importDB(Context context, FileUtilsCallback fileUtilsCallback) {
-        boolean copyDB = copyFile(INTERNAL_STORAGE + "/" + DBHelper.DATABASE_NAME, DATABSE_STORAGE, DBHelper.DATABASE_NAME);
-        boolean copySP = copyFile(INTERNAL_STORAGE + "/" + SHARED_PREFERENCES_NAME, context);
-        if (copyDB && copySP) {
-            fileUtilsCallback.suceess();
+        String internalStorage = getExternalPath(context);
+        if (internalStorage != null) {
+            boolean copyDB = copyFile(internalStorage + "/" + DBHelper.DATABASE_NAME, DATABSE_STORAGE, DBHelper.DATABASE_NAME);
+            boolean copySP = copyFile(internalStorage + "/" + SHARED_PREFERENCES_NAME, context);
+            if (copyDB && copySP) {
+                fileUtilsCallback.suceess();
+            } else {
+                fileUtilsCallback.error();
+            }
         } else {
-            fileUtilsCallback.error();
+            fileUtilsCallback.noSD();
         }
     }
 
@@ -89,10 +94,10 @@ public class FileUtils {
             inputStream.close();
             data = stringBuilder.toString();
         } catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
+            Log.e(TAG, "File not found: " + e.toString());
             return false;
         } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
+            Log.e(TAG, "Can not read file: " + e.toString());
             return false;
         }
 
@@ -135,9 +140,23 @@ public class FileUtils {
         }
     }
 
+    private static String getExternalPath(Context context) {
+        String path = null;
+        for (File f : context.getExternalFilesDirs(null)) {
+            if (f != null) {
+                if (Environment.isExternalStorageRemovable(f.getAbsoluteFile())) {
+                    path = f.getAbsolutePath();
+                }
+            }
+        }
+        return path;
+    }
+
     public interface FileUtilsCallback {
         void suceess();
 
         void error();
+
+        void noSD();
     }
 }
