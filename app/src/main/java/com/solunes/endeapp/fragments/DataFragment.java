@@ -1232,7 +1232,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      * @param decimales    decimales del medidor
      * @return un entero con los digitos corregidos
      */
-    private int correccionDeDigitos(int nuevaLectura, int decimales) {
+    public static int correccionDeDigitos(int nuevaLectura, int decimales) {
         if (decimales == 0) {
             return (nuevaLectura);
         }
@@ -1283,6 +1283,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         ControlCode controlCode = new ControlCode();
         DBAdapter dbAdapter = new DBAdapter(getContext());
         String llaveDosificacion = dbAdapter.getLlaveDosificacion(dataModel.getTlxAre());
+        Log.e(TAG, "getControlCode: " + String.valueOf(dataModel.getTlxCliNit()));
         String generateControlCode = controlCode.generate(dataModel.getTlxNroAut(),
                 dataModel.getTlxFacNro(),
                 String.valueOf(dataModel.getTlxCliNit()),

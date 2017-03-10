@@ -138,7 +138,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxPotCon integer, " +
                 "TlxPotLei integer, " +
                 "TlxPotFac integer, " +
-                "TlxCliNit integer, " +
+                "TlxCliNit text, " +
                 "TlxFecCor numeric, " +
                 "TlxFecVto numeric, " +
                 "TlxFecproEmi numeric, " +

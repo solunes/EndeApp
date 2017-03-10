@@ -64,9 +64,10 @@ public class GenLecturas {
             Tarifa tarifa = cargoEnergia.get(i);
             // se define si el consumo restante es mayor a todo el rango o no
             if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
-                res = tarifa.getImporte() * (tarifa.getKwh_hasta() - descuento);
-                kWhConsumo -= (tarifa.getKwh_hasta() - descuento);
-                descuento += tarifa.getKwh_hasta();
+                int diferencia = tarifa.getKwh_hasta() - tarifa.getKwh_desde() + 1;
+                res = tarifa.getImporte() * diferencia;
+                kWhConsumo -= diferencia;
+                descuento += diferencia;
             } else {
                 res = tarifa.getImporte() * kWhConsumo;
                 finish = true;
@@ -128,8 +129,8 @@ public class GenLecturas {
      */
     public static double ley1886(Context context, int kWhConsumo, int categoria) {
         DBAdapter dbAdapter = new DBAdapter(context);
-        int limite = (int) dbAdapter.getParametroValor(Parametro.Values.descuento_1886.name());
-        double descuento = (dbAdapter.getParametroValor(Parametro.Values.limite_1886.name()) / 100);
+        int limite = (int) dbAdapter.getParametroValor(Parametro.Values.limite_1886.name());
+        double descuento = (dbAdapter.getParametroValor(Parametro.Values.descuento_1886.name()) / 100);
         Log.e(TAG, "ley1886: limite " + limite);
         Log.e(TAG, "ley1886: descuento " + descuento);
         if (kWhConsumo <= limite) {
@@ -181,7 +182,7 @@ public class GenLecturas {
         DBAdapter dbAdapter = new DBAdapter(context);
         double importeAseo = 0;
         if (dataModel.getTlxCotaseo() != 0) {
-            importeAseo = dbAdapter.getImporteAseo(dataModel.getTlxCtgAseo(), dataModel.getTlxMes(), dataModel.getTlxAno(), kWhConsumo);
+            importeAseo = dbAdapter.getImporteAseo(dataModel.getTlxCtg(), dataModel.getTlxMes(), dataModel.getTlxAno(), kWhConsumo);
         }
         dbAdapter.close();
         return round(importeAseo);

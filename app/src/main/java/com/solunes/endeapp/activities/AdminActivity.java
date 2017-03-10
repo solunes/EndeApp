@@ -5,10 +5,8 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,7 +22,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -41,10 +38,8 @@ import com.solunes.endeapp.models.TarifaTap;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
-import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.networking.Token;
 import com.solunes.endeapp.utils.FileUtils;
-import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
 import com.solunes.endeapp.utils.UserPreferences;
 
@@ -53,9 +48,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * Esta activity controla el login del usuario
@@ -88,14 +80,6 @@ public class AdminActivity extends AppCompatActivity {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        Map<String, ?> all = preferences.getAll();
-        for (String key : all.keySet()) {
-            Log.e(TAG, "onCreate: key " + key + " : " + all.get(key));
-        }
-        Log.e(TAG, "onCreate: " + all.toString());
 
         editDomain = (EditText) findViewById(R.id.edit_domain);
         TextView textUsername = (TextView) findViewById(R.id.text_username);
@@ -183,6 +167,14 @@ public class AdminActivity extends AppCompatActivity {
                     UserPreferences.putString(getApplicationContext(), KEY_PRINT_MANE, printname);
                     printName.setText("Impresora: " + printname);
                 }
+            }
+        });
+
+        Button buttonTest = (Button) findViewById(R.id.btn_test);
+        buttonTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(AdminActivity.this, TestActivity.class));
             }
         });
     }

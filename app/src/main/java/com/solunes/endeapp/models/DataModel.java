@@ -57,7 +57,7 @@ public class DataModel {
     private int TlxTap;
     private int TlxPotCon;
     private int TlxPotFac;
-    private int TlxCliNit;
+    private String TlxCliNit;
     private String TlxFecCor;
     private String TlxFecVto;
     private String TlxFecproEmi;
@@ -318,7 +318,7 @@ public class DataModel {
         dataModel.setTlxTap(cursor.getInt(Columns.TlxTap.ordinal()));
         dataModel.setTlxPotCon(cursor.getInt(Columns.TlxPotCon.ordinal()));
         dataModel.setTlxPotFac(cursor.getInt(Columns.TlxPotFac.ordinal()));
-        dataModel.setTlxCliNit(cursor.getInt(Columns.TlxCliNit.ordinal()));
+        dataModel.setTlxCliNit(cursor.getString(Columns.TlxCliNit.ordinal()));
         dataModel.setTlxFecCor(cursor.getString(Columns.TlxFecCor.ordinal()));
         dataModel.setTlxFecVto(cursor.getString(Columns.TlxFecVto.ordinal()));
         dataModel.setTlxFecproEmi(cursor.getString(Columns.TlxFecproEmi.ordinal()));
@@ -1063,11 +1063,11 @@ public class DataModel {
         TlxPotFac = tlxPotFac;
     }
 
-    public int getTlxCliNit() {
+    public String getTlxCliNit() {
         return TlxCliNit;
     }
 
-    public void setTlxCliNit(int tlxCliNit) {
+    public void setTlxCliNit(String tlxCliNit) {
         TlxCliNit = tlxCliNit;
     }
 
