@@ -39,6 +39,7 @@ import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.GenLecturas;
+import com.solunes.endeapp.utils.NumberToLetterConverter;
 import com.solunes.endeapp.utils.PrintGenerator;
 import com.solunes.endeapp.utils.StringUtils;
 
@@ -740,6 +741,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         // calculo del importe total del suministro
         double totalSuministro = GenLecturas.totalSuministro(totalConsumo, dataModel.getTlxLey1886(), cargoExtraTotal);
+        Log.e(TAG, "calculo: " + NumberToLetterConverter.convertNumberToLetter(totalSuministro));
 
         // calculo de suministro tap y suministro por aseo
         if (!reprint) {

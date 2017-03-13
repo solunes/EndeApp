@@ -197,6 +197,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                doDisconnect();
                 finish();
                 return true;
             case R.id.action_search:
@@ -224,6 +225,15 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     protected void onPause() {
         super.onPause();
         UserPreferences.putInt(this, KEY_LAST_PAGER_PSOTION, datas.get(viewPager.getCurrentItem()).getId());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        doDisconnect();
+    }
+
+    private void doDisconnect() {
         new Thread(new Runnable() {
             @Override
             public void run() {
