@@ -21,6 +21,7 @@ import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObsData;
+import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
@@ -234,6 +235,18 @@ public class DBAdapter {
         return dataModel;
     }
 
+    public Resultados getDataRes(int dataId) {
+        open();
+        Cursor query = db.query(DBHelper.RESULTADOS_TABLE, null, Resultados.Columns.general_id.name() + " = " + dataId, null, null, null, null);
+        query.moveToFirst();
+        Resultados resultados = null;
+        if (query.getCount() > 0) {
+            resultados = Resultados.fromCursor(query);
+        }
+        query.close();
+        return resultados;
+    }
+
     /**
      * Obtiene el primer data
      *
@@ -306,7 +319,7 @@ public class DBAdapter {
      */
     public Cursor getObs() {
         open();
-        Cursor query = db.query(DBHelper.OBS_TABLE, null, null, null, null, null, null);
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsAut.name() + " = 0", null, null, null, null);
         return query;
     }
 
@@ -478,8 +491,11 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
         if (cursor.getCount() > 0) {
             cursor.moveToNext();
-            return cursor.getInt(Tarifa.Columns.kwh_hasta.ordinal());
+            int cursorInt = cursor.getInt(Tarifa.Columns.kwh_hasta.ordinal());
+            cursor.close();
+            return cursorInt;
         }
+        cursor.close();
         return 0;
     }
 
@@ -530,6 +546,7 @@ public class DBAdapter {
         while (cursor.moveToNext()) {
             printObsDatas.add(PrintObsData.fromCursor(cursor));
         }
+        cursor.close();
         return printObsDatas;
     }
 
@@ -543,6 +560,7 @@ public class DBAdapter {
         while (cursor.moveToNext()) {
             detalleFacturas.add(DetalleFactura.fromCursor(cursor));
         }
+        cursor.close();
         return detalleFacturas;
     }
 
@@ -556,8 +574,11 @@ public class DBAdapter {
                         DetalleFactura.Columns.item_facturacion_id.name() + " = " + idItem, null, null, null, null);
         cursor.moveToNext();
         if (cursor.getCount() > 0) {
-            return DetalleFactura.fromCursor(cursor).getImporte();
+            double importe = DetalleFactura.fromCursor(cursor).getImporte();
+            cursor.close();
+            return importe;
         }
+        cursor.close();
         return 0;
     }
 
@@ -571,8 +592,11 @@ public class DBAdapter {
                         DetalleFactura.Columns.item_facturacion_id.name() + " = " + idItem, null, null, null, null);
         cursor.moveToNext();
         if (cursor.getCount() > 0) {
-            return DetalleFactura.fromCursor(cursor);
+            DetalleFactura detalleFactura = DetalleFactura.fromCursor(cursor);
+            cursor.close();
+            return detalleFactura;
         }
+        cursor.close();
         return null;
     }
 
@@ -591,6 +615,7 @@ public class DBAdapter {
         query = db.query(DBHelper.PARAMETRO_TABLE, null, Parametro.Columns.codigo.name() + " = '" + Parametro.Values.leyenda_3.name() + "'", null, null, null, null);
         query.moveToNext();
         leyenda[2] = Parametro.fromCursor(query).getTexto();
+        query.close();
         return leyenda;
     }
 
@@ -623,8 +648,11 @@ public class DBAdapter {
         Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.general_id.name() + " = " + idData, null, null, null, null);
         cursor.moveToNext();
         if (cursor.getCount() > 0){
-            return Historico.fromCursor(cursor);
+            Historico historico = Historico.fromCursor(cursor);
+            cursor.close();
+            return historico;
         }
+        cursor.close();
         return null;
     }
 
@@ -634,8 +662,11 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id + " = 41", null, null, null, null);
         cursor.moveToNext();
         if (cursor.getCount() > 0) {
-            return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+            double cursorDouble = cursor.getDouble(Tarifa.Columns.importe.ordinal());
+            cursor.close();
+            return cursorDouble;
         }
+        cursor.close();
         return -1;
     }
 
@@ -644,7 +675,9 @@ public class DBAdapter {
         Cursor cursor = db.query(DBHelper.FACTURA_DOSIFICACION_TABLE, null,
                 FacturaDosificacion.Columns.area_id + " = " + are, null, null, null, null);
         cursor.moveToFirst();
-        return cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
+        String cursorString = cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
+        cursor.close();
+        return cursorString;
     }
 
     public double getValorTAP(int area, int categoriaTarifa, int mes, int anio) {
@@ -655,12 +688,15 @@ public class DBAdapter {
                 " AND " + TarifaTap.Columns.anio.name() + " = " + anio, null, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            return cursor.getDouble(TarifaTap.Columns.valor.ordinal());
+            double cursorDouble = cursor.getDouble(TarifaTap.Columns.valor.ordinal());
+            cursor.close();
+            return cursorDouble;
         }
+        cursor.close();
         return -1;
     }
 
-    public double getImporteAseo(int categoriaTarifa, int mes, int anio, int kwhConsumo) {
+    public double getImporteAseo(int categoriaTarifa, int mes, int anio, double kwhConsumo) {
         open();
         Cursor cursor = db.query(DBHelper.TARIFA_ASEO_TABLE, null, TarifaAseo.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
                 " AND " + TarifaAseo.Columns.mes.name() + " = " + mes +
@@ -669,8 +705,11 @@ public class DBAdapter {
                 " AND " + TarifaAseo.Columns.kwh_hasta.name() + " >= " + kwhConsumo, null, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            return cursor.getDouble(TarifaAseo.Columns.importe.ordinal());
+            double cursorDouble = cursor.getDouble(TarifaAseo.Columns.importe.ordinal());
+            cursor.close();
+            return cursorDouble;
         }
+        cursor.close();
         return -1;
     }
 
@@ -735,8 +774,11 @@ public class DBAdapter {
                 null, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            return cursor.getInt(LimitesMaximos.Columns.max_kwh.ordinal());
+            int cursorInt = cursor.getInt(LimitesMaximos.Columns.max_kwh.ordinal());
+            cursor.close();
+            return cursorInt;
         }
+        cursor.close();
         return -1;
     }
 }

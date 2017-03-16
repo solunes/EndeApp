@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
      * @param progressDialog
      */
     public void sendPostRequest(final View view, final ProgressDialog progressDialog) {
-        Hashtable<String, String> params = prepareDataToPost();
+        Hashtable<String, String> params = prepareDataToPost(getApplicationContext(), user);
 //                Token.getToken(getApplicationContext(), user);
         new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
             @Override
@@ -537,10 +537,10 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return retorna un hashtable para enviarlo en el endpoint
      */
-    public Hashtable<String, String> prepareDataToPost() {
+    public static Hashtable<String, String> prepareDataToPost(Context context, User user) {
         Hashtable<String, String> params = new Hashtable<>();
 
-        DBAdapter dbAdapter = new DBAdapter(this);
+        DBAdapter dbAdapter = new DBAdapter(context);
         ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
 
         params.put("UsrCod", String.valueOf(user.getLecCod()));
@@ -723,7 +723,7 @@ public class MainActivity extends AppCompatActivity {
         newMedidor.show();
     }
 
-    private ContentValues stringNull(String key, String string) {
+    public static ContentValues stringNull(String key, String string) {
         ContentValues values = new ContentValues();
         if (string.equalsIgnoreCase("null")) {
             values.putNull(key);
@@ -734,7 +734,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendEveryMinute() {
-        Hashtable<String, String> params = prepareDataToPost();
+        Hashtable<String, String> params = prepareDataToPost(getApplicationContext(), user);
         new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
             @Override
             public void onSuccess(String result, int statusCode) {

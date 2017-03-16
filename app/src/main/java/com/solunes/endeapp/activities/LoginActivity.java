@@ -10,8 +10,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.solunes.endeapp.BuildConfig;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.models.User;
@@ -44,6 +46,8 @@ public class LoginActivity extends AppCompatActivity {
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
+
+        versionName();
 
         inputLayoutUser = (TextInputLayout) findViewById(R.id.input_user);
         inputLayoutPass = (TextInputLayout) findViewById(R.id.input_pass);
@@ -104,5 +108,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void versionName() {
+        TextView textView = (TextView) findViewById(R.id.label_version_name);
+        textView.setText("v" + BuildConfig.VERSION_NAME);
     }
 }

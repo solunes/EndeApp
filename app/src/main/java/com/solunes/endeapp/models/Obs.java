@@ -12,6 +12,8 @@ public class Obs {
     private int id;
     private String obsDes;
     private int obsTip;
+    private int obsAut;
+    private int obsInd;
     private int obsLec;
     private int obsFac;
 
@@ -19,6 +21,8 @@ public class Obs {
         id,
         ObsDes,
         ObsTip,
+        ObsAut,
+        ObsInd,
         ObsLec,
         ObsFac
     }
@@ -28,23 +32,27 @@ public class Obs {
         obs.setId(cursor.getInt(Columns.id.ordinal()));
         obs.setObsDes(cursor.getString(Columns.ObsDes.ordinal()));
         obs.setObsTip(cursor.getInt(Columns.ObsTip.ordinal()));
+        obs.setObsAut(cursor.getInt(Columns.ObsAut.ordinal()));
+        obs.setObsInd(cursor.getInt(Columns.ObsInd.ordinal()));
         obs.setObsLec(cursor.getInt(Columns.ObsLec.ordinal()));
         obs.setObsFac(cursor.getInt(Columns.ObsFac.ordinal()));
         return obs;
     }
 
-    public JSONObject toJson() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(Columns.id.name(), getId());
-            jsonObject.put(Columns.ObsDes.name(), getObsDes());
-            jsonObject.put(Columns.ObsTip.name(), getObsTip());
-            jsonObject.put(Columns.ObsLec.name(), getObsLec());
-            jsonObject.put(Columns.ObsFac.name(), getObsFac());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
+    public int getObsAut() {
+        return obsAut;
+    }
+
+    public void setObsAut(int obsAut) {
+        this.obsAut = obsAut;
+    }
+
+    public int getObsInd() {
+        return obsInd;
+    }
+
+    public void setObsInd(int obsInd) {
+        this.obsInd = obsInd;
     }
 
     public int getId() {

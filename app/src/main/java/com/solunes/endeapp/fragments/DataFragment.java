@@ -275,13 +275,20 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     if (input.isEmpty()) {
                         input = "0";
                     }
-                    final String finalInput = input;
 
                     // obtener tipo de lectura
                     int tipoLectura = dataModel.getTlxTipLec();
                     if (obs.getId() != 104) {
                         tipoLectura = obs.getObsLec();
                     }
+
+                    if (obs.getObsInd() == 1) {
+                        input = String.valueOf(dataModel.getTlxUltInd());
+                    } else if (obs.getObsInd() == 2) {
+                        input = "0";
+                    }
+
+                    final String finalInput = input;
 
                     // Precintos
                     if (dataModel.getTlxPotTag() == 1) {
@@ -452,10 +459,16 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 message += "\n- Consumo elevado";
                 isAlert = true;
                 autoObs.add(80);
+                if (obsLec(dbAdapter, 80)) {
+                    tipoLectura = 5;
+                }
             } else if (lecturaKwh < (conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_bajo.name()) / 100))) {
                 message += "\n- Consumo bajo";
                 isAlert = true;
                 autoObs.add(81);
+                if (obsLec(dbAdapter, 81)) {
+                    tipoLectura = 5;
+                }
             }
             if (giro) {
                 message += "\n- Giro de medidor";
@@ -598,7 +611,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     if (!inputPotenciaReading.getText().toString().isEmpty()) {
                         potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
                     }
-                    potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
+                    potenciaLeida = correccionPotencia(potenciaLeida, dataModel.getTlxDecPot());
                     dataModel.setTlxPotLei(potenciaLeida);
                 }
                 dataModel.setTlxTipLec(tipoLectura);
@@ -608,11 +621,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
             // correccion para consumo promedio
             if (tipoLectura == 3 || tipoLectura == 9) {
-                dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
                 dataModel.setTlxKwhDev(lectura);
-            } else {
-                dataModel.setTlxNvaLec(nuevaLectura);
             }
+
+            dataModel.setTlxNvaLec(nuevaLectura);
             dataModel.setTlxTipLec(tipoLectura);
             dataModel.setTlxConsumo(lectura);
 
@@ -661,7 +673,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 if (!inputPotenciaReading.getText().toString().isEmpty()) {
                     potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
                 }
-                potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
+                potenciaLeida = correccionPotencia(potenciaLeida, dataModel.getTlxDecPot());
                 dataModel.setTlxPotLei(potenciaLeida);
                 // maximo entre potencia anterior y potencia leida
                 int potMax = Math.max(potenciaLeida, dataModel.getTlxPotFac());
@@ -1310,7 +1322,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         return "" + value;
     }
 
-    private int correccionPotencia(String demPot, int lecturaPotencia, int decimales) {
+    public static int correccionPotencia(int lecturaPotencia, int decimales) {
         if (decimales == 0) {
             return (lecturaPotencia);
         }
@@ -1336,5 +1348,13 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             int intLecttura = Integer.parseInt(strlectura.substring(0, strlectura.length() - decimales));
             return (intLecttura + newInt);
         }
+    }
+
+    private boolean obsLec(DBAdapter dbAdapter, int obsCod) {
+        Obs obs1 = Obs.fromCursor(dbAdapter.getObs(obsCod));
+        if (obs1.getObsLec() == 5) {
+            return true;
+        }
+        return false;
     }
 }

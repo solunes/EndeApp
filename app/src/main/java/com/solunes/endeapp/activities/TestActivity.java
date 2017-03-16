@@ -2,13 +2,17 @@ package com.solunes.endeapp.activities;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.solunes.endeapp.R;
@@ -18,32 +22,76 @@ import com.solunes.endeapp.fragments.DataFragment;
 import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.DetalleFactura;
+import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.Resultados;
+import com.solunes.endeapp.models.User;
+import com.solunes.endeapp.networking.CallbackAPI;
+import com.solunes.endeapp.networking.GetRequest;
+import com.solunes.endeapp.networking.PostRequest;
+import com.solunes.endeapp.networking.Token;
 import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.StringUtils;
+import com.solunes.endeapp.utils.Urls;
+import com.solunes.endeapp.utils.UserPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.Map;
+
+import static com.solunes.endeapp.activities.MainActivity.prepareDataToPost;
+import static com.solunes.endeapp.activities.MainActivity.stringNull;
 
 public class TestActivity extends AppCompatActivity {
 
     private static final String TAG = "TestActivity";
     private DBAdapter dbAdapter;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         dbAdapter = new DBAdapter(getApplicationContext());
+        user = new User();
+        user.setLecCod("user1");
+        Button testDownload = (Button) findViewById(R.id.btn_test_download);
+        testDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                download();
+            }
+        });
+        Button testRun = (Button) findViewById(R.id.btn_test_run);
+        testRun.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startTest();
+            }
+        });
+
+        Button testSend = (Button) findViewById(R.id.btn_test_send);
+        testSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendRes();
+            }
+        });
     }
 
-    private void inicio(DataModel dataModel, int obsCod, String lecturaEnergia) {
-        final Obs obs = Obs.fromCursor(dbAdapter.getObs(obsCod));
+    private void inicio(DataModel dataModel, int lecturaEnergia, int lecturaPotencia, int obsCod) {
+        Cursor dbAdapterObs = dbAdapter.getObs(obsCod);
+        final Obs obs = Obs.fromCursor(dbAdapterObs);
+        dbAdapterObs.close();
 
         // obtener tipo de lectura
         int tipoLectura = dataModel.getTlxTipLec();
@@ -51,37 +99,27 @@ public class TestActivity extends AppCompatActivity {
             tipoLectura = obs.getObsLec();
         }
 
-        methodPequeñaMedianaDemanda(dataModel, lecturaEnergia, tipoLectura, obs);
+        if (obs.getObsInd() == 1) {
+            lecturaEnergia = dataModel.getTlxUltInd();
+        } else if (obs.getObsInd() == 2) {
+            lecturaEnergia = 0;
+        }
+
+        methodPequeñaMedianaDemanda(dataModel, lecturaEnergia, lecturaPotencia, tipoLectura, obs);
     }
 
-    private void methodPequeñaMedianaDemanda(DataModel dataModel, String lecturaEnergia, int tipoLectura, final Obs obs) {
+    private void methodPequeñaMedianaDemanda(DataModel dataModel, int lecturaEnergia, int lecturaPotencia, int tipoLectura, final Obs obs) {
 
-        int nuevaLectura;
         int lecturaKwh;
-
-        // si es mediana demanda se verifica que tiene potencia
-//        if (dataModel.getTlxTipDem() == 2 && tipoLectura != 3 && tipoLectura != 9) {
-//            if (inputPotenciaReading.getText().toString().isEmpty()) {
-//                Snackbar.make(view, "Ingresar indice de potencia", Snackbar.LENGTH_SHORT).show();
-//                return;
-//            }
-//        }
-
-        // Verificar y obtener la lectura inicial cuando sea requerida
-//        if (tipoLectura != 3 && tipoLectura != 9 && lecturaEnergia.isEmpty()) {
-//            Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
-//            return;
-//        } else {
         // obtener lectura de energia y verificar digitos
-        nuevaLectura = Integer.parseInt(lecturaEnergia);
+        int nuevaLectura = lecturaEnergia;
         if (nuevaLectura > dataModel.getTlxTope()) {
             return;
         }
         nuevaLectura = DataFragment.correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
-//        }
 
         // correccion si es que el consumo estimado tiene un indice mayor a cero, se vuelve una lectura normal
-        if (tipoLectura == 9 && nuevaLectura > 0) {
+        if (tipoLectura == 9 && lecturaEnergia > 0) {
             tipoLectura = 1;
         }
 
@@ -105,23 +143,20 @@ public class TestActivity extends AppCompatActivity {
             }
         }
 
-        final int finalLecturaKwh = lecturaKwh;
-        final int finalNuevaLectura = nuevaLectura;
-        final int finalTipoLectura = tipoLectura;
-
         // si hay alerta y el tipo de lectura no es postergada
-        confirmarLectura(dataModel, finalTipoLectura, finalNuevaLectura, finalLecturaKwh, obs);
+        confirmarLectura(dataModel, tipoLectura, nuevaLectura, lecturaPotencia, lecturaKwh, obs);
         dbAdapter.close();
     }
 
-    private void confirmarLectura(DataModel dataModel, int finalTipoLectura, int finalNuevaLectura, int finalLecturaKwh, Obs obs) {
-        boolean isCalculo = calculo(dataModel, finalTipoLectura, finalNuevaLectura, finalLecturaKwh, false, obs);
+    private void confirmarLectura(DataModel dataModel, int tipoLectura, int nuevaLectura, int lecturaPotencia, int finalLecturaKwh, Obs obs) {
+        boolean isCalculo = calculo(dataModel, tipoLectura, nuevaLectura, lecturaPotencia, finalLecturaKwh, false, obs);
         if (isCalculo) {
             saveLectura(dataModel, obs);
+            Log.e(TAG, "calculo: " + dataModel.getId());
         }
     }
 
-    private boolean calculo(DataModel dataModel, int tipoLectura, int nuevaLectura, int lectura, boolean reprint, Obs obs) {
+    private boolean calculo(DataModel dataModel, int tipoLectura, int nuevaLectura, int lecturaPotencia, int lectura, boolean reprint, Obs obs) {
         // revisar si no es reimpresion, para no realizar el calculo de nuevo
         if (!reprint) {
             if (obs.getObsFac() == 0) {
@@ -140,14 +175,10 @@ public class TestActivity extends AppCompatActivity {
 
             if (tipoLectura == 5) {
                 dataModel.setTlxNvaLec(nuevaLectura);
-//                if (dataModel.getTlxTipDem() == 2) {
-//                    int potenciaLeida = 0;
-//                    if (!inputPotenciaReading.getText().toString().isEmpty()) {
-//                        potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
-//                    }
-//                    potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
-//                    dataModel.setTlxPotLei(potenciaLeida);
-//                }
+                if (dataModel.getTlxTipDem() == 2) {
+                    lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
+                    dataModel.setTlxPotLei(lecturaPotencia);
+                }
                 dataModel.setTlxTipLec(tipoLectura);
                 dataModel.setTlxImpAvi(0);
                 return true;
@@ -194,34 +225,25 @@ public class TestActivity extends AppCompatActivity {
         }
 
         // calculo de potencia para mediana demanda
-//        double importePotencia = 0;
-//        if (dataModel.getTlxTipDem() == 2) {
-//            if (!reprint) {
-        // correccion de digitos para la potencia leida
-//                int potenciaLeida = 0;
-//                if (!inputPotenciaReading.getText().toString().isEmpty()) {
-//                    potenciaLeida = Integer.valueOf(inputPotenciaReading.getText().toString());
-//                }
-//                potenciaLeida = correccionPotencia(dataModel.getTlxDemPot(), potenciaLeida, dataModel.getTlxDecPot());
-//                dataModel.setTlxPotLei(potenciaLeida);
-        // maximo entre potencia anterior y potencia leida
-//                int potMax = Math.max(potenciaLeida, dataModel.getTlxPotFac());
-        // calculo del importe por potencia
-//                double cargoPotencia = dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
+        double importePotencia = 0;
+        if (dataModel.getTlxTipDem() == 2) {
+            if (!reprint) {
+                // correccion de digitos para la potencia leida
+                lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
+                dataModel.setTlxPotLei(lecturaPotencia);
+                // maximo entre potencia anterior y potencia leida
+                int potMax = Math.max(lecturaPotencia, dataModel.getTlxPotFac());
+                // calculo del importe por potencia
+                double cargoPotencia = dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
 //                if (cargoPotencia == -1) {
 //                    Toast.makeText(getContext(), "No hay cargo de potencia", Toast.LENGTH_LONG).show();
 //                    return false;
 //                }
-//                importePotencia = potMax * cargoPotencia;
-//                importePotencia = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 41, importePotencia);
-//                dataModel.setTlxImpPot(importePotencia);
-//            }
-
-        // agregar el importe por potencia al array de impresion
-//            printTitles.add(dbAdapter.getItemDescription(41));
-//            printValues.add(GenLecturas.round(dataModel.getTlxImpPot()));
-//        }
-
+                importePotencia = potMax * cargoPotencia;
+                importePotencia = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 41, importePotencia);
+                dataModel.setTlxImpPot(importePotencia);
+            }
+        }
 
         double importeConsumo = GenLecturas.round(dataModel.getTlxCarFij() + dataModel.getTlxImpEn() + dataModel.getTlxImpPot());
 
@@ -274,7 +296,7 @@ public class TestActivity extends AppCompatActivity {
 //            }
             totalSuministroTap = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 153, totalSuministroTap);
 
-            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
+            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), totalConsumo);
 //            if (totalSuministroAseo == -1) {
 //                Toast.makeText(getApplicationContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
 //                return false;
@@ -360,5 +382,241 @@ public class TestActivity extends AppCompatActivity {
         dbAdapter.saveObject(DBHelper.DATA_OBS_TABLE, cv);
 
         dbAdapter.close();
+    }
+
+    private void sleeper(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void download() {
+        final String url = Urls.urlDescarga(getApplicationContext()) + user.getLecCod();
+        Token.getToken(getApplicationContext(), user, new Token.CallbackToken() {
+            @Override
+            public void onSuccessToken() {
+                new GetRequest(getApplicationContext(), url, new CallbackAPI() {
+                    @Override
+                    public void onSuccess(final String result, int statusCode) {
+                        Runnable runSaveData = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                boolean response = false;
+                                try {
+                                    response = processResponse(result);
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "onSuccess: ", e);
+                                }
+                                Log.e(TAG, "run: res: " + response);
+                            }
+                        };
+                        new Thread(runSaveData).start();
+                    }
+
+                    @Override
+                    public void onFailed(String reason, int statusCode) {
+                        Log.e(TAG, "onFailed: " + reason);
+                    }
+                }).execute();
+            }
+
+            @Override
+            public void onFailToken() {
+                Log.e(TAG, "onFailToken: ");
+            }
+        });
+    }
+
+    private boolean processResponse(String result) throws JSONException {
+        JSONArray results = new JSONArray(result);
+        DBAdapter dbAdapter = new DBAdapter(this);
+        dbAdapter.beforeDownloadData();
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject object = results.getJSONObject(i);
+            ContentValues values = new ContentValues();
+
+            values.put(DataModel.Columns.id.name(), object.getInt(DataModel.Columns.id.name()));
+            values.put(DataModel.Columns.TlxRem.name(), object.getInt(DataModel.Columns.TlxRem.name()));
+            values.put(DataModel.Columns.TlxAre.name(), object.getInt(DataModel.Columns.TlxAre.name()));
+            values.put(DataModel.Columns.TlxRutO.name(), object.getInt(DataModel.Columns.TlxRutO.name()));
+            values.put(DataModel.Columns.TlxRutA.name(), object.getInt(DataModel.Columns.TlxRutA.name()));
+            values.put(DataModel.Columns.TlxAno.name(), object.getInt(DataModel.Columns.TlxAno.name()));
+            values.put(DataModel.Columns.TlxMes.name(), object.getInt(DataModel.Columns.TlxMes.name()));
+            values.put(DataModel.Columns.TlxCli.name(), object.getDouble(DataModel.Columns.TlxCli.name()));
+            values.put(DataModel.Columns.TlxDav.name(), object.getInt(DataModel.Columns.TlxDav.name()));
+            values.put(DataModel.Columns.TlxEstCli.name(), object.getInt(DataModel.Columns.TlxEstCli.name()));
+            values.put(DataModel.Columns.TlxOrdTpl.name(), object.getInt(DataModel.Columns.TlxOrdTpl.name()));
+            values.put(DataModel.Columns.TlxNom.name(), object.getString(DataModel.Columns.TlxNom.name()).trim());
+            values.put(DataModel.Columns.TlxDir.name(), object.getString(DataModel.Columns.TlxDir.name()).trim());
+            values.put(DataModel.Columns.TlxCtaAnt.name(), object.getString(DataModel.Columns.TlxCtaAnt.name()).trim());
+            values.put(DataModel.Columns.TlxCtg.name(), object.getString(DataModel.Columns.TlxCtg.name()).trim());
+            values.put(DataModel.Columns.TlxCtgTap.name(), object.getInt(DataModel.Columns.TlxCtgTap.name()));
+            values.put(DataModel.Columns.TlxCtgAseo.name(), object.getInt(DataModel.Columns.TlxCtgAseo.name()));
+            values.put(DataModel.Columns.TlxNroMed.name(), object.getString(DataModel.Columns.TlxNroMed.name()).trim());
+            values.put(DataModel.Columns.TlxNroDig.name(), object.getInt(DataModel.Columns.TlxNroDig.name()));
+            values.put(DataModel.Columns.TlxFacMul.name(), object.getDouble(DataModel.Columns.TlxFacMul.name()));
+            values.put(DataModel.Columns.TlxFecAnt.name(), object.getString(DataModel.Columns.TlxFecAnt.name()).trim());
+            values.put(DataModel.Columns.TlxFecLec.name(), object.getString(DataModel.Columns.TlxFecLec.name()).trim());
+            values.put(DataModel.Columns.TlxUltInd.name(), object.getInt(DataModel.Columns.TlxUltInd.name()));
+            values.put(DataModel.Columns.TlxConPro.name(), object.getInt(DataModel.Columns.TlxConPro.name()));
+            values.put(DataModel.Columns.TlxTipLec.name(), object.getInt(DataModel.Columns.TlxTipLec.name()));
+            values.put(DataModel.Columns.TlxSgl.name(), object.getString(DataModel.Columns.TlxSgl.name()).trim());
+            values.put(DataModel.Columns.TlxTipDem.name(), object.getInt(DataModel.Columns.TlxTipDem.name()));
+            values.put(DataModel.Columns.TlxOrdSeq.name(), object.getInt(DataModel.Columns.TlxOrdSeq.name()));
+            values.put(DataModel.Columns.TlxLeePot.name(), object.getInt(DataModel.Columns.TlxLeePot.name()));
+            values.put(DataModel.Columns.TlxCotaseo.name(), object.getInt(DataModel.Columns.TlxCotaseo.name()));
+            values.put(DataModel.Columns.TlxTap.name(), object.getDouble(DataModel.Columns.TlxTap.name()));
+            values.put(DataModel.Columns.TlxPotCon.name(), object.getInt(DataModel.Columns.TlxPotCon.name()));
+            values.put(DataModel.Columns.TlxPotFac.name(), object.getInt(DataModel.Columns.TlxPotFac.name()));
+            values.put(DataModel.Columns.TlxCliNit.name(), object.getString(DataModel.Columns.TlxCliNit.name()));
+            values.put(DataModel.Columns.TlxFecCor.name(), object.getString(DataModel.Columns.TlxFecCor.name()).trim());
+            values.put(DataModel.Columns.TlxFecVto.name(), object.getString(DataModel.Columns.TlxFecVto.name()).trim());
+            values.put(DataModel.Columns.TlxFecproEmi.name(), object.getString(DataModel.Columns.TlxFecproEmi.name()).trim());
+            values.put(DataModel.Columns.TlxFecproMed.name(), object.getString(DataModel.Columns.TlxFecproMed.name()).trim());
+            values.put(DataModel.Columns.TlxTope.name(), object.getInt(DataModel.Columns.TlxTope.name()));
+            values.put(DataModel.Columns.TlxLeyTag.name(), object.getInt(DataModel.Columns.TlxLeyTag.name()));
+            values.put(DataModel.Columns.TlxTpoTap.name(), object.getInt(DataModel.Columns.TlxTpoTap.name()));
+            values.put(DataModel.Columns.TlxKwhAdi.name(), object.getInt(DataModel.Columns.TlxKwhAdi.name()));
+            values.put(DataModel.Columns.TlxImpAvi.name(), object.getInt(DataModel.Columns.TlxImpAvi.name()));
+            values.put(DataModel.Columns.TlxCarFac.name(), object.getInt(DataModel.Columns.TlxCarFac.name()));
+            values.put(DataModel.Columns.TlxDeuEneC.name(), object.getInt(DataModel.Columns.TlxDeuEneC.name()));
+            values.put(DataModel.Columns.TlxDeuEneI.name(), object.getDouble(DataModel.Columns.TlxDeuEneI.name()));
+            values.put(DataModel.Columns.TlxDeuAseC.name(), object.getInt(DataModel.Columns.TlxDeuAseC.name()));
+            values.put(DataModel.Columns.TlxDeuAseI.name(), object.getDouble(DataModel.Columns.TlxDeuAseI.name()));
+            values.put(DataModel.Columns.TlxFecEmi.name(), object.getString(DataModel.Columns.TlxFecEmi.name()).trim());
+            values.put(DataModel.Columns.TlxUltPag.name(), object.getString(DataModel.Columns.TlxUltPag.name()).trim());
+            values.put(DataModel.Columns.TlxEstado.name(), object.getInt(DataModel.Columns.TlxEstado.name()));
+            values.put(DataModel.Columns.TlxUltObs.name(), object.getString(DataModel.Columns.TlxUltObs.name()).trim());
+            values.put(DataModel.Columns.TlxActivi.name(), object.getString(DataModel.Columns.TlxActivi.name()).trim());
+            values.put(DataModel.Columns.TlxCiudad.name(), object.getString(DataModel.Columns.TlxCiudad.name()).trim());
+            values.put(DataModel.Columns.TlxFacNro.name(), object.getString(DataModel.Columns.TlxFacNro.name()).trim());
+            values.put(DataModel.Columns.TlxNroAut.name(), object.getString(DataModel.Columns.TlxNroAut.name()).trim());
+            values.put(DataModel.Columns.TlxCodCon.name(), object.getString(DataModel.Columns.TlxCodCon.name()).trim());
+            values.put(DataModel.Columns.TlxFecLim.name(), object.getString(DataModel.Columns.TlxFecLim.name()).trim());
+            values.put(DataModel.Columns.TlxKwhDev.name(), object.getInt(DataModel.Columns.TlxKwhDev.name()));
+            values.put(DataModel.Columns.TlxUltTipL.name(), object.getInt(DataModel.Columns.TlxUltTipL.name()));
+            values.put(DataModel.Columns.TlxCliNew.name(), object.getInt(DataModel.Columns.TlxCliNew.name()));
+            values.put(DataModel.Columns.TlxEntEne.name(), object.getInt(DataModel.Columns.TlxEntEne.name()));
+            values.put(DataModel.Columns.TlxDecEne.name(), object.getInt(DataModel.Columns.TlxDecEne.name()));
+            values.put(DataModel.Columns.TlxEntPot.name(), object.getInt(DataModel.Columns.TlxEntPot.name()));
+            values.put(DataModel.Columns.TlxDecPot.name(), object.getInt(DataModel.Columns.TlxDecPot.name()));
+            values.put(DataModel.Columns.TlxDemPot.name(), object.getString(DataModel.Columns.TlxDemPot.name()).trim());
+            values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name()).trim()));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name()).trim()));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name()).trim()));
+            values.putAll(stringNull(DataModel.Columns.TlxPreAnt4.name(), object.getString(DataModel.Columns.TlxPreAnt4.name()).trim()));
+            values.putAll(stringNull(DataModel.Columns.TlxDebAuto.name(), object.getString(DataModel.Columns.TlxDebAuto.name()).trim()));
+            values.putAll(stringNull(DataModel.Columns.TlxRecordatorio.name(), object.getString(DataModel.Columns.TlxRecordatorio.name()).trim()));
+            values.put(DataModel.Columns.estado_lectura.name(), 0);
+            values.put(DataModel.Columns.enviado.name(), 0);
+            values.put(DataModel.Columns.TlxDignidad.name(), object.getInt(DataModel.Columns.TlxDignidad.name()));
+            dbAdapter.saveObject(DBHelper.DATA_TABLE, values);
+
+            try {
+                JSONObject historico = object.getJSONObject("historico");
+                Log.e(TAG, "processResponse: " + historico.toString());
+                ContentValues valuesH = new ContentValues();
+                valuesH.put(Historico.Columns.id.name(), historico.getInt(Historico.Columns.id.name()));
+                valuesH.put(Historico.Columns.general_id.name(), historico.getInt(Historico.Columns.general_id.name()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes01.name(), historico.getString(Historico.Columns.ConMes01.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes02.name(), historico.getString(Historico.Columns.ConMes02.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes03.name(), historico.getString(Historico.Columns.ConMes03.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes04.name(), historico.getString(Historico.Columns.ConMes04.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes05.name(), historico.getString(Historico.Columns.ConMes05.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes06.name(), historico.getString(Historico.Columns.ConMes06.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes07.name(), historico.getString(Historico.Columns.ConMes07.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes08.name(), historico.getString(Historico.Columns.ConMes08.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes09.name(), historico.getString(Historico.Columns.ConMes09.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes10.name(), historico.getString(Historico.Columns.ConMes10.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes11.name(), historico.getString(Historico.Columns.ConMes11.name()).trim()));
+                valuesH.putAll(stringNull(Historico.Columns.ConMes12.name(), historico.getString(Historico.Columns.ConMes12.name()).trim()));
+                valuesH.put(Historico.Columns.ConKwh01.name(), historico.getInt(Historico.Columns.ConKwh01.name()));
+                valuesH.put(Historico.Columns.ConKwh02.name(), historico.getInt(Historico.Columns.ConKwh02.name()));
+                valuesH.put(Historico.Columns.ConKwh03.name(), historico.getInt(Historico.Columns.ConKwh03.name()));
+                valuesH.put(Historico.Columns.ConKwh04.name(), historico.getInt(Historico.Columns.ConKwh04.name()));
+                valuesH.put(Historico.Columns.ConKwh05.name(), historico.getInt(Historico.Columns.ConKwh05.name()));
+                valuesH.put(Historico.Columns.ConKwh06.name(), historico.getInt(Historico.Columns.ConKwh06.name()));
+                valuesH.put(Historico.Columns.ConKwh07.name(), historico.getInt(Historico.Columns.ConKwh07.name()));
+                valuesH.put(Historico.Columns.ConKwh08.name(), historico.getInt(Historico.Columns.ConKwh08.name()));
+                valuesH.put(Historico.Columns.ConKwh09.name(), historico.getInt(Historico.Columns.ConKwh09.name()));
+                valuesH.put(Historico.Columns.ConKwh10.name(), historico.getInt(Historico.Columns.ConKwh10.name()));
+                valuesH.put(Historico.Columns.ConKwh11.name(), historico.getInt(Historico.Columns.ConKwh11.name()));
+                valuesH.put(Historico.Columns.ConKwh12.name(), historico.getInt(Historico.Columns.ConKwh12.name()));
+                dbAdapter.saveObject(DBHelper.HISTORICO_TABLE, valuesH);
+            } catch (Exception e) {
+                Log.e(TAG, "historico nulo", e);
+            }
+
+            JSONObject resultado = object.getJSONObject("resultados");
+            ContentValues valuesRes = new ContentValues();
+            valuesRes.put(Resultados.Columns.id.name(), resultado.getInt(Resultados.Columns.id.name()));
+            valuesRes.put(Resultados.Columns.general_id.name(), resultado.getInt(Resultados.Columns.general_id.name()));
+            valuesRes.put(Resultados.Columns.lectura.name(), resultado.getInt(Resultados.Columns.lectura.name()));
+            valuesRes.put(Resultados.Columns.lectura_potencia.name(), resultado.getDouble(Resultados.Columns.lectura_potencia.name()));
+            valuesRes.put(Resultados.Columns.observacion.name(), resultado.getDouble(Resultados.Columns.observacion.name()));
+            dbAdapter.saveObject(DBHelper.RESULTADOS_TABLE, valuesRes);
+
+            JSONArray detalleFacturaArray = object.getJSONArray("detalle_factura");
+            Log.e(TAG, "processResponse: " + detalleFacturaArray.toString());
+            for (int j = 0; j < detalleFacturaArray.length(); j++) {
+                JSONObject detalleFactura = detalleFacturaArray.getJSONObject(j);
+                ContentValues valuesDF = new ContentValues();
+                valuesDF.put(DetalleFactura.Columns.id.name(), detalleFactura.getInt(DetalleFactura.Columns.id.name()));
+                valuesDF.put(DetalleFactura.Columns.general_id.name(), detalleFactura.getInt(DetalleFactura.Columns.general_id.name()));
+                valuesDF.put(DetalleFactura.Columns.item_facturacion_id.name(), detalleFactura.getInt(DetalleFactura.Columns.item_facturacion_id.name()));
+                valuesDF.put(DetalleFactura.Columns.importe.name(), detalleFactura.getDouble(DetalleFactura.Columns.importe.name()));
+                valuesDF.put(DetalleFactura.Columns.imp_redondeo.name(), detalleFactura.getDouble(DetalleFactura.Columns.imp_redondeo.name()));
+                dbAdapter.saveObject(DBHelper.DETALLE_FACTURA_TABLE, valuesDF);
+            }
+        }
+        dbAdapter.close();
+        return results.length() > 0;
+    }
+
+    private void sendRes() {
+        Hashtable<String, String> params = prepareDataToPost(getApplicationContext(), user);
+        new PostRequest(getApplicationContext(), params, null, Urls.urlSubida(getApplicationContext()), new CallbackAPI() {
+            @Override
+            public void onSuccess(String result, int statusCode) {
+                Log.e(TAG, "onSuccess: " + result);
+                Toast.makeText(TestActivity.this, "Ressultados enviados", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String reason, int statusCode) {
+                Log.e(TAG, "onFailed: " + reason);
+                Toast.makeText(TestActivity.this, reason, Toast.LENGTH_SHORT).show();
+            }
+        }).execute();
+    }
+
+    private void startTest() {
+        new AsyncTask<Boolean, Void, Boolean>() {
+
+
+            @Override
+            protected Boolean doInBackground(Boolean... booleen) {
+//                ArrayList<Integer> integers = new ArrayList<>();
+//                integers.add(5903);
+//                for (int id : integers) {
+//                    DataModel data = dbAdapter.getData(id);
+//                    Resultados dataRes = dbAdapter.getDataRes(data.getId());
+//                    inicio(data, dataRes.getLectura(), dataRes.getObservacion());
+//                }
+
+                for (DataModel dataModel : dbAdapter.getAllData()) {
+                    Resultados dataRes = dbAdapter.getDataRes(dataModel.getId());
+                    inicio(dataModel, dataRes.getLectura(), dataRes.getLecturaPotencia(), dataRes.getObservacion());
+                }
+                Log.e(TAG, "doInBackground: finish");
+
+                return Boolean.TRUE;
+            }
+
+        }.execute();
     }
 }

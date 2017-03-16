@@ -17,6 +17,7 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
+import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
@@ -34,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "endeapp.db";
     // este es el numero de version de la base de datos,
     // cuando se hace un cambio en la base de datos se debe incrementar el numero
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 23;
 
     // nombres de las tablas de la base de datos
 
@@ -54,6 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TARIFA_ASEO_TABLE = "tarifa_aseo_table";
     public static final String DETALLE_FACTURA_TABLE = "detalle_factura_table";
     public static final String LIMITES_MAXIMOS_TABLE = "limites_maximos_table";
+    public static final String RESULTADOS_TABLE = "resultados_table";
 
     private Context context;
 
@@ -90,6 +92,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 Obs.Columns.id.name() + " integer, " +
                 Obs.Columns.ObsDes.name() + " text, " +
                 Obs.Columns.ObsTip.name() + " integer, " +
+                Obs.Columns.ObsAut.name() + " integer, " +
+                Obs.Columns.ObsInd.name() + " integer, " +
                 Obs.Columns.ObsLec.name() + " integer, " +
                 Obs.Columns.ObsFac.name() + " integer)");
 
@@ -318,6 +322,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 LimitesMaximos.Columns.max_kwh.name() + " integer," +
                 LimitesMaximos.Columns.max_bs.name() + " integer)");
 
+        sqLiteDatabase.execSQL("CREATE TABLE " + RESULTADOS_TABLE + " (" +
+                Resultados.Columns.id.name() + " integer," +
+                Resultados.Columns.general_id.name() + " integer," +
+                Resultados.Columns.lectura.name() + " integer," +
+                Resultados.Columns.lectura_potencia.name() + " integer," +
+                Resultados.Columns.observacion.name() + " integer)");
+
         // inserts
         // TODO: 25-11-16 encriptacion
         String encriptPass = null;
@@ -355,6 +366,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TARIFA_ASEO_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DETALLE_FACTURA_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LIMITES_MAXIMOS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RESULTADOS_TABLE);
 
         onCreate(sqLiteDatabase);
     }

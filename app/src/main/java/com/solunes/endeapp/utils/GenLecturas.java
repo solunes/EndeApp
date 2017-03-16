@@ -60,6 +60,7 @@ public class GenLecturas {
         boolean finish = false;
         // se obtienen los rangos de energia para la categoria
         ArrayList<Tarifa> cargoEnergia = dbAdapter.getCargoEnergia(categoria);
+        dbAdapter.close();
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
             // se define si el consumo restante es mayor a todo el rango o no
@@ -110,8 +111,6 @@ public class GenLecturas {
         DBAdapter dbAdapter = new DBAdapter(context);
         int limite = (int) dbAdapter.getParametroValor(Parametro.Values.dignidad_limite.name());
         double descuento = dbAdapter.getParametroValor(Parametro.Values.dignidad_descuento.name()) / 100;
-        Log.e(TAG, "tarifaDignidad: limite " + limite);
-        Log.e(TAG, "tarifaDignidad: descuento " + descuento);
         if (kWhConsumo <= limite) {
             return round(importeConsumo * -descuento);
         } else {
@@ -131,8 +130,6 @@ public class GenLecturas {
         DBAdapter dbAdapter = new DBAdapter(context);
         int limite = (int) dbAdapter.getParametroValor(Parametro.Values.limite_1886.name());
         double descuento = (dbAdapter.getParametroValor(Parametro.Values.descuento_1886.name()) / 100);
-        Log.e(TAG, "ley1886: limite " + limite);
-        Log.e(TAG, "ley1886: descuento " + descuento);
         if (kWhConsumo <= limite) {
             return round(-descuento * (dbAdapter.getCargoFijo(categoria) + subTotal(context, kWhConsumo, categoria, 0)));
         } else {
@@ -178,11 +175,11 @@ public class GenLecturas {
      * @param kWhConsumo los Kwh de consumo
      * @return si hay aseo, se obtiene la tarifa de aseo de la tabla tarifa_aseo, si no hay se devuelve 0
      */
-    public static double totalSuministroAseo(DataModel dataModel, Context context, int kWhConsumo) {
+    public static double totalSuministroAseo(DataModel dataModel, Context context, double kWhConsumo) {
         DBAdapter dbAdapter = new DBAdapter(context);
         double importeAseo = 0;
         if (dataModel.getTlxCotaseo() != 0) {
-            importeAseo = dbAdapter.getImporteAseo(dataModel.getTlxCtg(), dataModel.getTlxMes(), dataModel.getTlxAno(), kWhConsumo);
+            importeAseo = dbAdapter.getImporteAseo(dataModel.getTlxCtgAseo(), dataModel.getTlxMes(), dataModel.getTlxAno(), kWhConsumo);
         }
         dbAdapter.close();
         return round(importeAseo);
@@ -232,9 +229,18 @@ public class GenLecturas {
      * @return retorna un decimal redondeado
      */
     public static double roundDecimal(double value, int decimal) {
+        boolean isNegative = false;
+        if (value < 0) {
+            value = Math.abs(value);
+            isNegative = true;
+        }
         long factor = (long) Math.pow(10, decimal);
         value = value * factor;
         long tmp = Math.round(value);
-        return (double) tmp / factor;
+        double res = (double) tmp / factor;
+        if (isNegative) {
+            res = -res;
+        }
+        return res;
     }
 }
