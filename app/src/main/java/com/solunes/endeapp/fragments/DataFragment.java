@@ -25,6 +25,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.solunes.endeapp.R;
+import com.solunes.endeapp.adapters.SingleChoiceAdapter;
 import com.solunes.endeapp.control_code.ControlCode;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
@@ -41,6 +42,7 @@ import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.NumberToLetterConverter;
 import com.solunes.endeapp.utils.PrintGenerator;
+import com.solunes.endeapp.utils.SingleChoiceItem;
 import com.solunes.endeapp.utils.StringUtils;
 
 import org.json.JSONObject;
@@ -340,23 +342,27 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Selecionar una observación");
                 DBAdapter dbAdapter = new DBAdapter(getContext());
-                Cursor cursor = dbAdapter.getObs();
-                final String[] stringObs = new String[cursor.getCount()];
+                final Cursor cursor = dbAdapter.getObs();
+                final ArrayList<SingleChoiceItem> items = new ArrayList<>();
                 for (int i = 0; i < cursor.getCount(); i++) {
                     cursor.moveToNext();
-                    stringObs[i] = Obs.fromCursor(cursor).getObsDes();
+                    Obs obs = Obs.fromCursor(cursor);
+                    SingleChoiceItem choiceItem = new SingleChoiceItem();
+                    choiceItem.setCode(obs.getId());
+                    choiceItem.setTitle(obs.getObsDes());
+                    choiceItem.setObsInd(obs.getObsInd());
+                    items.add(choiceItem);
                 }
                 cursor.close();
                 dbAdapter.close();
-                alertDialog.setSingleChoiceItems(stringObs, -1, new DialogInterface.OnClickListener() {
+
+                alertDialog.setSingleChoiceItems(new SingleChoiceAdapter(getContext(), items), -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position) {
                         dialogInterface.dismiss();
-                        DBAdapter dbAdapter = new DBAdapter(getContext());
-                        Obs obs = Obs.fromCursor(dbAdapter.getObs(stringObs[position]));
-                        dbAdapter.close();
-                        labelObs.setText(obs.getObsDes());
-                        inputObsCode.setText(String.valueOf(obs.getId()));
+                        SingleChoiceItem choiceItem = items.get(position);
+                        labelObs.setText(choiceItem.getTitle());
+                        inputObsCode.setText(String.valueOf(choiceItem.getCode()));
                     }
                 });
                 alertDialog.show();
