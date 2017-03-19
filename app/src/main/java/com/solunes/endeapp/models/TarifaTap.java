@@ -8,7 +8,6 @@ import android.database.Cursor;
 
 public class TarifaTap {
     private int id;
-    private int area_id;
     private int categoria_tarifa_id;
     private int anio;
     private int mes;
@@ -16,7 +15,6 @@ public class TarifaTap {
 
     public enum Columns {
         id,
-        area_id,
         categoria_tarifa_id,
         anio,
         mes,
@@ -26,7 +24,6 @@ public class TarifaTap {
     public static TarifaTap fromCursor(Cursor cursor){
         TarifaTap tarifaTap = new TarifaTap();
         tarifaTap.setId(cursor.getInt(Columns.id.ordinal()));
-        tarifaTap.setArea_id(cursor.getInt(Columns.area_id.ordinal()));
         tarifaTap.setCategoria_tarifa_id(cursor.getInt(Columns.categoria_tarifa_id.ordinal()));
         tarifaTap.setAnio(cursor.getInt(Columns.anio.ordinal()));
         tarifaTap.setMes(cursor.getInt(Columns.mes.ordinal()));
@@ -40,14 +37,6 @@ public class TarifaTap {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getArea_id() {
-        return area_id;
-    }
-
-    public void setArea_id(int area_id) {
-        this.area_id = area_id;
     }
 
     public int getCategoria_tarifa_id() {

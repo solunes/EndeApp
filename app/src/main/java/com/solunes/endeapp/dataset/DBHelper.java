@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "endeapp.db";
     // este es el numero de version de la base de datos,
     // cuando se hace un cambio en la base de datos se debe incrementar el numero
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 24;
 
     // nombres de las tablas de la base de datos
 
@@ -294,7 +294,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TARIFA_TAP_TABLE + " (" +
                 TarifaTap.Columns.id.name() + " integer," +
-                TarifaTap.Columns.area_id.name() + " integer," +
                 TarifaTap.Columns.categoria_tarifa_id.name() + " integer," +
                 TarifaTap.Columns.anio.name() + " integer," +
                 TarifaTap.Columns.mes.name() + " integer," +

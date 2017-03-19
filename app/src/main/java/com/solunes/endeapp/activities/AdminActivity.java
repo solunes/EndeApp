@@ -339,7 +339,6 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = tarifaTap.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(TarifaTap.Columns.id.name(), object.getInt(TarifaTap.Columns.id.name()));
-            values.put(TarifaTap.Columns.area_id.name(), object.getInt(TarifaTap.Columns.area_id.name()));
             values.put(TarifaTap.Columns.categoria_tarifa_id.name(), object.getInt(TarifaTap.Columns.categoria_tarifa_id.name()));
             values.put(TarifaTap.Columns.anio.name(), object.getInt(TarifaTap.Columns.anio.name()));
             values.put(TarifaTap.Columns.mes.name(), object.getInt(TarifaTap.Columns.mes.name()));

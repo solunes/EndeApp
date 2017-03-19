@@ -647,7 +647,7 @@ public class DBAdapter {
         open();
         Cursor cursor = db.query(DBHelper.HISTORICO_TABLE, null, Historico.Columns.general_id.name() + " = " + idData, null, null, null, null);
         cursor.moveToNext();
-        if (cursor.getCount() > 0){
+        if (cursor.getCount() > 0) {
             Historico historico = Historico.fromCursor(cursor);
             cursor.close();
             return historico;
@@ -680,10 +680,9 @@ public class DBAdapter {
         return cursorString;
     }
 
-    public double getValorTAP(int area, int categoriaTarifa, int mes, int anio) {
+    public double getValorTAP(int categoriaTarifa, int mes, int anio) {
         open();
-        Cursor cursor = db.query(DBHelper.TARIFA_TAP_TABLE, null, TarifaTap.Columns.area_id.name() + " = " + area +
-                " AND " + TarifaTap.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
+        Cursor cursor = db.query(DBHelper.TARIFA_TAP_TABLE, null, TarifaTap.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
                 " AND " + TarifaTap.Columns.mes.name() + " = " + mes +
                 " AND " + TarifaTap.Columns.anio.name() + " = " + anio, null, null, null, null);
         cursor.moveToFirst();
@@ -696,7 +695,7 @@ public class DBAdapter {
         return -1;
     }
 
-    public double getImporteAseo(int categoriaTarifa, int mes, int anio, double kwhConsumo) {
+    public double getImporteAseo(int categoriaTarifa, int mes, int anio, int kwhConsumo) {
         open();
         Cursor cursor = db.query(DBHelper.TARIFA_ASEO_TABLE, null, TarifaAseo.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
                 " AND " + TarifaAseo.Columns.mes.name() + " = " + mes +

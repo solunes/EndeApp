@@ -296,7 +296,7 @@ public class TestActivity extends AppCompatActivity {
 //            }
             totalSuministroTap = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 153, totalSuministroTap);
 
-            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), totalConsumo);
+            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
 //            if (totalSuministroAseo == -1) {
 //                Toast.makeText(getApplicationContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
 //                return false;

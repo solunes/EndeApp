@@ -161,7 +161,7 @@ public class GenLecturas {
         DBAdapter dbAdapter = new DBAdapter(context);
         double valorTAP = 0;
         if (dataModel.getTlxTap() != 0) {
-            valorTAP = dbAdapter.getValorTAP(dataModel.getTlxAre(), dataModel.getTlxCtgTap(), dataModel.getTlxMes(), dataModel.getTlxAno());
+            valorTAP = dbAdapter.getValorTAP(dataModel.getTlxCtgTap(), dataModel.getTlxMes(), dataModel.getTlxAno());
         }
         dbAdapter.close();
         return round(importeEnergia * valorTAP);
@@ -175,7 +175,7 @@ public class GenLecturas {
      * @param kWhConsumo los Kwh de consumo
      * @return si hay aseo, se obtiene la tarifa de aseo de la tabla tarifa_aseo, si no hay se devuelve 0
      */
-    public static double totalSuministroAseo(DataModel dataModel, Context context, double kWhConsumo) {
+    public static double totalSuministroAseo(DataModel dataModel, Context context, int kWhConsumo) {
         DBAdapter dbAdapter = new DBAdapter(context);
         double importeAseo = 0;
         if (dataModel.getTlxCotaseo() != 0) {
