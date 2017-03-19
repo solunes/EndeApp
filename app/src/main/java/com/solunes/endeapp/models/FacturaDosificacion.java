@@ -8,7 +8,6 @@ import android.database.Cursor;
 
 public class FacturaDosificacion {
     private int id;
-    private int areaId;
     private int numero;
     private int comprobante;
     private String fechaInicial;
@@ -23,7 +22,6 @@ public class FacturaDosificacion {
 
     public enum Columns{
         id,
-        area_id,
         numero,
         comprobante,
         fecha_inicial,
@@ -40,7 +38,6 @@ public class FacturaDosificacion {
     public static FacturaDosificacion fromCursor(Cursor cursor){
         FacturaDosificacion dosificacion = new FacturaDosificacion();
         dosificacion.setId(cursor.getInt(Columns.id.ordinal()));
-        dosificacion.setAreaId(cursor.getInt(Columns.area_id.ordinal()));
         dosificacion.setNumero(cursor.getInt(Columns.numero.ordinal()));
         dosificacion.setComprobante(cursor.getInt(Columns.comprobante.ordinal()));
         dosificacion.setFechaInicial(cursor.getString(Columns.fecha_inicial.ordinal()));
@@ -61,14 +58,6 @@ public class FacturaDosificacion {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getAreaId() {
-        return areaId;
-    }
-
-    public void setAreaId(int areaId) {
-        this.areaId = areaId;
     }
 
     public int getNumero() {

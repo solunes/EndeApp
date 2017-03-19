@@ -670,10 +670,10 @@ public class DBAdapter {
         return -1;
     }
 
-    public String getLlaveDosificacion(int are) {
+    public String getLlaveDosificacion() {
         open();
         Cursor cursor = db.query(DBHelper.FACTURA_DOSIFICACION_TABLE, null,
-                FacturaDosificacion.Columns.area_id + " = " + are, null, null, null, null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         String cursorString = cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
         cursor.close();

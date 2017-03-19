@@ -317,7 +317,6 @@ public class AdminActivity extends AppCompatActivity {
             JSONObject object = facturaDosificacion.getJSONObject(i);
             ContentValues values = new ContentValues();
             values.put(FacturaDosificacion.Columns.id.name(), object.getInt(FacturaDosificacion.Columns.id.name()));
-            values.put(FacturaDosificacion.Columns.area_id.name(), object.getInt(FacturaDosificacion.Columns.area_id.name()));
             values.put(FacturaDosificacion.Columns.numero.name(), object.getInt(FacturaDosificacion.Columns.numero.name()));
             values.put(FacturaDosificacion.Columns.comprobante.name(), object.getInt(FacturaDosificacion.Columns.comprobante.name()));
             values.put(FacturaDosificacion.Columns.numero_autorizacion.name(), object.getInt(FacturaDosificacion.Columns.numero_autorizacion.name()));

@@ -1296,8 +1296,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private String getControlCode(DataModel dataModel) {
         ControlCode controlCode = new ControlCode();
         DBAdapter dbAdapter = new DBAdapter(getContext());
-        String llaveDosificacion = dbAdapter.getLlaveDosificacion(dataModel.getTlxAre());
-        Log.e(TAG, "getControlCode: " + String.valueOf(dataModel.getTlxCliNit()));
+        String llaveDosificacion = dbAdapter.getLlaveDosificacion();
         String generateControlCode = controlCode.generate(dataModel.getTlxNroAut(),
                 dataModel.getTlxFacNro(),
                 String.valueOf(dataModel.getTlxCliNit()),
