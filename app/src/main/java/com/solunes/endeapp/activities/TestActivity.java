@@ -119,12 +119,12 @@ public class TestActivity extends AppCompatActivity {
         nuevaLectura = DataFragment.correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
 
         // correccion si es que el consumo estimado tiene un indice mayor a cero, se vuelve una lectura normal
-        if (tipoLectura == 9 && lecturaEnergia > 0) {
-            tipoLectura = 1;
+        if (tipoLectura == 9 && lecturaEnergia == 0) {
+            tipoLectura = 3;
         }
 
         // Calcular la lectura en Kwh segun el tipo de lectura
-        if (tipoLectura == 3 || tipoLectura == 9) {
+        if (tipoLectura == 3) {
             lecturaKwh = dataModel.getTlxConPro();
         } else {
             if (nuevaLectura < dataModel.getTlxUltInd()) {
@@ -185,7 +185,7 @@ public class TestActivity extends AppCompatActivity {
             }
 
             // correccion para consumo promedio
-            if (tipoLectura == 3 || tipoLectura == 9) {
+            if (tipoLectura == 3) {
                 dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
                 dataModel.setTlxKwhDev(lectura);
             } else {
@@ -198,7 +198,7 @@ public class TestActivity extends AppCompatActivity {
             lectura = (int) (lectura * dataModel.getTlxFacMul());
 
             // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
-            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 9) {
+            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3) {
                 lectura = lectura - dataModel.getTlxKwhDev();
                 if (lectura > 0) {
                     dataModel.setTlxKwhDev(0);
@@ -209,9 +209,11 @@ public class TestActivity extends AppCompatActivity {
             }
 
             // lectura final
-            lectura = lectura + dataModel.getTlxKwhAdi();
+            if (dataModel.getTlxKwhAdi() > 0 && tipoLectura != 3) {
+                lectura = lectura + dataModel.getTlxKwhAdi();
+                dataModel.setTlxKwhAdi(0);
+            }
             dataModel.setTlxConsFacturado(lectura);
-            dataModel.setTlxKwhAdi(0);
 
             // obtener cargo fijo de la base de datos para la categoria
             double cargoFijo = dbAdapter.getCargoFijo(dataModel.getTlxCtg());
@@ -601,11 +603,13 @@ public class TestActivity extends AppCompatActivity {
             @Override
             protected Boolean doInBackground(Boolean... booleen) {
 //                ArrayList<Integer> integers = new ArrayList<>();
-//                integers.add(5903);
+//                integers.add(2985);
+//                integers.add(3036);
+//                integers.add(5529);
 //                for (int id : integers) {
 //                    DataModel data = dbAdapter.getData(id);
 //                    Resultados dataRes = dbAdapter.getDataRes(data.getId());
-//                    inicio(data, dataRes.getLectura(), dataRes.getObservacion());
+//                    inicio(data, dataRes.getLectura(), dataRes.getLecturaPotencia(), dataRes.getObservacion());
 //                }
 
                 for (DataModel dataModel : dbAdapter.getAllData()) {

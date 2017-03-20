@@ -8,6 +8,7 @@ import com.solunes.endeapp.models.DataModel;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Tarifa;
+import com.solunes.endeapp.models.TarifaAseo;
 
 import java.util.ArrayList;
 

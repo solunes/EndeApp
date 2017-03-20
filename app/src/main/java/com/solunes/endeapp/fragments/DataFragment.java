@@ -434,12 +434,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
         // correccion si es que el consumo estimado tiene un indice mayor a cero, se vuelve una lectura normal
-        if (tipoLectura == 9 && nuevaLectura > 0) {
-            tipoLectura = 1;
+        if (tipoLectura == 9 && nuevaLectura == 0) {
+            tipoLectura = 3;
         }
 
         // Calcular la lectura en Kwh segun el tipo de lectura
-        if (tipoLectura == 3 || tipoLectura == 9) {
+        if (tipoLectura == 3) {
             lecturaKwh = dataModel.getTlxConPro();
         } else {
             if (nuevaLectura < dataModel.getTlxUltInd()) {
@@ -626,7 +626,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
 
             // correccion para consumo promedio
-            if (tipoLectura == 3 || tipoLectura == 9) {
+            if (tipoLectura == 3) {
                 dataModel.setTlxKwhDev(lectura);
             }
 
@@ -638,7 +638,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             lectura = (int) (lectura * dataModel.getTlxFacMul());
 
             // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
-            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 9) {
+            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3) {
                 lectura = lectura - dataModel.getTlxKwhDev();
                 if (lectura > 0) {
                     dataModel.setTlxKwhDev(0);
@@ -649,9 +649,11 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
 
             // lectura final
-            lectura = lectura + dataModel.getTlxKwhAdi();
+            if (dataModel.getTlxKwhAdi() > 0 && tipoLectura != 3) {
+                lectura = lectura + dataModel.getTlxKwhAdi();
+                dataModel.setTlxKwhAdi(0);
+            }
             dataModel.setTlxConsFacturado(lectura);
-            dataModel.setTlxKwhAdi(0);
 
             // obtener cargo fijo de la base de datos para la categoria
             double cargoFijo = dbAdapter.getCargoFijo(dataModel.getTlxCtg());
