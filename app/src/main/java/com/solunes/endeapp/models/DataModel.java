@@ -44,7 +44,10 @@ public class DataModel {
     private String TlxSgl;
     private int TlxTipDem;
     private int TlxOrdSeq;
+    private double TlxImpTotCns;
+    private double TlxImpSum;
     private double TlxImpFac;
+    private double TlxImpMes;
     private double TlxImpTap;
     private double TlxImpAse;
     private double TlxCarFij;
@@ -163,7 +166,10 @@ public class DataModel {
         TlxSgl,
         TlxTipDem,
         TlxOrdSeq,
+        TlxImpTotCns,
+        TlxImpSum,
         TlxImpFac,
+        TlxImpMes,
         TlxImpTap,
         TlxImpAse,
         TlxCarFij,
@@ -305,7 +311,10 @@ public class DataModel {
         dataModel.setTlxTipLec(cursor.getInt(Columns.TlxTipLec.ordinal()));
         dataModel.setTlxSgl(cursor.getString(Columns.TlxSgl.ordinal()));
         dataModel.setTlxOrdSeq(cursor.getInt(Columns.TlxOrdSeq.ordinal()));
+        dataModel.setTlxImpTotCns(cursor.getDouble(Columns.TlxImpTotCns.ordinal()));
+        dataModel.setTlxImpSum(cursor.getDouble(Columns.TlxImpSum.ordinal()));
         dataModel.setTlxImpFac(cursor.getDouble(Columns.TlxImpFac.ordinal()));
+        dataModel.setTlxImpMes(cursor.getDouble(Columns.TlxImpMes.ordinal()));
         dataModel.setTlxImpTap(cursor.getDouble(Columns.TlxImpTap.ordinal()));
         dataModel.setTlxImpAse(cursor.getDouble(Columns.TlxImpAse.ordinal()));
         dataModel.setTlxCarFij(cursor.getDouble(Columns.TlxCarFij.ordinal()));
@@ -420,14 +429,11 @@ public class DataModel {
             }
             jsonObject.put(Columns.TlxNvaLec.name(), dataModel.getTlxNvaLec());
             jsonObject.put(Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
+            jsonObject.put(Columns.TlxImpTotCns.name(), dataModel.getTlxImpTotCns());
+            jsonObject.put(Columns.TlxImpSum.name(), dataModel.getTlxImpSum());
             jsonObject.put(Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
-            jsonObject.put(Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
-            jsonObject.put(Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
-            jsonObject.put(Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
+            jsonObject.put(Columns.TlxImpMes.name(), dataModel.getTlxImpMes());
             jsonObject.put(Columns.TlxImpEn.name(), dataModel.getTlxImpEn());
-            jsonObject.put(Columns.TlxImpPot.name(), dataModel.getTlxImpPot());
-            jsonObject.put(Columns.TlxDesTdi.name(), dataModel.getTlxDesTdi());
-            jsonObject.put(Columns.TlxLey1886.name(), dataModel.getTlxLey1886());
             jsonObject.put(Columns.TlxPotLei.name(), dataModel.getTlxPotLei());
             jsonObject.put(Columns.TlxImpTot.name(), dataModel.getTlxImpTot());
             jsonObject.put(Columns.TlxFecEmi.name(), dataModel.getTlxFecEmi());
@@ -545,6 +551,30 @@ public class DataModel {
 
     public int getTlxRutA() {
         return TlxRutA;
+    }
+
+    public double getTlxImpTotCns() {
+        return TlxImpTotCns;
+    }
+
+    public void setTlxImpTotCns(double tlxImpTotCns) {
+        TlxImpTotCns = tlxImpTotCns;
+    }
+
+    public double getTlxImpSum() {
+        return TlxImpSum;
+    }
+
+    public void setTlxImpSum(double tlxImpSum) {
+        TlxImpSum = tlxImpSum;
+    }
+
+    public double getTlxImpMes() {
+        return TlxImpMes;
+    }
+
+    public void setTlxImpMes(double tlxImpMes) {
+        TlxImpMes = tlxImpMes;
     }
 
     public void setTlxRutA(int tlxRutA) {

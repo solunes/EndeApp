@@ -1,14 +1,10 @@
 package com.solunes.endeapp.activities;
 
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -24,18 +20,15 @@ import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.Historico;
 import com.solunes.endeapp.models.Obs;
-import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.networking.CallbackAPI;
 import com.solunes.endeapp.networking.GetRequest;
 import com.solunes.endeapp.networking.PostRequest;
 import com.solunes.endeapp.networking.Token;
-import com.solunes.endeapp.utils.FileUtils;
 import com.solunes.endeapp.utils.GenLecturas;
 import com.solunes.endeapp.utils.StringUtils;
 import com.solunes.endeapp.utils.Urls;
-import com.solunes.endeapp.utils.UserPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +37,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.Map;
 
 import static com.solunes.endeapp.activities.MainActivity.prepareDataToPost;
 import static com.solunes.endeapp.activities.MainActivity.stringNull;
@@ -149,124 +141,117 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void confirmarLectura(DataModel dataModel, int tipoLectura, int nuevaLectura, int lecturaPotencia, int finalLecturaKwh, Obs obs) {
-        boolean isCalculo = calculo(dataModel, tipoLectura, nuevaLectura, lecturaPotencia, finalLecturaKwh, false, obs);
+        boolean isCalculo = calculo(dataModel, tipoLectura, nuevaLectura, lecturaPotencia, finalLecturaKwh, obs);
         if (isCalculo) {
             saveLectura(dataModel, obs);
             Log.e(TAG, "calculo: " + dataModel.getId());
         }
     }
 
-    private boolean calculo(DataModel dataModel, int tipoLectura, int nuevaLectura, int lecturaPotencia, int lectura, boolean reprint, Obs obs) {
+    private boolean calculo(DataModel dataModel, int tipoLectura, int nuevaLectura, int lecturaPotencia, int lectura, Obs obs) {
         // revisar si no es reimpresion, para no realizar el calculo de nuevo
-        if (!reprint) {
-            if (obs.getObsFac() == 0) {
-                dataModel.setTlxImpAvi(0);
-            }
+        if (obs.getObsFac() == 0) {
+            dataModel.setTlxImpAvi(0);
+        }
 
-            // verificacion de limites maximos para consumos muy elevados
-            int maxKwh = dbAdapter.getMaxKwh(dataModel.getTlxCtg());
-            if (maxKwh == -1) {
+        // verificacion de limites maximos para consumos muy elevados
+        int maxKwh = dbAdapter.getMaxKwh(dataModel.getTlxCtg());
+        if (maxKwh == -1) {
 //                Toast.makeText(getContext(), "No hay un límite máximo para el consumo", Toast.LENGTH_LONG).show();
-                return false;
-            }
-            if (lectura >= maxKwh) {
-                tipoLectura = 5;
-            }
+            return false;
+        }
+        if (lectura >= maxKwh) {
+            tipoLectura = 5;
+        }
 
-            if (tipoLectura == 5) {
-                dataModel.setTlxNvaLec(nuevaLectura);
-                if (dataModel.getTlxTipDem() == 2) {
-                    lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
-                    dataModel.setTlxPotLei(lecturaPotencia);
-                }
-                dataModel.setTlxTipLec(tipoLectura);
-                dataModel.setTlxImpAvi(0);
-                return true;
-            }
-
-            // correccion para consumo promedio
-            if (tipoLectura == 3) {
-                dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
-                dataModel.setTlxKwhDev(lectura);
-            } else {
-                dataModel.setTlxNvaLec(nuevaLectura);
+        if (tipoLectura == 5) {
+            dataModel.setTlxNvaLec(nuevaLectura);
+            if (dataModel.getTlxTipDem() == 2) {
+                lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
+                dataModel.setTlxPotLei(lecturaPotencia);
             }
             dataModel.setTlxTipLec(tipoLectura);
-            dataModel.setTlxConsumo(lectura);
-
-            // multiplicar la lectura con el multiplicador de energia
-            lectura = (int) (lectura * dataModel.getTlxFacMul());
-
-            // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
-            if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3) {
-                lectura = lectura - dataModel.getTlxKwhDev();
-                if (lectura > 0) {
-                    dataModel.setTlxKwhDev(0);
-                } else {
-                    dataModel.setTlxKwhDev(Math.abs(lectura));
-                    lectura = 0;
-                }
-            }
-
-            // lectura final
-            if (dataModel.getTlxKwhAdi() > 0 && tipoLectura != 3) {
-                lectura = lectura + dataModel.getTlxKwhAdi();
-                dataModel.setTlxKwhAdi(0);
-            }
-            dataModel.setTlxConsFacturado(lectura);
-
-            // obtener cargo fijo de la base de datos para la categoria
-            double cargoFijo = dbAdapter.getCargoFijo(dataModel.getTlxCtg());
-            // redondeo del cargo fijo
-            cargoFijo = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 1, cargoFijo);
-            dataModel.setTlxCarFij(cargoFijo);
-
-            // obtener y calcular el importe de energia por rangos
-            double importeEnergia = GenLecturas.importeEnergia(getApplicationContext(), lectura, dataModel.getTlxCtg(), dataModel.getId());
-            dataModel.setTlxImpEn(importeEnergia);
+            dataModel.setTlxImpAvi(0);
+            return true;
         }
+
+        // correccion para consumo promedio
+        if (tipoLectura == 3) {
+            dataModel.setTlxNvaLec(dataModel.getTlxUltInd());
+            dataModel.setTlxKwhDev(lectura);
+        } else {
+            dataModel.setTlxNvaLec(nuevaLectura);
+        }
+        dataModel.setTlxTipLec(tipoLectura);
+        dataModel.setTlxConsumo(lectura);
+
+        // multiplicar la lectura con el multiplicador de energia
+        lectura = (int) (lectura * dataModel.getTlxFacMul());
+
+        // correccion de kwh a devolver sino es consumo promedio o lectura ajustada
+        if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3) {
+            lectura = lectura - dataModel.getTlxKwhDev();
+            if (lectura > 0) {
+                dataModel.setTlxKwhDev(0);
+            } else {
+                dataModel.setTlxKwhDev(Math.abs(lectura));
+                lectura = 0;
+            }
+        }
+
+        // lectura final
+        if (dataModel.getTlxKwhAdi() > 0 && tipoLectura != 3) {
+            lectura = lectura + dataModel.getTlxKwhAdi();
+            dataModel.setTlxKwhAdi(0);
+        }
+        dataModel.setTlxConsFacturado(lectura);
+
+        // obtener cargo fijo de la base de datos para la categoria
+        double cargoFijo = dbAdapter.getCargoFijo(dataModel.getTlxCtg());
+        // redondeo del cargo fijo
+        cargoFijo = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 1, cargoFijo);
+        dataModel.setTlxCarFij(cargoFijo);
+
+        // obtener y calcular el importe de energia por rangos
+        double importeEnergia = GenLecturas.importeEnergia(getApplicationContext(), lectura, dataModel.getTlxCtg(), dataModel.getId());
 
         // calculo de potencia para mediana demanda
         double importePotencia = 0;
         if (dataModel.getTlxTipDem() == 2) {
-            if (!reprint) {
-                // correccion de digitos para la potencia leida
-                lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
-                dataModel.setTlxPotLei(lecturaPotencia);
-                // maximo entre potencia anterior y potencia leida
-                int potMax = Math.max(lecturaPotencia, dataModel.getTlxPotFac());
-                // calculo del importe por potencia
-                double cargoPotencia = dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
+            // correccion de digitos para la potencia leida
+            lecturaPotencia = DataFragment.correccionPotencia(lecturaPotencia, dataModel.getTlxDecPot());
+            dataModel.setTlxPotLei(lecturaPotencia);
+            // maximo entre potencia anterior y potencia leida
+            int potMax = Math.max(lecturaPotencia, dataModel.getTlxPotFac());
+            // calculo del importe por potencia
+            double cargoPotencia = dbAdapter.getCargoPotencia(dataModel.getTlxCtg());
 //                if (cargoPotencia == -1) {
 //                    Toast.makeText(getContext(), "No hay cargo de potencia", Toast.LENGTH_LONG).show();
 //                    return false;
 //                }
-                importePotencia = potMax * cargoPotencia;
-                importePotencia = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 41, importePotencia);
-                dataModel.setTlxImpPot(importePotencia);
-            }
+            importePotencia = potMax * cargoPotencia;
+            importePotencia = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 41, importePotencia);
+            dataModel.setTlxImpPot(importePotencia);
         }
 
-        double importeConsumo = GenLecturas.round(dataModel.getTlxCarFij() + dataModel.getTlxImpEn() + dataModel.getTlxImpPot());
+        double importeConsumo = GenLecturas.round(dataModel.getTlxCarFij() + importeEnergia + dataModel.getTlxImpPot());
+        dataModel.setTlxImpEn(importeConsumo);
 
         // verificar la tarifa dignidad, calcular, guardar el importe en detalle facturacion
         double tarifaDignidad = 0;
         if (dataModel.getTlxDignidad() == 1) {
-            if (!reprint) {
-                tarifaDignidad = GenLecturas.tarifaDignidad(getApplicationContext(), lectura, importeConsumo);
-                tarifaDignidad = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 192, tarifaDignidad);
-                dataModel.setTlxDesTdi(tarifaDignidad);
-            }
+            tarifaDignidad = GenLecturas.tarifaDignidad(getApplicationContext(), lectura, importeConsumo);
+            tarifaDignidad = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 192, tarifaDignidad);
+            dataModel.setTlxDesTdi(tarifaDignidad);
         }
+        dataModel.setTlxImpTotCns(dataModel.getTlxImpEn() + tarifaDignidad);
 
         // verificar que hay ley 1886 calcular su importe y guardarlo en detalle facturacion
         double ley1886 = 0;
         if (dataModel.getTlxLeyTag() == 1) {
-            if (!reprint) {
-                ley1886 = GenLecturas.ley1886(getApplicationContext(), lectura, dataModel.getTlxCtg());
-                ley1886 = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 195, ley1886);
-                dataModel.setTlxLey1886(ley1886);
-            }
+            ley1886 = GenLecturas.ley1886(getApplicationContext(), lectura, dataModel.getTlxCtg());
+            ley1886 = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 195, ley1886);
+            dataModel.setTlxLey1886(ley1886);
         }
 
         // calcular consumo total
@@ -287,40 +272,38 @@ public class TestActivity extends AppCompatActivity {
         }
 
         // calculo del importe total del suministro
-        double totalSuministro = GenLecturas.totalSuministro(totalConsumo, dataModel.getTlxLey1886(), cargoExtraTotal);
+        double totalSuministro = GenLecturas.totalSuministro(dataModel.getTlxImpTotCns(), dataModel.getTlxLey1886(), cargoExtraTotal);
+        dataModel.setTlxImpSum(totalSuministro);
 
         // calculo de suministro tap y suministro por aseo
-        if (!reprint) {
-            double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
+        double totalSuministroTap = GenLecturas.totalSuministroTap(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
 //            if (totalSuministroTap < 0) {
 //                Toast.makeText(getApplicationContext(), "No hay tarifa para el TAP", Toast.LENGTH_LONG).show();
 //                return false;
 //            }
-            totalSuministroTap = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 153, totalSuministroTap);
+        totalSuministroTap = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 153, totalSuministroTap);
 
-            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
+        double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getApplicationContext(), dataModel.getTlxConsumo());
 //            if (totalSuministroAseo == -1) {
 //                Toast.makeText(getApplicationContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
 //                return false;
 //            }
-            totalSuministroAseo = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 171, totalSuministroAseo);
-            dataModel.setTlxImpFac(totalSuministro);
-            dataModel.setTlxImpTap(totalSuministroTap);
-            dataModel.setTlxImpAse(totalSuministroAseo);
-        }
+        totalSuministroAseo = DetalleFactura.crearDetalle(getApplicationContext(), dataModel.getId(), 171, totalSuministroAseo);
+        dataModel.setTlxImpTap(totalSuministroTap);
+        dataModel.setTlxImpAse(totalSuministroAseo);
+        double importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
+        dataModel.setTlxImpFac(importeTotalFactura);
 
         // calculo de importe a facturar
-        double importeTotalFactura = GenLecturas.totalFacturar(totalSuministro, dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
         double carDep = dbAdapter.getDetalleFacturaImporte(dataModel.getId(), 427);
         double importeMesCancelar = importeTotalFactura + carDep;
-        if (!reprint) {
-            dataModel.setTlxImpTot(GenLecturas.round(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI()));
+        dataModel.setTlxImpMes(importeMesCancelar);
+        dataModel.setTlxImpTot(GenLecturas.round(importeMesCancelar + dataModel.getTlxDeuEneI() + dataModel.getTlxDeuAseI()));
 //            dataModel.setTlxCodCon(getControlCode(dataModel));
-            if (dataModel.getTlxTipLec() != 5) {
-                dataModel.setEstadoLectura(DataFragment.estados_lectura.Leido.ordinal());
-            } else {
-                dataModel.setEstadoLectura(DataFragment.estados_lectura.Postergado.ordinal());
-            }
+        if (dataModel.getTlxTipLec() != 5) {
+            dataModel.setEstadoLectura(DataFragment.estados_lectura.Leido.ordinal());
+        } else {
+            dataModel.setEstadoLectura(DataFragment.estados_lectura.Postergado.ordinal());
         }
         dbAdapter.close();
         return true;
