@@ -224,6 +224,13 @@
                             android:inputType="number"
                             android:visibility="gone" />
 
+                        <Button
+                            android:id="@+id/button_postergar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/colorAccent"
+                            android:text="@string/postergar_lectura" />
+
                     </LinearLayout>
 
                     <include layout="@layout/layout_gran_demanda" />

@@ -66,6 +66,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private EditText inputPotenciaReading;
     private EditText inputObsCode;
     private Button buttonConfirm;
+    private Button buttonPostergar;
     private Button buttonObs;
     private TextView labelObs;
     private TextView estadoMedidor;
@@ -182,6 +183,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         inputReading = (EditText) view.findViewById(R.id.input_reading);
         inputReading.setSelected(false);
         buttonConfirm = (Button) view.findViewById(R.id.button_confirm);
+        buttonPostergar = (Button) view.findViewById(R.id.button_postergar);
         buttonObs = (Button) view.findViewById(R.id.button_obs);
         inputObsCode = (EditText) view.findViewById(R.id.obs_code);
         estadoCliente = (TextView) view.findViewById(R.id.estado_client);
@@ -391,6 +393,34 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     labelObs.setText("Codigo incorrecto");
                 }
                 dbAdapter.close();
+            }
+        });
+        buttonPostergar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (dataModel.getEstadoLectura() == estados_lectura.Leido.ordinal()) {
+                    DBAdapter dbAdapter = new DBAdapter(getContext());
+                    PrintObs printObs = dbAdapter.getPrintObs(6);
+                    ContentValues cvData = new ContentValues();
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(PrintObsData.Columns.general_id.name(), dataModel.getId());
+                    contentValues.put(PrintObsData.Columns.observacion_imp_id.name(), printObs.getId());
+                    cvData.put(DataModel.Columns.enviado.name(), DataModel.EstadoEnviado.no_enviado.ordinal());
+                    dbAdapter.saveObject(DBHelper.PRINT_OBS_DATA_TABLE, contentValues);
+                    dbAdapter.updateData(dataModel.getId(), cvData);
+                    dbAdapter.close();
+                } else {
+                    dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
+                    dataModel.setTlxTipLec(5);
+                    hidingViews(null);
+
+                    DBAdapter dbAdapter = new DBAdapter(getContext());
+                    ContentValues cv = new ContentValues();
+                    cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
+                    cv.put(DataModel.Columns.TlxTipLec.name(), dataModel.getTlxTipLec());
+                    dbAdapter.updateData(dataModel.getId(), cv);
+                    dbAdapter.close();
+                }
             }
         });
     }
@@ -817,7 +847,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             impaviString = "Impreso";
         }
         buttonObs.setEnabled(false);
-        inputObsCode.setText(String.valueOf(obs.getId()));
+        if (obs != null) {
+            inputObsCode.setText(String.valueOf(obs.getId()));
+        }
         inputObsCode.setEnabled(false);
         inputReading.setEnabled(false);
         if (dataModel.getTlxTipLec() != 5) {
@@ -846,15 +878,18 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             estadoMedidor.setText(estados_lectura.Leido.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
             buttonConfirm.setText(R.string.re_print);
+            buttonPostergar.setText(R.string.postergar_lectura);
             inputPotenciaReading.setEnabled(false);
             inputPreNue1.setEnabled(false);
             inputPreNue2.setEnabled(false);
         } else {
             buttonConfirm.setEnabled(false);
+            buttonPostergar.setEnabled(false);
             estadoMedidor.setText(estados_lectura.Postergado.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
             buttonConfirm.setEnabled(false);
-            buttonConfirm.setText("confirmar");
+            buttonConfirm.setText(R.string.confirmar);
+            buttonPostergar.setText(R.string.postergar_lectura);
         }
     }
 
@@ -1038,7 +1073,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
      * Este metodo valida las vistas para el inicio del fragmento
      */
     private void validSaved() {
-        String impaviString = "";
+        String impaviString;
         if (dataModel.getTlxImpAvi() == 0) {
             impaviString = "No Impreso";
         } else {
@@ -1048,6 +1083,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             estadoMedidor.setText(estados_lectura.Leido.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPrint));
             buttonConfirm.setText(R.string.re_print);
+            buttonPostergar.setText(R.string.postergar_impresion);
             inputReading.setEnabled(false);
             buttonObs.setEnabled(false);
             inputObsCode.setEnabled(false);
@@ -1058,6 +1094,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputObsCode.setEnabled(false);
             inputReading.setEnabled(false);
             buttonConfirm.setEnabled(false);
+            buttonPostergar.setEnabled(false);
             estadoMedidor.setText(estados_lectura.Postergado.name() + " - " + impaviString);
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPostponed));
         } else {
@@ -1076,7 +1113,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getEstadoLectura() != 0) {
             if (dataModel.getTlxImpAvi() == 0) {
                 buttonConfirm.setEnabled(false);
-                buttonConfirm.setText("confirmar");
+                buttonConfirm.setText(R.string.confirmar);
+                buttonPostergar.setEnabled(false);
+                buttonPostergar.setText(R.string.postergar_lectura);
             }
         }
     }

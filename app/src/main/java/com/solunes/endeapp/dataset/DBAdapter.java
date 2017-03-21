@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Base64;
 import android.util.Log;
 
 import com.solunes.endeapp.activities.MainActivity;
@@ -20,6 +19,7 @@ import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
+import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
 import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.Tarifa;
@@ -29,16 +29,8 @@ import com.solunes.endeapp.models.User;
 import com.solunes.endeapp.utils.Encrypt;
 import com.solunes.endeapp.utils.StatisticsItem;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Esta clase contiene funciones de consulta a la base de datos
@@ -534,6 +526,19 @@ public class DBAdapter {
         open();
         Cursor cursor = db.query(DBHelper.PRINT_OBS_TABLE, null, null, null, null, null, null);
         return cursor;
+    }
+
+    public PrintObs getPrintObs(int idObs) {
+        open();
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_TABLE, null, PrintObs.Columns.id.name() + " = " + idObs, null, null, null, null);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            PrintObs printObs = PrintObs.fromCursor(cursor);
+            cursor.close();
+            return printObs;
+        }
+        cursor.close();
+        return null;
     }
 
     /**

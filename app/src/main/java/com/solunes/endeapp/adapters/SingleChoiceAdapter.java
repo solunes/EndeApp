@@ -56,7 +56,7 @@ public class SingleChoiceAdapter extends ArrayAdapter<SingleChoiceItem> {
         SingleChoiceItem singleChoiceItem = singleChoiceItems.get(position);
         TextView textViewCode = (TextView) convertView.findViewById(R.id.item_code);
         TextView textViewTitle = (TextView) convertView.findViewById(R.id.item_title);
-        textViewCode.setText(singleChoiceItem.getCode());
+        textViewCode.setText(singleChoiceItem.getCode()+"");
         textViewTitle.setText(singleChoiceItem.getTitle());
         if (singleChoiceItem.getObsInd() == 2) {
             textViewCode.setTextColor(Color.parseColor("#ff3d00"));

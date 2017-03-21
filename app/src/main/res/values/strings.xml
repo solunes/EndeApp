@@ -12,4 +12,7 @@
     <string name="admin_password">1234</string>
     <string name="action_import">Importar</string>
     <string name="action_export">Exportar</string>
+    <string name="postergar_lectura">postergar lec</string>
+    <string name="confirmar">confirmar</string>
+    <string name="postergar_impresion">postergar imp</string>
 </resources>
