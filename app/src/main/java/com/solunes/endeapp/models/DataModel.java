@@ -136,6 +136,7 @@ public class DataModel {
     private int TlxDecPot;
     private String TlxDemPot;
     private String TlxRecordatorio;
+    private double TlxImpEnergia;
 
     public enum Columns {
         id,
@@ -257,6 +258,7 @@ public class DataModel {
         TlxConsFacturado,
         TlxDebAuto,
         TlxRecordatorio,
+        TlxImpEnergia,
         estado_lectura,
         enviado
     }
@@ -373,6 +375,7 @@ public class DataModel {
         dataModel.setTlxPerHr1(cursor.getDouble(Columns.TlxPerHr1.ordinal()));
         dataModel.setTlxConsumo(cursor.getInt(Columns.TlxConsumo.ordinal()));
         dataModel.setTlxPerdidas(cursor.getDouble(Columns.TlxPerdidas.ordinal()));
+        dataModel.setTlxImpEnergia(cursor.getDouble(Columns.TlxImpEnergia.ordinal()));
         dataModel.setTlxConsFacturado(cursor.getInt(Columns.TlxConsFacturado.ordinal()));
         dataModel.setTlxDebAuto(cursor.getString(Columns.TlxDebAuto.ordinal()));
         dataModel.setEstadoLectura(cursor.getInt(Columns.estado_lectura.ordinal()));
@@ -521,6 +524,14 @@ public class DataModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public double getTlxImpEnergia() {
+        return TlxImpEnergia;
+    }
+
+    public void setTlxImpEnergia(double tlxImpEnergia) {
+        TlxImpEnergia = tlxImpEnergia;
     }
 
     public int getTlxPromAseo() {

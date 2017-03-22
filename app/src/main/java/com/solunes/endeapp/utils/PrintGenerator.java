@@ -24,7 +24,6 @@ public class PrintGenerator {
      * @param printValues    un array con valores de los campos personalizados
      * @param historico      objeto Historico para esta impresion
      * @param garantiaString deposito de garantia, si no hay es null
-     * @param cardep         cargo por deposito
      * @param aseoTitle      titulo de la tarifa de aseo
      * @param tapTitle       titulo de la tarifa de alumbrado publico
      * @param leyenda        un string array de la leyenda
@@ -33,9 +32,11 @@ public class PrintGenerator {
     public static String creator(DataModel dataModel,
                                  ArrayList<String> printTitles,
                                  ArrayList<Double> printValues,
+                                 ArrayList<String> printBottomTitles,
+                                 ArrayList<Double> printBottomValues,
+                                 double carDep,
                                  Historico historico,
                                  String garantiaString,
-                                 double cardep,
                                  String aseoTitle,
                                  String tapTitle,
                                  String nit,
@@ -69,7 +70,7 @@ public class PrintGenerator {
                 "|" + dataModel.getTlxCliNit() +
                 "|" + StringUtils.roundTwoDigits(tasas) +
                 "|0" +
-                "|" + StringUtils.roundTwoDigits(tasas + cardep) +
+                "|" + StringUtils.roundTwoDigits(tasas + carDep) +
                 "|0";
 
         String carta;
@@ -206,7 +207,18 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 720 1430 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n";
 
         // Bloque 3
-        cpclConfigLabel += detalleFacturacion(printTitles, printValues, cardep, dataModel.getTlxImpFac(), dataModel.getTlxImpMes(), dataModel.getTlxImpTap(), dataModel.getTlxImpAse(), garantiaString, aseoTitle, tapTitle);
+        cpclConfigLabel += detalleFacturacion(
+                printTitles,
+                printValues,
+                printBottomTitles,
+                printBottomValues,
+                dataModel.getTlxImpFac(),
+                dataModel.getTlxImpMes(),
+                dataModel.getTlxImpTap(),
+                dataModel.getTlxImpAse(),
+                garantiaString,
+                aseoTitle,
+                tapTitle);
         cpclConfigLabel += "" +
                 "FORM\r\n" +
                 "PRINT\r\n";
@@ -304,7 +316,6 @@ public class PrintGenerator {
      *
      * @param titles         Es un array de titulos para generar
      * @param values         Es un array de valores para generar
-     * @param garantia       Es el deposito de garantia
      * @param impTotFac      importe total a facturar
      * @param importeMes     importe del mes a facturar
      * @param tap            importe de alumbrado publico
@@ -316,7 +327,8 @@ public class PrintGenerator {
      */
     private static String detalleFacturacion(ArrayList<String> titles,
                                              ArrayList<Double> values,
-                                             double garantia,
+                                             ArrayList<String> bottomTitles,
+                                             ArrayList<Double> bottomValues,
                                              double impTotFac,
                                              double importeMes,
                                              double tap,
@@ -361,14 +373,13 @@ public class PrintGenerator {
         res += "RIGHT 782\r\n";
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
 
-        if (garantia > 0) {
-
+        for (int i = 0; i < bottomTitles.size(); i++) {
             yValue += 20;
             res += "LEFT\r\n";
             res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-            res += "T CONSO3.CPF 0 40 " + yValue + " " + garantiaString + "\r\n";
+            res += "T CONSO3.CPF 0 40 " + yValue + " " + bottomTitles.get(i) + "\r\n";
             res += "RIGHT 782\r\n";
-            res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(garantia) + "\r\n";
+            res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(bottomValues.get(i)) + "\r\n";
         }
 
         yValue += 55;
