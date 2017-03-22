@@ -411,6 +411,8 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDav.name(), object.getInt(DataModel.Columns.TlxDav.name()));
             values.put(DataModel.Columns.TlxEstCli.name(), object.getInt(DataModel.Columns.TlxEstCli.name()));
             values.put(DataModel.Columns.TlxOrdTpl.name(), object.getInt(DataModel.Columns.TlxOrdTpl.name()));
+            values.put(DataModel.Columns.TlxPromAseo.name(), object.getInt(DataModel.Columns.TlxPromAseo.name()));
+            values.put(DataModel.Columns.TlxDivAseo.name(), object.getInt(DataModel.Columns.TlxDivAseo.name()));
             values.put(DataModel.Columns.TlxNom.name(), object.getString(DataModel.Columns.TlxNom.name()).trim());
             values.put(DataModel.Columns.TlxDir.name(), object.getString(DataModel.Columns.TlxDir.name()).trim());
             values.put(DataModel.Columns.TlxCtaAnt.name(), object.getString(DataModel.Columns.TlxCtaAnt.name()).trim());

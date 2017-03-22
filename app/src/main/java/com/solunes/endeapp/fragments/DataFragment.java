@@ -409,6 +409,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     dbAdapter.saveObject(DBHelper.PRINT_OBS_DATA_TABLE, contentValues);
                     dbAdapter.updateData(dataModel.getId(), cvData);
                     dbAdapter.close();
+                    buttonPostergar.setEnabled(false);
                 } else {
                     dataModel.setEstadoLectura(estados_lectura.Postergado.ordinal());
                     dataModel.setTlxTipLec(5);
@@ -802,7 +803,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
             totalSuministroTap = DetalleFactura.crearDetalle(getContext(), dataModel.getId(), 153, totalSuministroTap);
 
-            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), dataModel.getTlxConsumo());
+            int consumoAseo = (dataModel.getTlxPromAseo() + dataModel.getTlxConsumo()) / (dataModel.getTlxDivAseo() + 1);
+            double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, getContext(), consumoAseo);
             if (totalSuministroAseo == -1) {
                 Toast.makeText(getContext(), "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
                 return false;
@@ -936,7 +938,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataModel.Columns.TlxHoraBajo.name(), dataModel.getTlxHoraBajo());
         cv.put(DataModel.Columns.TlxFechaBajo.name(), dataModel.getTlxFechaBajo());
 
+        cv.put(DataModel.Columns.TlxImpTotCns.name(), dataModel.getTlxImpTotCns());
+        cv.put(DataModel.Columns.TlxImpSum.name(), dataModel.getTlxImpSum());
         cv.put(DataModel.Columns.TlxImpFac.name(), dataModel.getTlxImpFac());
+        cv.put(DataModel.Columns.TlxImpMes.name(), dataModel.getTlxImpMes());
         cv.put(DataModel.Columns.TlxCarFij.name(), dataModel.getTlxCarFij());
         cv.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
         cv.put(DataModel.Columns.TlxImpAse.name(), dataModel.getTlxImpAse());

@@ -44,6 +44,8 @@ public class DataModel {
     private String TlxSgl;
     private int TlxTipDem;
     private int TlxOrdSeq;
+    private int TlxPromAseo;
+    private int TlxDivAseo;
     private double TlxImpTotCns;
     private double TlxImpSum;
     private double TlxImpFac;
@@ -166,6 +168,8 @@ public class DataModel {
         TlxSgl,
         TlxTipDem,
         TlxOrdSeq,
+        TlxPromAseo,
+        TlxDivAseo,
         TlxImpTotCns,
         TlxImpSum,
         TlxImpFac,
@@ -311,6 +315,8 @@ public class DataModel {
         dataModel.setTlxTipLec(cursor.getInt(Columns.TlxTipLec.ordinal()));
         dataModel.setTlxSgl(cursor.getString(Columns.TlxSgl.ordinal()));
         dataModel.setTlxOrdSeq(cursor.getInt(Columns.TlxOrdSeq.ordinal()));
+        dataModel.setTlxPromAseo(cursor.getInt(Columns.TlxPromAseo.ordinal()));
+        dataModel.setTlxDivAseo(cursor.getInt(Columns.TlxDivAseo.ordinal()));
         dataModel.setTlxImpTotCns(cursor.getDouble(Columns.TlxImpTotCns.ordinal()));
         dataModel.setTlxImpSum(cursor.getDouble(Columns.TlxImpSum.ordinal()));
         dataModel.setTlxImpFac(cursor.getDouble(Columns.TlxImpFac.ordinal()));
@@ -515,6 +521,22 @@ public class DataModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getTlxPromAseo() {
+        return TlxPromAseo;
+    }
+
+    public void setTlxPromAseo(int tlxPromAseo) {
+        TlxPromAseo = tlxPromAseo;
+    }
+
+    public int getTlxDivAseo() {
+        return TlxDivAseo;
+    }
+
+    public void setTlxDivAseo(int tlxDivAseo) {
+        TlxDivAseo = tlxDivAseo;
     }
 
     public int getTlxRem() {
