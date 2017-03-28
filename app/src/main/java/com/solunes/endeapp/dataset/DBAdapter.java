@@ -467,7 +467,9 @@ public class DBAdapter {
                 + " AND " + Tarifa.Columns.item_facturacion_id.name() + " = 1", null, null, null, null);
         if (cursor.getCount() > 0) {
             cursor.moveToNext();
-            return cursor.getDouble(Tarifa.Columns.importe.ordinal());
+            double cursorDouble = cursor.getDouble(Tarifa.Columns.importe.ordinal());
+            cursor.close();
+            return cursorDouble;
         }
         return 0;
     }

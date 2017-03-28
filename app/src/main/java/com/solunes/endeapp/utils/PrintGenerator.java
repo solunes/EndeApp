@@ -157,7 +157,7 @@ public class PrintGenerator {
                 "RIGHT 782\r\n" +
                 "T CONSO3.CPF 0 45 881 " + StringUtils.roundTwoDigits(dataModel.getTlxImpMes()) + "\r\n" +
                 "T CONSO3.CPF 0 45 968 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n" +
-                "T CONSO3.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) + "\r\n" +
+                "T CONSO3.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) + "\r\n" +
 
                 deudasEnergia +
                 deudasAseo +

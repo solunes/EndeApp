@@ -566,7 +566,6 @@ public class MainActivity extends AppCompatActivity {
                     dbAdapter.getDataObsByCli(dataModel.getId()),
                     dbAdapter.getPrintObsData(dataModel.getId()),
                     dbAdapter.getDetalleFactura(dataModel.getId()));
-            Log.e(TAG, "prepareDataToPost json: " + json);
             params.put("" + (dataModel.getTlxCli()), json);
         }
 
@@ -577,7 +576,6 @@ public class MainActivity extends AppCompatActivity {
                 MedEntreLineas entreLineas = entreLineasList.get(i);
                 jsonArray.put(i, entreLineas.toJson());
             }
-            Log.e(TAG, "prepareDataToPost: mel: " + jsonArray.toString());
             params.put("med_entre_lineas", jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();

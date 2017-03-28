@@ -53,7 +53,6 @@ public class DetalleFactura {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.e("TAG", "toJson: " + jsonObject.toString());
         return jsonObject.toString();
     }
 

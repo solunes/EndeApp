@@ -82,7 +82,6 @@ public class AdminActivity extends AppCompatActivity {
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
 
         editDomain = (EditText) findViewById(R.id.edit_domain);
-        TextView textUsername = (TextView) findViewById(R.id.text_username);
         Button btnSaveDomain = (Button) findViewById(R.id.btn_save_domain);
         Button btnFixParams = (Button) findViewById(R.id.btn_fix_params);
         nroDomain = (TextView) findViewById(R.id.label_nro_domain);
@@ -98,7 +97,6 @@ public class AdminActivity extends AppCompatActivity {
         final DBAdapter dbAdapter = new DBAdapter(this);
         user = dbAdapter.getUser(id_user);
         dbAdapter.close();
-        textUsername.setText(user.getLecNom());
         btnSaveDomain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

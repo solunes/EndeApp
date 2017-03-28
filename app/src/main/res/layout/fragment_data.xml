@@ -116,18 +116,18 @@
                     </LinearLayout>
 
                     <!--<View-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="1dp"-->
-                        <!--android:layout_marginBottom="8dp"-->
-                        <!--android:layout_marginTop="8dp"-->
-                        <!--android:background="#e7e7e7" />-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="1dp"-->
+                    <!--android:layout_marginBottom="8dp"-->
+                    <!--android:layout_marginTop="8dp"-->
+                    <!--android:background="#e7e7e7" />-->
 
                     <TextView
                         android:id="@+id/support_ultind"
                         android:layout_width="wrap_content"
-                        android:visibility="gone"
                         android:layout_height="wrap_content"
-                        android:text="Último índice: " />
+                        android:text="Último índice: "
+                        android:visibility="gone" />
 
                     <View
                         android:layout_width="match_parent"
@@ -224,24 +224,9 @@
                             android:inputType="number"
                             android:visibility="gone" />
 
-                        <Button
-                            android:id="@+id/button_postergar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="@color/colorAccent"
-                            android:text="@string/postergar_lectura" />
-
                     </LinearLayout>
 
                     <include layout="@layout/layout_gran_demanda" />
-
-                    <TextView
-                        android:id="@+id/label_obs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:lines="1"
-                        android:text="Ninguno"
-                        android:textAppearance="?android:textAppearanceMedium" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -256,12 +241,14 @@
                             android:inputType="number"
                             android:lines="1" />
 
-                        <Button
-                            android:id="@+id/button_obs"
-                            style="@style/Base.Widget.AppCompat.Button.Borderless"
-                            android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/label_obs"
+                            android:layout_weight="1"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Observaciones" />
+                            android:lines="1"
+                            android:text="NINGUNO"
+                            android:textAppearance="?android:textAppearanceMedium" />
 
                         <Button
                             android:id="@+id/button_confirm"
@@ -269,6 +256,28 @@
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/colorAccent"
                             android:text="Confirmar" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/button_obs"
+                            style="@style/Base.Widget.AppCompat.Button.Borderless"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Observaciones" />
+
+                        <Button
+                            android:id="@+id/button_postergar"
+                            style="@style/Base.Widget.AppCompat.Button.Borderless"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/postergar_lectura" />
                     </LinearLayout>
 
                     <EditText

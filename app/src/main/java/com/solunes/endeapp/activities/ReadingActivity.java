@@ -128,7 +128,8 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
             View inflate = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
             TextView tabText = (TextView) inflate.findViewById(R.id.textview_custom_tab);
             tabText.setText(i + 1 + "");
-            if (datas.get(i).getEstadoLectura() != DataFragment.estados_lectura.Pendiente.ordinal()) {
+            if (datas.get(i).getEstadoLectura() != DataFragment.estados_lectura.Pendiente.ordinal()
+                    && datas.get(i).getEstadoLectura() != DataFragment.estados_lectura.PostergadoTmp.ordinal()) {
                 tabText.setTextColor(getResources().getColor(android.R.color.white));
             }
             tabAt.setCustomView(inflate);
@@ -191,6 +192,14 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         values.put(DataModel.Columns.TlxOrdTpl.name(), dataCurrent.getTlxOrdTpl());
         dbAdapter.updateData(dataCurrent.getId(), values);
         dbAdapter.close();
+    }
+
+    @Override
+    public void onNextPage() {
+        int currentItem = viewPager.getCurrentItem();
+        if (currentItem < adapter.getCount()){
+            viewPager.setCurrentItem(currentItem + 1);
+        }
     }
 
     @Override
@@ -409,39 +418,6 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
-    }
-
-    public Hashtable<String, String> prepareDataToPost() {
-        Hashtable<String, String> params = new Hashtable<>();
-
-        DBAdapter dbAdapter = new DBAdapter(this);
-        ArrayList<DataModel> allData = dbAdapter.getAllDataToSend();
-
-        params.put("UsrCod", String.valueOf(user.getLecCod()));
-
-        for (DataModel dataModel : allData) {
-            String json = DataModel.getJsonToSend(dataModel,
-                    dbAdapter.getDataObsByCli(dataModel.getId()),
-                    dbAdapter.getPrintObsData(dataModel.getId()),
-                    dbAdapter.getDetalleFactura(dataModel.getId()));
-            Log.e(TAG, "prepareDataToPost json: " + json);
-            params.put("" + (dataModel.getTlxCli()), json);
-        }
-
-        try {
-            ArrayList<MedEntreLineas> entreLineasList = dbAdapter.getMedEntreLineas();
-            JSONArray jsonArray = new JSONArray();
-            for (int i = 0; i < entreLineasList.size(); i++) {
-                MedEntreLineas entreLineas = entreLineasList.get(i);
-                jsonArray.put(i, entreLineas.toJson());
-            }
-            Log.e(TAG, "prepareDataToPost: mel: " + jsonArray.toString());
-            params.put("med_entre_lineas", jsonArray.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        dbAdapter.close();
-        return params;
     }
 
     private void checkStatus(int status) {
