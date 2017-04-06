@@ -151,7 +151,7 @@ public class TestActivity extends AppCompatActivity {
                 obs);
 
         if (isCalculo) {
-            DataFragment.saveDataModel(getApplicationContext(), dataModel, obs);
+            DataFragment.saveDataModel(getApplicationContext(), dataModel);
             Log.e(TAG, "calculo: " + dataModel.getId());
         } else {
             Log.e(TAG, "calculo: Error " + dataModel.getId());

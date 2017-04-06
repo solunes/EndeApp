@@ -8,6 +8,7 @@ public class SingleChoiceItem {
     private int code;
     private String title;
     private int obsInd;
+    private boolean check;
 
     public int getCode() {
         return code;
@@ -31,5 +32,13 @@ public class SingleChoiceItem {
 
     public void setObsInd(int obsInd) {
         this.obsInd = obsInd;
+    }
+
+    public boolean isCheck() {
+        return check;
+    }
+
+    public void setCheck(boolean check) {
+        this.check = check;
     }
 }

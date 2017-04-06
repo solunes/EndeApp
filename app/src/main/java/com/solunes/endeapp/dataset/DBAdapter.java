@@ -311,7 +311,25 @@ public class DBAdapter {
      */
     public Cursor getObs() {
         open();
-        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsAut.name() + " = 0", null, null, null, null);
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, null, null, null, null, null);
+        return query;
+    }
+
+    /**
+     * Obtiene todas las observaciones para seleccionar de tipo 1
+     */
+    public Cursor getObsTip1() {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsTip.name() + " = 1", null, null, null, null);
+        return query;
+    }
+
+    /**
+     * Obtiene todas las observaciones para seleccionar de tipo 2
+     */
+    public Cursor getObsTip2() {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.ObsTip.name() + " = 2", null, null, null, null);
         return query;
     }
 
@@ -321,6 +339,28 @@ public class DBAdapter {
     public Cursor getObs(int obsCod) {
         open();
         Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.id.name() + " = " + obsCod, null, null, null, null);
+        query.moveToNext();
+        return query;
+    }
+
+    /**
+     * Obtiene una obervaciones apartir de su id tipo 1
+     */
+    public Cursor getObsTip1(int obsCod) {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.id.name() + " = " + obsCod + " AND " +
+                Obs.Columns.ObsTip.name() + " = 1", null, null, null, null);
+        query.moveToNext();
+        return query;
+    }
+
+    /**
+     * Obtiene una obervaciones apartir de su id tipo 2
+     */
+    public Cursor getObsTip2(int obsCod) {
+        open();
+        Cursor query = db.query(DBHelper.OBS_TABLE, null, Obs.Columns.id.name() + " = " + obsCod + " AND " +
+                Obs.Columns.ObsTip.name() + " = 2", null, null, null, null);
         query.moveToNext();
         return query;
     }
@@ -356,29 +396,17 @@ public class DBAdapter {
      * @param data Es el id data para para buscar la observacion
      * @return
      */
-    public Obs getObsByCli(int data) {
+    public ArrayList<Integer> getObsByCli(int data) {
         open();
         Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null,
-                DataObs.Columns.general_id.name() + " = " + data + " AND " +
-                        "NOT " + DataObs.Columns.observacion_id.name() + " = 80 AND " +
-                        "NOT " + DataObs.Columns.observacion_id.name() + " = 81",
-                null, null, null, null);
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            Cursor cursorObs = db.query(DBHelper.OBS_TABLE, null,
-                    Obs.Columns.id.name() + " = " + cursor.getInt(DataObs.Columns.observacion_id.ordinal()),
-                    null, null, null, null);
-            cursorObs.moveToFirst();
-            Obs obs = Obs.fromCursor(cursorObs);
-            Log.e(TAG, "getObsByCli: " + obs.getObsDes());
-            cursor.close();
-            cursorObs.close();
-            return obs;
-        } else {
-            Log.e(TAG, "getObsByCli: " + 0);
-            cursor.close();
-            return null;
+                DataObs.Columns.general_id.name() + " = " + data, null, null, null, null);
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        while (cursor.moveToNext()){
+            DataObs dataObs = DataObs.fromCursor(cursor);
+            arrayList.add(dataObs.getObgCod());
         }
+        cursor.close();
+        return arrayList;
     }
 
     /**

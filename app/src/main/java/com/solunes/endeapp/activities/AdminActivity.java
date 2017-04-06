@@ -254,10 +254,10 @@ public class AdminActivity extends AppCompatActivity {
             values.put(Obs.Columns.id.name(), object.getInt(Obs.Columns.id.name()));
             values.put(Obs.Columns.ObsDes.name(), object.getString(Obs.Columns.ObsDes.name()).trim());
             values.put(Obs.Columns.ObsTip.name(), object.getInt(Obs.Columns.ObsTip.name()));
-            values.put(Obs.Columns.ObsAut.name(), object.getInt(Obs.Columns.ObsAut.name()));
             values.put(Obs.Columns.ObsInd.name(), object.getInt(Obs.Columns.ObsInd.name()));
             values.put(Obs.Columns.ObsLec.name(), object.getInt(Obs.Columns.ObsLec.name()));
             values.put(Obs.Columns.ObsFac.name(), object.getInt(Obs.Columns.ObsFac.name()));
+            values.put(Obs.Columns.ObsCond.name(), object.getInt(Obs.Columns.ObsCond.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.OBS_TABLE, values);
         }

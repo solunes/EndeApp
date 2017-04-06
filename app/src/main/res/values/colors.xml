@@ -10,4 +10,6 @@
     <color name="colorPendiente">#ff3d00</color>
 
     <color name="colorConectado">#64dd17</color>
+
+    <color name="colorDisableImped">#aae4e4e4</color>
 </resources>

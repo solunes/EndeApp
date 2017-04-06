@@ -234,21 +234,29 @@
 
                         <EditText
                             android:id="@+id/obs_code"
-                            android:layout_width="54dp"
+                            android:layout_width="48dp"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/colorPrimary"
                             android:hint="Obs"
                             android:inputType="number"
                             android:lines="1" />
 
-                        <TextView
-                            android:id="@+id/label_obs"
-                            android:layout_weight="1"
+                        <ImageButton
+                            android:id="@+id/button_obs_add"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="-8dp"
+                            android:backgroundTint="@android:color/white"
+                            android:src="@android:drawable/ic_input_add" />
+
+                        <Button
+                            android:id="@+id/button_obs_imped"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:lines="1"
-                            android:text="NINGUNO"
-                            android:textAppearance="?android:textAppearanceMedium" />
+                            android:layout_weight="1"
+                            android:textColor="@android:color/white"
+                            android:backgroundTint="@color/colorPendiente"
+                            android:text="Obs Imped" />
 
                         <Button
                             android:id="@+id/button_confirm"
@@ -279,6 +287,12 @@
                             android:layout_weight="1"
                             android:text="@string/postergar_lectura" />
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/container_obs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
 
                     <EditText
                         android:id="@+id/input_remenber"

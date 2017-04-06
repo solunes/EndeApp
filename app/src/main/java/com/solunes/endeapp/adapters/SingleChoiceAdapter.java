@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.solunes.endeapp.R;
@@ -23,11 +24,13 @@ public class SingleChoiceAdapter extends ArrayAdapter<SingleChoiceItem> {
 
     private Context context;
     private ArrayList<SingleChoiceItem> singleChoiceItems;
+    private boolean isImpred;
 
-    public SingleChoiceAdapter(Context context, ArrayList<SingleChoiceItem> objects) {
+    public SingleChoiceAdapter(Context context, ArrayList<SingleChoiceItem> objects, boolean isImpred) {
         super(context, 0, objects);
         this.context = context;
         singleChoiceItems = objects;
+        this.isImpred = isImpred;
     }
 
     @Override
@@ -56,13 +59,13 @@ public class SingleChoiceAdapter extends ArrayAdapter<SingleChoiceItem> {
         SingleChoiceItem singleChoiceItem = singleChoiceItems.get(position);
         TextView textViewCode = (TextView) convertView.findViewById(R.id.item_code);
         TextView textViewTitle = (TextView) convertView.findViewById(R.id.item_title);
-        textViewCode.setText(singleChoiceItem.getCode()+"");
+        textViewCode.setText(String.valueOf(singleChoiceItem.getCode()));
         textViewTitle.setText(singleChoiceItem.getTitle());
-        if (singleChoiceItem.getObsInd() == 2) {
+        if (isImpred) {
             textViewCode.setTextColor(Color.parseColor("#ff3d00"));
             textViewTitle.setTextColor(Color.parseColor("#ff3d00"));
         }
 
-        return convertView ;
+        return convertView;
     }
 }

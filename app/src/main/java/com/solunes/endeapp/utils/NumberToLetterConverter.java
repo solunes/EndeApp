@@ -54,6 +54,7 @@ public abstract class NumberToLetterConverter {
         // formateamos el numero, para ajustarlo a el formato de tres puntos
         // decimales
         String formatedDouble = format.format(doubleNumber);
+        formatedDouble = formatedDouble.replace(",",".");
         doubleNumber = Double.parseDouble(formatedDouble);
 
         // Validamos que sea un numero legal
