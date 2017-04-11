@@ -251,7 +251,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getTlxPreNue2() != null) {
             inputPreNue2.setText(dataModel.getTlxPreNue2());
         }
-        if (dataModel.getTlxPreNue3() != null){
+        if (dataModel.getTlxPreNue3() != null) {
             inputPreNue3.setText(dataModel.getTlxPreNue3());
         }
 
@@ -486,7 +486,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                         autoObs = new ArrayList<>();
                         obsArray = new ArrayList<>();
                         obsArray.add(obs.getId());
-                        confirmarLectura(5, 0, 0, obs, view);
+                        methodPequeñaMedianaDemanda(view, "0", obs.getObsLec(), obs);
                         buttonObsImped.setEnabled(false);
                         buttonObsImped.setTextColor(getResources().getColor(R.color.colorDisableImped));
                         dialogInterface.dismiss();
@@ -721,7 +721,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         hidingViews();
         onFragmentListener.onAjusteOrden(dataModel.getId());
+        autoObs = new ArrayList<>();
+        obsArray = new ArrayList<>();
         saveLectura();
+        onFragmentListener.onNextPage();
         Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
     }
 
@@ -1058,6 +1061,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputHoraAlto.setEnabled(false);
             inputHoraMedio.setEnabled(false);
             inputHoraBajo.setEnabled(false);
+            inputPreNue1.setEnabled(false);
+            inputPreNue2.setEnabled(false);
+            inputPreNue3.setEnabled(false);
         }
         if (dataModel.getEstadoLectura() == 1) {
             estadoMedidor.setText(estados_lectura.Leido.name() + " - " + impaviString);

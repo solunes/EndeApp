@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Config;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.solunes.endeapp.BuildConfig;
 import com.solunes.endeapp.R;
 import com.solunes.endeapp.dataset.DBAdapter;
 import com.solunes.endeapp.dataset.DBHelper;
@@ -169,6 +171,9 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         Button buttonTest = (Button) findViewById(R.id.btn_test);
+        if (BuildConfig.DEBUG){
+            buttonTest.setVisibility(View.VISIBLE);
+        }
         buttonTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

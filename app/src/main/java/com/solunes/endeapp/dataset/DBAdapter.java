@@ -794,7 +794,7 @@ public class DBAdapter {
 
     public String getItemDescription(int idItem) {
         open();
-        Cursor query = db.query(DBHelper.ITEM_FACTURACION_TABLE, null, ItemFacturacion.Columns.id.name() + " = " + idItem, null, null, null, null);
+        Cursor query = db.query(DBHelper.ITEM_FACTURACION_TABLE, null, ItemFacturacion.Columns.codigo.name() + " = " + idItem, null, null, null, null);
         query.moveToFirst();
         String desc = query.getString(ItemFacturacion.Columns.descripcion.ordinal());
         query.close();

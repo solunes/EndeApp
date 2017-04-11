@@ -103,7 +103,7 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 575 173 N° MEDIDOR:\r\n" +
                 "RIGHT 100\r\n" +
                 "T CONSO2.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
-                "T CONSO2.CPF 0 445 173 " + dataModel.getTlxCli() + dataModel.getTlxDav() + "\r\n" +
+                "T CONSO2.CPF 0 445 173 " + dataModel.getTlxCli() +"-"+ dataModel.getTlxDav() + "\r\n" +
                 "T CONSO2.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
 
                 "LEFT\r\n" +
