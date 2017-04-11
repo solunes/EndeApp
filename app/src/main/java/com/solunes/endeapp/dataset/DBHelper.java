@@ -289,7 +289,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 FacturaDosificacion.Columns.comprobante.name() + " integer," +
                 FacturaDosificacion.Columns.fecha_inicial.name() + " text," +
                 FacturaDosificacion.Columns.fecha_limite_emision.name() + " text," +
-                FacturaDosificacion.Columns.numero_autorizacion.name() + " integer," +
+                FacturaDosificacion.Columns.numero_autorizacion.name() + " text," +
                 FacturaDosificacion.Columns.llave_dosificacion.name() + " text," +
                 FacturaDosificacion.Columns.numero_factura.name() + " integer," +
                 FacturaDosificacion.Columns.estado.name() + " integer," +

@@ -41,7 +41,6 @@ public class PrintGenerator {
                                  String tapTitle,
                                  String nit,
                                  String[] leyenda) {
-        calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec());
         String deudasEnergia = "";
 
         if (dataModel.getTlxDeuEneC() > 0) {
@@ -65,7 +64,7 @@ public class PrintGenerator {
                 "|" + dataModel.getTlxNroAut() +
                 "|" + dataModel.getTlxFecEmi() +
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) +
-                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpFac()) +
+                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) +
                 "|" + dataModel.getTlxCodCon() +
                 "|" + dataModel.getTlxCliNit() +
                 "|" + StringUtils.roundTwoDigits(tasas) +
@@ -234,18 +233,13 @@ public class PrintGenerator {
      * @param dateLec fecha actual
      * @return retorna la camtidad de dias entre 27 a 33 dias, si esta fuera de ese intervalo retorna '--'
      */
-    private static String calcDays(String dateAnt, String dateLec) {
+    private static int calcDays(String dateAnt, String dateLec) {
         Calendar calendarAnt = Calendar.getInstance();
         calendarAnt.setTime(StringUtils.formateStringFromDate(StringUtils.DATE_FORMAT, dateAnt));
         Calendar calendarLec = Calendar.getInstance();
         calendarLec.setTime(StringUtils.formateStringFromDate(StringUtils.DATE_FORMAT, dateLec));
 
-        int days = calendarAnt.getActualMaximum(Calendar.DAY_OF_MONTH) - calendarAnt.get(Calendar.DAY_OF_MONTH) + calendarLec.get(Calendar.DAY_OF_MONTH);
-        if (27 <= days && days <= 33) {
-            return String.valueOf(days);
-        } else {
-            return "--";
-        }
+        return calendarAnt.getActualMaximum(Calendar.DAY_OF_MONTH) - calendarAnt.get(Calendar.DAY_OF_MONTH) + calendarLec.get(Calendar.DAY_OF_MONTH);
     }
 
     /**

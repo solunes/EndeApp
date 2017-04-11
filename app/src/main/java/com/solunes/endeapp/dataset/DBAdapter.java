@@ -705,14 +705,14 @@ public class DBAdapter {
         return -1;
     }
 
-    public String getLlaveDosificacion() {
+    public FacturaDosificacion getLlaveDosificacion() {
         open();
         Cursor cursor = db.query(DBHelper.FACTURA_DOSIFICACION_TABLE, null,
                 null, null, null, null, null);
         cursor.moveToFirst();
-        String cursorString = cursor.getString(FacturaDosificacion.Columns.llave_dosificacion.ordinal());
+        FacturaDosificacion facturaDosificacion = FacturaDosificacion.fromCursor(cursor);
         cursor.close();
-        return cursorString;
+        return facturaDosificacion;
     }
 
     public double getValorTAP(int categoriaTarifa, int mes, int anio) {

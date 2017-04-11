@@ -12,7 +12,7 @@ public class FacturaDosificacion {
     private int comprobante;
     private String fechaInicial;
     private String fechaLimiteEmision;
-    private int numeroAutorizacion;
+    private String numeroAutorizacion;
     private String llaveDosificacion;
     private int numeroFactura;
     private int estado;
@@ -42,7 +42,7 @@ public class FacturaDosificacion {
         dosificacion.setComprobante(cursor.getInt(Columns.comprobante.ordinal()));
         dosificacion.setFechaInicial(cursor.getString(Columns.fecha_inicial.ordinal()));
         dosificacion.setFechaLimiteEmision(cursor.getString(Columns.fecha_limite_emision.ordinal()));
-        dosificacion.setNumeroAutorizacion(cursor.getInt(Columns.numero_autorizacion.ordinal()));
+        dosificacion.setNumeroAutorizacion(cursor.getString(Columns.numero_autorizacion.ordinal()));
         dosificacion.setLlaveDosificacion(cursor.getString(Columns.llave_dosificacion.ordinal()));
         dosificacion.setNumeroFactura(cursor.getInt(Columns.numero_factura.ordinal()));
         dosificacion.setEstado(cursor.getInt(Columns.estado.ordinal()));
@@ -92,11 +92,11 @@ public class FacturaDosificacion {
         this.fechaLimiteEmision = fechaLimiteEmision;
     }
 
-    public int getNumeroAutorizacion() {
+    public String getNumeroAutorizacion() {
         return numeroAutorizacion;
     }
 
-    public void setNumeroAutorizacion(int numeroAutorizacion) {
+    public void setNumeroAutorizacion(String numeroAutorizacion) {
         this.numeroAutorizacion = numeroAutorizacion;
     }
 

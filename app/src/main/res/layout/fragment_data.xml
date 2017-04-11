@@ -200,6 +200,8 @@
                     android:orientation="vertical"
                     android:padding="@dimen/activity_horizontal_margin">
 
+                    <include layout="@layout/layout_gran_demanda" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -214,19 +216,23 @@
                             android:hint="Lectura Energía"
                             android:inputType="number" />
 
-                        <EditText
-                            android:id="@+id/input_potencia_reading"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:id="@+id/button_confirm"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:backgroundTint="@color/colorPrimary"
-                            android:hint="Lectura Potencia"
-                            android:inputType="number"
-                            android:visibility="gone" />
-
+                            android:backgroundTint="@color/colorAccent"
+                            android:text="Confirmar" />
                     </LinearLayout>
 
-                    <include layout="@layout/layout_gran_demanda" />
+                    <EditText
+                        android:id="@+id/input_potencia_reading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:hint="Lectura Potencia"
+                        android:inputType="number"
+                        android:visibility="gone" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -245,8 +251,8 @@
                             android:id="@+id/button_obs_add"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="-8dp"
                             android:backgroundTint="@android:color/white"
+                            android:padding="-8dp"
                             android:src="@android:drawable/ic_input_add" />
 
                         <Button
@@ -254,16 +260,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textColor="@android:color/white"
                             android:backgroundTint="@color/colorPendiente"
-                            android:text="Obs Imped" />
+                            android:text="Obs Imped"
+                            android:textColor="@android:color/white" />
 
-                        <Button
-                            android:id="@+id/button_confirm"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="@color/colorAccent"
-                            android:text="Confirmar" />
                     </LinearLayout>
 
                     <LinearLayout
