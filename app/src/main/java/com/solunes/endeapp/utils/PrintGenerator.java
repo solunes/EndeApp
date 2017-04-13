@@ -40,6 +40,7 @@ public class PrintGenerator {
                                  String aseoTitle,
                                  String tapTitle,
                                  String nit,
+                                 String fechaLimiteEmision,
                                  String[] leyenda) {
         String deudasEnergia = "";
 
@@ -62,8 +63,8 @@ public class PrintGenerator {
         String qrData = nit +
                 "|" + dataModel.getTlxFacNro() +
                 "|" + dataModel.getTlxNroAut() +
-                "|" + dataModel.getTlxFecEmi() +
-                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) +
+                "|" + formatedDateQR(dataModel.getTlxFecEmi()) +
+                "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpMes()) +
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) +
                 "|" + dataModel.getTlxCodCon() +
                 "|" + dataModel.getTlxCliNit() +
@@ -171,7 +172,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
                 "T CONSO2.CPF 0 270 1100 " + dataModel.getTlxCodCon() + "\r\n" +
-                "T CONSO2.CPF 0 270 1130 " + dataModel.getTlxFecLim() + "\r\n" +
+                "T CONSO2.CPF 0 270 1130 " + fechaLimiteEmision + "\r\n" +
 
                 "CENTER\r\n" +
                 "T CONSO4.CPF 0 0 1230 " + leyenda[0] + "\n\r\n" +
@@ -290,6 +291,20 @@ public class PrintGenerator {
         String month = split[1];
         String day = split[2];
         return day + "-" + mesString(Integer.parseInt(month)).toUpperCase().substring(0, 3) + "-" + year.substring(2);
+    }
+
+    /**
+     * Este metodo le da un formato especifico para la factura. Por ejemplo: 21-04-16
+     *
+     * @param fecha la fecha a ser procesada
+     * @return retorna la fecha en el formato dd-MM-yy
+     */
+    private static String formatedDateQR(String fecha) {
+        String[] split = fecha.split("-");
+        String year = split[0];
+        String month = split[1];
+        String day = split[2];
+        return day + "/" + month + "/" + year;
     }
 
     /**

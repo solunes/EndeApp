@@ -322,7 +322,7 @@ public class AdminActivity extends AppCompatActivity {
             values.put(FacturaDosificacion.Columns.id.name(), object.getInt(FacturaDosificacion.Columns.id.name()));
             values.put(FacturaDosificacion.Columns.numero.name(), object.getInt(FacturaDosificacion.Columns.numero.name()));
             values.put(FacturaDosificacion.Columns.comprobante.name(), object.getInt(FacturaDosificacion.Columns.comprobante.name()));
-            values.put(FacturaDosificacion.Columns.numero_autorizacion.name(), object.getInt(FacturaDosificacion.Columns.numero_autorizacion.name()));
+            values.put(FacturaDosificacion.Columns.numero_autorizacion.name(), object.getString(FacturaDosificacion.Columns.numero_autorizacion.name()));
             values.put(FacturaDosificacion.Columns.numero_factura.name(), object.getInt(FacturaDosificacion.Columns.numero_factura.name()));
             values.put(FacturaDosificacion.Columns.estado.name(), object.getInt(FacturaDosificacion.Columns.estado.name()));
             values.put(FacturaDosificacion.Columns.fecha_inicial.name(), object.getString(FacturaDosificacion.Columns.fecha_inicial.name()).trim());

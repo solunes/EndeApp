@@ -176,7 +176,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         TextView nameData = (TextView) view.findViewById(R.id.data_name);
         nameData.setText(data.getTlxNom());
         TextView dataClient = (TextView) view.findViewById(R.id.data_client);
-        dataClient.setText("N° Cliente: " + data.getTlxCli() + "-"+data.getTlxDav());
+        dataClient.setText("N° Cliente: " + data.getTlxCli() + "-" + data.getTlxDav());
         TextView adressCliente = (TextView) view.findViewById(R.id.adress_client);
         adressCliente.setText(data.getTlxDir());
         TextView categoryCliente = (TextView) view.findViewById(R.id.category_client);
@@ -462,6 +462,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
                     dbAdapter.updateData(dataModel.getId(), cv);
                     dbAdapter.close();
+                    onFragmentListener.onAjusteOrden(dataModel.getId());
                     onFragmentListener.onNextPage();
                 }
             }
@@ -1089,6 +1090,9 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputPreNue2.setEnabled(false);
             inputPreNue3.setEnabled(false);
             inputPreNue4.setEnabled(false);
+            if (dataModel.getTlxImpAvi() == 0) {
+                buttonConfirm.setEnabled(false);
+            }
         } else {
             buttonConfirm.setEnabled(false);
             buttonPostergar.setEnabled(false);
@@ -1217,6 +1221,10 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getTlxImpAvi() == 1) {
             sendPrint();
         } else {
+            printValues = new ArrayList<>();
+            printTitles = new ArrayList<>();
+            printBottomTitles = new ArrayList<>();
+            printBottomValues = new ArrayList<>();
             Snackbar.make(view, "No se imprime factura", Snackbar.LENGTH_LONG).show();
         }
     }
@@ -1236,6 +1244,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         String tapTitle = dbAdapter.getItemDescription(153);
         String nit = dbAdapter.getParametroTexto(Parametro.Values.nit.name());
         double carDep = dbAdapter.getDetalleFacturaImporte(dataModel.getId(), 427);
+        FacturaDosificacion llaveDosificacion = dbAdapter.getLlaveDosificacion();
         dbAdapter.close();
         onFragmentListener.onPrinting(PrintGenerator.creator(
                 dataModel,
@@ -1249,6 +1258,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 aseoTitle,
                 tapTitle,
                 nit,
+                llaveDosificacion.getFechaLimiteEmision(),
                 leyenda));
         printValues = new ArrayList<>();
         printTitles = new ArrayList<>();
@@ -1343,7 +1353,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         if (dataModel.getTlxTipDem() == 2 && dataModel.getTlxPotLei() > 0) {
             inputPotenciaReading.setText(String.valueOf(dataModel.getTlxPotLei()));
         }
-        if (dataModel.getEstadoLectura() != 0) {
+        if (dataModel.getEstadoLectura() != 0 && dataModel.getEstadoLectura() != 3) {
             if (dataModel.getTlxImpAvi() == 0) {
                 buttonConfirm.setEnabled(false);
                 buttonObsImped.setEnabled(false);
@@ -1446,7 +1456,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             inputHoraMedio = view.findViewById(R.id.input_gd_horamedio);
             inputHoraBajo = view.findViewById(R.id.input_gd_horabajo);
 
-            if (dataModel.getEstadoLectura() != 0) {
+            if (dataModel.getEstadoLectura() != estados_lectura.Pendiente.ordinal()
+                    && dataModel.getEstadoLectura() != estados_lectura.PostergadoTmp.ordinal()) {
                 kwInst.setText(String.valueOf(dataModel.getTlxKwInst()));
                 reactiva.setText(String.valueOf(dataModel.getTlxReactiva()));
                 kwalto.setText(String.valueOf(dataModel.getTlxKwhAlto()));
@@ -1591,7 +1602,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                 dataModel.getTlxFacNro(),
                 String.valueOf(dataModel.getTlxCliNit()),
                 dataModel.getTlxFecEmi().replace("-", ""),
-                String.valueOf((int) dataModel.getTlxImpSum()),
+                String.valueOf(GenLecturas.roundDecimal(dataModel.getTlxImpSum(), 0)),
                 llaveDosificacion.getLlaveDosificacion());
     }
 

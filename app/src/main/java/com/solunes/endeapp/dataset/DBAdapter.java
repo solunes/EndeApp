@@ -107,6 +107,7 @@ public class DBAdapter {
         db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_DATA_TABLE, null, null);
         db.delete(DBHelper.LIMITES_MAXIMOS_TABLE, null, null);
+        db.delete(DBHelper.FACTURA_DOSIFICACION_TABLE, null, null);
     }
 
     /**
@@ -759,10 +760,9 @@ public class DBAdapter {
         return null;
     }
 
-    public void orderPendents(int idDataLas, int idDataCurrent) {
+    public void orderPendents(int idDataCurrent) {
         open();
         Cursor cursor = db.query(DBHelper.DATA_TABLE, null, DataModel.Columns.estado_lectura.name() + " = " + DataFragment.estados_lectura.Pendiente.ordinal() +
-                " AND " + DataModel.Columns.TlxOrdTpl.name() + " > " + idDataLas +
                 " AND " + DataModel.Columns.TlxOrdTpl.name() + " < " + idDataCurrent, null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
         Cursor allData = db.query(DBHelper.DATA_TABLE, null, null, null, null, null, DataModel.Columns.TlxOrdTpl.name() + " ASC");
         allData.moveToLast();
@@ -773,6 +773,7 @@ public class DBAdapter {
             cv.put(DataModel.Columns.TlxOrdTpl.name(), lastOrdTpl);
             db.update(DBHelper.DATA_TABLE, cv, DataModel.Columns.id.name() + " = " + cursor.getInt(DataModel.Columns.id.ordinal()), null);
         }
+        cursor.close();
     }
 
     public ArrayList<DataModel> getAllDataToSend() {

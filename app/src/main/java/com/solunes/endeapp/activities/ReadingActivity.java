@@ -182,11 +182,10 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         DBAdapter dbAdapter = new DBAdapter(this);
         DataModel dataLastSaved = dbAdapter.getLastSaved();
         DataModel dataCurrent = dbAdapter.getData(idData);
+        dbAdapter.orderPendents(dataCurrent.getTlxOrdTpl());
         if (dataLastSaved == null) {
-            dbAdapter.orderPendents(0, dataCurrent.getTlxOrdTpl());
-            dataCurrent.setTlxOrdTpl(1);
+            dataCurrent.setTlxOrdTpl(0);
         } else {
-            dbAdapter.orderPendents(dataLastSaved.getTlxOrdTpl(), dataCurrent.getTlxOrdTpl());
             dataCurrent.setTlxOrdTpl(dataLastSaved.getTlxOrdTpl() + 1);
         }
         ContentValues values = new ContentValues();
@@ -198,7 +197,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
     @Override
     public void onNextPage() {
         int currentItem = viewPager.getCurrentItem();
-        if (currentItem < adapter.getCount()){
+        if (currentItem < adapter.getCount()) {
             viewPager.setCurrentItem(currentItem + 1);
         }
     }
