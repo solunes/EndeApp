@@ -585,6 +585,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             } else {
                 tipoLectura = 9;
             }
+        } else if (obs.getObsCond() == 5) {
+            if (nuevaLectura > 0) {
+                tipoLectura = 0;
+            } else {
+                tipoLectura = 5;
+            }
         }
 
         // correction de obs ind
@@ -830,17 +836,13 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         // correccion de kwh a devolver sino es consumo promedio o lectura estinada
         if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 9) {
-        /*    lectura = lectura - dataModel.getTlxKwhDev();
+            lectura = lectura - dataModel.getTlxKwhDev();
             if (lectura > 0) {
                 dataModel.setTlxKwhDev(0);
             } else {
                 dataModel.setTlxKwhDev(Math.abs(lectura));
                 lectura = 0;
             }
-            SE POSTERGAN LOS QUE TENGAN LETURA AJUSTADA
-            */
-            tipoLectura = 5;
-            dataModel.setTlxTipLec(tipoLectura);
         }
 
         // lectura final
@@ -956,10 +958,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private void printArrays() {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         // agregar cargo fijo y energia al array de impresion
-        printTitles.add(dbAdapter.getItemDescription(1));
-        printValues.add(GenLecturas.round(dataModel.getTlxCarFij()));
         printTitles.add("Importe por energía");
-        printValues.add(GenLecturas.round(dataModel.getTlxImpEnergia()));
+        printValues.add(GenLecturas.round(dataModel.getTlxImpEnergia() + dataModel.getTlxCarFij()));
 
         // calculo de potencia para mediana demanda
         if (dataModel.getTlxTipDem() == 2) {

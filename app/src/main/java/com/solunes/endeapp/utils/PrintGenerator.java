@@ -457,6 +457,13 @@ public class PrintGenerator {
                     "RIGHT 782\r\n" +
                     "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi() + " kWh\r\n";
         }
+
+        offsetX += 20;
+        res += "LEFT\r\n" +
+                "T CONSO2.CPF 0 45 " + offsetX + " Total energía a facturar\r\n" +
+                "RIGHT 782\r\n" +
+                "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxConsFacturado() + " kWh\r\n";
+
         if (dataModel.getTlxTipDem() == 2) {
             offsetX += 20;
             res += "LEFT\r\n" +
