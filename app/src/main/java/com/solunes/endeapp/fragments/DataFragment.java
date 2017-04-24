@@ -551,27 +551,27 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
         }
 
-        // Verificar y obtener la lectura inicial cuando sea requerida
-        if (tipoLectura != 3 && tipoLectura != 9 && input.isEmpty()) {
-            Snackbar.make(view, "Ingresar un indice", Snackbar.LENGTH_SHORT).show();
-            return;
-        } else {
-            // obtener lectura de energia y verificar digitos
-            nuevaLectura = Integer.parseInt(input);
+        boolean isAlert = false;
+        String message = "Se ha detectado:";
 
-            if (nuevaLectura > dataModel.getTlxTope()) {
-                Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
-                return;
-            }
-            nuevaLectura = correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
+        // obtener lectura de energia y verificar digitos
+        nuevaLectura = Integer.parseInt(input);
+
+        if (nuevaLectura > dataModel.getTlxTope()) {
+            Snackbar.make(view, "La lectura no puede tener mas de " + dataModel.getTlxNroDig() + " digitos", Snackbar.LENGTH_SHORT).show();
+            return;
         }
+        nuevaLectura = correccionDeDigitos(nuevaLectura, dataModel.getTlxDecEne());
+
+        boolean isCond = false;
 
         // condicionante de observacion 1
         if (obs.getObsCond() == 1) {
             if (nuevaLectura > 0) {
                 tipoLectura = 0;
             } else {
-                tipoLectura = 9;
+                isCond = true;
+                tipoLectura = 0;
             }
         } else if (obs.getObsCond() == 3) {
             if (dataModel.getTlxUltInd() == nuevaLectura) {
@@ -594,10 +594,12 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
         // correction de obs ind
-        if (obs.getObsInd() == 1) {
-            nuevaLectura = dataModel.getTlxUltInd();
-        } else if (obs.getObsInd() == 2) {
-            nuevaLectura = 0;
+        if (tipoLectura != 0) {
+            if (obs.getObsInd() == 1) {
+                nuevaLectura = dataModel.getTlxUltInd();
+            } else if (obs.getObsInd() == 2) {
+                nuevaLectura = 0;
+            }
         }
 
         // Calcular la lectura en Kwh segun el tipo de lectura
@@ -605,7 +607,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             lecturaKwh = dataModel.getTlxConPro();
         } else {
             if (nuevaLectura < dataModel.getTlxUltInd()) {
-                if ((dataModel.getTlxUltInd() - nuevaLectura) <= 10) {
+                if (Math.abs(dataModel.getTlxUltInd() - nuevaLectura) <= 10) {
                     nuevaLectura = dataModel.getTlxUltInd();
                     indiceIgualado = true;
                 } else {
@@ -624,7 +626,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         int conPro = dataModel.getTlxConPro();
         autoObs = new ArrayList<>();
         // Alertas de consumo bajo, consumo elevado y giro de medidor
-        boolean isAlert = false;
         boolean isPostergado = false;
         if (tipoLectura == 5) {
             isPostergado = true;
@@ -632,7 +633,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.Theme_Dialog);
         builder.setTitle("Alerta!");
         if (dataModel.getTlxCliNew() == 0) {
-            String message = "Se ha detectado:";
             if (lecturaKwh > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
                 message += "\n- Consumo elevado";
                 isAlert = true;
@@ -651,22 +651,24 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             if (giro) {
                 message += "\n- Giro de medidor";
                 isAlert = true;
+                if (autoObs.contains(80)) {
+                    autoObs.add(36);
+                }
             }
             if (indiceIgualado) {
                 message += "\n- Índice igualado";
                 isAlert = true;
                 autoObs.add(50);
             }
-            message += "\n\n¿Es correcto el índice " + nuevaLectura + "?";
-            builder.setMessage(message);
-            builder.setNegativeButton("Cancelar", null);
         }
 
         // Verificacion si el estado de cliente es cortado o suspendido y se introduce el mismo indice al anterior, se posterga
         if (dataModel.getTlxEstCli() == 3 || dataModel.getTlxEstCli() == 5) {
-            if (dataModel.getTlxUltInd() != nuevaLectura) {
+            if (dataModel.getTlxUltInd() == nuevaLectura) {
                 tipoLectura = 5;
                 isPostergado = true;
+            } else {
+                autoObs.add(10);
             }
         }
 
@@ -674,16 +676,36 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             isAlert = false;
         }
 
+        // Verificar y obtener la lectura inicial cuando sea requerida
+        if (obs.getObsInd() == 0 && input.equals("0")) {
+            isAlert = true;
+            message += "\n- Índice introducido es 0";
+        }
+
+        message += "\n\n¿Es correcto el índice " + input + "?";
+
         final int finalLecturaKwh = lecturaKwh;
         final int finalNuevaLectura = nuevaLectura;
         final int finalTipoLectura = tipoLectura;
+        if (isCond && giro) {
+            message += "\n\n¿Desea confirmar un giro de medidor?";
+            builder.setNegativeButton("Rechazar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    confirmarLectura(9, 0, dataModel.getTlxConPro(), obs, view);
+                }
+            });
+            isAlert = true;
+        } else {
+            builder.setNegativeButton("Cancelar", null);
+        }
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 confirmarLectura(finalTipoLectura, finalNuevaLectura, finalLecturaKwh, obs, view);
             }
         });
-
+        builder.setMessage(message);
         // si hay alerta y el tipo de lectura no es postergada
         if (isAlert) {
             if (countAlert < 2) {
@@ -822,11 +844,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             return true;
         }
 
-        // correccion para consumo promedio
-        if (tipoLectura == 3 || tipoLectura == 9) {
-            dataModel.setTlxKwhDev(lectura);
-        }
-
         // multiplicar la lectura con el multiplicador de energia
         lectura = (int) (lectura * dataModel.getTlxFacMul());
 
@@ -834,13 +851,22 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel.setTlxTipLec(tipoLectura);
         dataModel.setTlxConsumo(lectura);
 
+        // correccion para consumo promedio
+        if (tipoLectura == 3 || tipoLectura == 9) {
+            dataModel.setTlxKwhDev(lectura);
+            dataModel.setTlxConsumo(0);
+        }
+
+        Log.e(TAG, "calculo: KwhDev2 " + dataModel.getTlxKwhDev2());
         // correccion de kwh a devolver sino es consumo promedio o lectura estinada
         if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 9) {
-            lectura = lectura - dataModel.getTlxKwhDev();
-            if (lectura > 0) {
+            int lectura2 = lectura - dataModel.getTlxKwhDev();
+            if (lectura2 > 0) {
                 dataModel.setTlxKwhDev(0);
             } else {
-                dataModel.setTlxKwhDev(Math.abs(lectura));
+                dataModel.setTlxKwhDev(Math.abs(lectura2));
+                dataModel.setTlxKwhDev2(lectura);
+                Log.e(TAG, "calculo: KwhDev2 " + dataModel.getTlxKwhDev2());
                 lectura = 0;
             }
         }
@@ -932,7 +958,17 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         dataModel.setTlxImpTap(totalSuministroTap);
         dataModel.setTlxImpAse(totalSuministroAseo);
         double importeTotalFactura = GenLecturas.totalFacturar(dataModel.getTlxImpSum(), dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
-        dataModel.setTlxImpFac(importeTotalFactura);
+        double importeTotalFactura2 = GenLecturas.roundDecimal(importeTotalFactura, 1);
+        double diff = importeTotalFactura - importeTotalFactura2;
+        if (dataModel.getTlxImpEnergia() > 0) {
+            dataModel.setTlxImpEnergia(GenLecturas.roundDecimal(dataModel.getTlxImpEnergia() - diff, 2));
+        } else {
+            dataModel.setTlxCarFij(GenLecturas.roundDecimal(dataModel.getTlxCarFij() - diff, 2));
+        }
+        dataModel.setTlxImpEn(GenLecturas.roundDecimal(dataModel.getTlxImpEn() - diff, 2));
+        dataModel.setTlxImpTotCns(GenLecturas.roundDecimal(dataModel.getTlxImpTotCns() - diff, 2));
+        dataModel.setTlxImpSum(GenLecturas.roundDecimal(dataModel.getTlxImpSum() - diff, 2));
+        dataModel.setTlxImpFac(importeTotalFactura2);
 
         double cargosTotal2 = 0;
         for (Integer itemId : arrayCargos2()) {
@@ -1181,6 +1217,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         cv.put(DataModel.Columns.TlxImpTap.name(), dataModel.getTlxImpTap());
         cv.put(DataModel.Columns.TlxImpAse.name(), dataModel.getTlxImpAse());
         cv.put(DataModel.Columns.TlxKwhDev.name(), dataModel.getTlxKwhDev());
+        cv.put(DataModel.Columns.TlxKwhDev2.name(), dataModel.getTlxKwhDev2());
         cv.put(DataModel.Columns.TlxRecordatorio.name(), dataModel.getTlxRecordatorio());
         cv.put(DataModel.Columns.estado_lectura.name(), dataModel.getEstadoLectura());
 

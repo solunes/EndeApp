@@ -470,6 +470,8 @@ public class MainActivity extends AppCompatActivity {
             values.put(DataModel.Columns.TlxDecPot.name(), object.getInt(DataModel.Columns.TlxDecPot.name()));
             values.put(DataModel.Columns.TlxDemPot.name(), object.getString(DataModel.Columns.TlxDemPot.name()).trim());
             values.put(DataModel.Columns.TlxPotTag.name(), object.getInt(DataModel.Columns.TlxPotTag.name()));
+            values.put(DataModel.Columns.TlxKwhAdi2.name(), object.getInt(DataModel.Columns.TlxKwhAdi.name()));
+            values.put(DataModel.Columns.TlxKwhDev2.name(), object.getInt(DataModel.Columns.TlxKwhDev.name()));
             values.putAll(stringNull(DataModel.Columns.TlxPreAnt1.name(), object.getString(DataModel.Columns.TlxPreAnt1.name()).trim()));
             values.putAll(stringNull(DataModel.Columns.TlxPreAnt2.name(), object.getString(DataModel.Columns.TlxPreAnt2.name()).trim()));
             values.putAll(stringNull(DataModel.Columns.TlxPreAnt3.name(), object.getString(DataModel.Columns.TlxPreAnt3.name()).trim()));

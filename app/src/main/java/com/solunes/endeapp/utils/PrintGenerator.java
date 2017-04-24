@@ -99,11 +99,11 @@ public class PrintGenerator {
 
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 40 173 NIT/CI:\r\n" +
-                "T CONSO2.CPF 0 280 173 N° CLIENTE:\r\n" +
+                "T CONSO2.CPF 0 280 173 N° CONSUMIDOR:\r\n" +
                 "T CONSO2.CPF 0 575 173 N° MEDIDOR:\r\n" +
                 "RIGHT 100\r\n" +
                 "T CONSO2.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
-                "T CONSO2.CPF 0 445 173 " + dataModel.getTlxCli() +"-"+ dataModel.getTlxDav() + "\r\n" +
+                "T CONSO2.CPF 0 450 173 " + dataModel.getTlxCli() +"-"+ dataModel.getTlxDav() + "\r\n" +
                 "T CONSO2.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
 
                 "LEFT\r\n" +
@@ -443,19 +443,26 @@ public class PrintGenerator {
     private static String detalleConsumo(DataModel dataModel) {
         String res = "";
         int offsetX = 340;
-        if (dataModel.getTlxKwhDev() > 0 && dataModel.getTlxTipLec() != 3 && dataModel.getTlxTipLec() != 6 && dataModel.getTlxTipLec() != 9) {
+        /*if (dataModel.getTlxTipLec() == 3 || dataModel.getTlxTipLec() == 9) {
+            offsetX += 20;
+            res += "LEFT\r\n" +
+                    "T CONSO2.CPF 0 45 " + offsetX + "Consumo promedio de energia\r\n" +
+                    "RIGHT 782\r\n" +
+                    "T CONSO2.CPF 0 720 " + offsetX + " -" + dataModel.getTlxConPro() + " kWh\r\n";
+        }*/
+        if (dataModel.getTlxKwhDev2() > 0 && dataModel.getTlxTipLec() != 3 && dataModel.getTlxTipLec() != 6 && dataModel.getTlxTipLec() != 9) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a devolver\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhDev() + " kWh\r\n";
+                    "T CONSO2.CPF 0 720 " + offsetX + " -" + dataModel.getTlxKwhDev2() + " kWh\r\n";
         }
-        if (dataModel.getTlxKwhAdi() > 0) {
+        if (dataModel.getTlxKwhAdi2() > 0) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a adicionar\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi() + " kWh\r\n";
+                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi2() + " kWh\r\n";
         }
 
         offsetX += 20;

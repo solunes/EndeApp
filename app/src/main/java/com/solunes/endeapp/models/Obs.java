@@ -35,6 +35,7 @@ public class Obs {
         obs.setObsInd(cursor.getInt(Columns.ObsInd.ordinal()));
         obs.setObsLec(cursor.getInt(Columns.ObsLec.ordinal()));
         obs.setObsFac(cursor.getInt(Columns.ObsFac.ordinal()));
+        obs.setObsCond(cursor.getInt(Columns.ObsCond.ordinal()));
         return obs;
     }
 

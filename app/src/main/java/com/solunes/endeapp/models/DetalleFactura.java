@@ -66,8 +66,10 @@ public class DetalleFactura {
      * @return importe redondeado
      */
     public static double crearDetalle(Context context, int idData, int idItem, double importe) {
-        double importeRedondeado = GenLecturas.roundDecimal(importe, 1);
-        double diferencia = importe - importeRedondeado;
+        //double importeRedondeado = GenLecturas.roundDecimal(importe, 1);
+        double importeRedondeado = GenLecturas.roundDecimal(importe, 2);
+        //double diferencia = importe - importeRedondeado;
+        double diferencia = 0;
 
         DBAdapter dbAdapter = new DBAdapter(context);
         DetalleFactura detalleFactura = dbAdapter.getDetalleFactura(idData, idItem);

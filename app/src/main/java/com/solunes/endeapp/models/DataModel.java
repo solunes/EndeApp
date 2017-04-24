@@ -137,6 +137,8 @@ public class DataModel {
     private String TlxDemPot;
     private String TlxRecordatorio;
     private double TlxImpEnergia;
+    private int TlxKwhAdi2;
+    private int TlxKwhDev2;
 
     public enum Columns {
         id,
@@ -260,7 +262,9 @@ public class DataModel {
         TlxRecordatorio,
         TlxImpEnergia,
         estado_lectura,
-        enviado
+        enviado,
+        TlxKwhAdi2,
+        TlxKwhDev2
     }
 
     public enum EstadoEnviado{
@@ -275,7 +279,7 @@ public class DataModel {
         if (idTipo == 0) {
             return "Lectura normal";
         } else if (idTipo == 3) {
-            return "Lectura promedio";
+            return "Consumo promedio";
         } else if (idTipo == 4) {
             return "Último índice";
         } else if (idTipo == 5) {
@@ -414,6 +418,8 @@ public class DataModel {
         dataModel.setTlxFechaAlto(cursor.getString(Columns.TlxFechaAlto.ordinal()));
         dataModel.setTlxFechaMedio(cursor.getString(Columns.TlxFechaMedio.ordinal()));
         dataModel.setTlxFechaBajo(cursor.getString(Columns.TlxFechaBajo.ordinal()));
+        dataModel.setTlxKwhAdi2(cursor.getInt(Columns.TlxKwhAdi2.ordinal()));
+        dataModel.setTlxKwhDev2(cursor.getInt(Columns.TlxKwhDev2.ordinal()));
         return dataModel;
     }
 
@@ -500,6 +506,22 @@ public class DataModel {
             Log.e(TAG, "getJsonToSend: ", e);
         }
         return jsonObject.toString();
+    }
+
+    public int getTlxKwhAdi2() {
+        return TlxKwhAdi2;
+    }
+
+    public void setTlxKwhAdi2(int tlxKwhAdi2) {
+        TlxKwhAdi2 = tlxKwhAdi2;
+    }
+
+    public int getTlxKwhDev2() {
+        return TlxKwhDev2;
+    }
+
+    public void setTlxKwhDev2(int tlxKwhDev2) {
+        TlxKwhDev2 = tlxKwhDev2;
     }
 
     public int getTlxEstCli() {
