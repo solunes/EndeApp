@@ -402,7 +402,7 @@ public class DBAdapter {
         Cursor cursor = db.query(DBHelper.DATA_OBS_TABLE, null,
                 DataObs.Columns.general_id.name() + " = " + data, null, null, null, null);
         ArrayList<Integer> arrayList = new ArrayList<>();
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             DataObs dataObs = DataObs.fromCursor(cursor);
             arrayList.add(dataObs.getObgCod());
         }
@@ -555,7 +555,7 @@ public class DBAdapter {
      */
     public Cursor getPrintObs() {
         open();
-        Cursor cursor = db.query(DBHelper.PRINT_OBS_TABLE, null, null, null, null, null, null);
+        Cursor cursor = db.query(DBHelper.PRINT_OBS_TABLE, null, PrintObs.Columns.ObiAut.name() + " = 0", null, null, null, null);
         return cursor;
     }
 

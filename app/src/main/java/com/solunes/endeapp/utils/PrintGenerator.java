@@ -103,7 +103,7 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 575 173 N° MEDIDOR:\r\n" +
                 "RIGHT 100\r\n" +
                 "T CONSO2.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
-                "T CONSO2.CPF 0 450 173 " + dataModel.getTlxCli() +"-"+ dataModel.getTlxDav() + "\r\n" +
+                "T CONSO2.CPF 0 450 173 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
                 "T CONSO2.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
 
                 "LEFT\r\n" +
@@ -172,7 +172,7 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
                 "T CONSO2.CPF 0 270 1100 " + dataModel.getTlxCodCon() + "\r\n" +
-                "T CONSO2.CPF 0 270 1130 " + fechaLimiteEmision + "\r\n" +
+                "T CONSO2.CPF 0 270 1130 " + formatedDatePrint(fechaLimiteEmision) + "\r\n" +
 
                 "CENTER\r\n" +
                 "T CONSO4.CPF 0 0 1230 " + leyenda[0] + "\n\r\n" +
@@ -195,11 +195,11 @@ public class PrintGenerator {
                 createHistorico(historico) +
 
                 "T CONSO0.CPF 0 55 1378 Fecha Vencimiento: \r\n" +
-                "T CONSO0.CPF 0 210 1378 " + dataModel.getTlxFecVto() + "\r\n" +
+                "T CONSO0.CPF 0 210 1378 " + formatedDatePrint(dataModel.getTlxFecVto()) + "\r\n" +
                 "T CONSO0.CPF 0 300 1378 Fecha Est.Prox.Med: \r\n" +
-                "T CONSO0.CPF 0 460 1378 " + dataModel.getTlxFecproMed() + "\r\n" +
+                "T CONSO0.CPF 0 460 1378 " + formatedDatePrint(dataModel.getTlxFecproMed()) + "\r\n" +
                 "T CONSO0.CPF 0 560 1378 Fecha Est.Prox.Emi: \r\n" +
-                "T CONSO0.CPF 0 710 1378 " + dataModel.getTlxFecproEmi() + "\r\n" +
+                "T CONSO0.CPF 0 710 1378 " + formatedDatePrint(dataModel.getTlxFecproEmi()) + "\r\n" +
 
                 "T CONSO1.CPF 0 135 1430 " + formatedDateSinDia(dataModel.getTlxFecLec()) + "\r\n" +
                 "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
@@ -307,6 +307,14 @@ public class PrintGenerator {
         return day + "/" + month + "/" + year;
     }
 
+    private static String formatedDatePrint(String fecha) {
+        String[] split = fecha.split("-");
+        String year = split[0];
+        String month = split[1];
+        String day = split[2];
+        return day + "/" + month + "/" + year.substring(2);
+    }
+
     /**
      * Este metodo le da un formato a la fecha para la factura sin el dia. Por ejemplo: JUN-16
      *
@@ -408,29 +416,29 @@ public class PrintGenerator {
     private static String createHistorico(Historico hist) {
         String res = "" +
                 "T CONSO1.CPF 0 40 1328 " + (hist.getConMes01() == null ? "" : hist.getConMes01()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1328 " + (hist.getConKwh01() == 0 ? "" : hist.getConKwh01()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1328 " + (hist.getConMes01() == null ? "" : hist.getConKwh01()) + "\r\n" +
                 "T CONSO1.CPF 0 40 1343 " + (hist.getConMes02() == null ? "" : hist.getConMes02()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1343 " + (hist.getConKwh02() == 0 ? "" : hist.getConKwh02()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1343 " + (hist.getConMes02() == null ? "" : hist.getConKwh02()) + "\r\n" +
                 "T CONSO1.CPF 0 40 1358 " + (hist.getConMes03() == null ? "" : hist.getConMes03()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1358 " + (hist.getConKwh03() == 0 ? "" : hist.getConKwh03()) + "\r\n" +
+                "T CONSO1.CPF 0 160 1358 " + (hist.getConMes03() == null ? "" : hist.getConKwh03()) + "\r\n" +
                 "T CONSO1.CPF 0 235 1328 " + (hist.getConMes04() == null ? "" : hist.getConMes04()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1328 " + (hist.getConKwh04() == 0 ? "" : hist.getConKwh04()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1328 " + (hist.getConMes04() == null ? "" : hist.getConKwh04()) + "\r\n" +
                 "T CONSO1.CPF 0 235 1343 " + (hist.getConMes05() == null ? "" : hist.getConMes05()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1343 " + (hist.getConKwh05() == 0 ? "" : hist.getConKwh05()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1343 " + (hist.getConMes05() == null ? "" : hist.getConKwh05()) + "\r\n" +
                 "T CONSO1.CPF 0 235 1358 " + (hist.getConMes06() == null ? "" : hist.getConMes06()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1358 " + (hist.getConKwh06() == 0 ? "" : hist.getConKwh06()) + "\r\n" +
+                "T CONSO1.CPF 0 360 1358 " + (hist.getConMes06() == null ? "" : hist.getConKwh06()) + "\r\n" +
                 "T CONSO1.CPF 0 435 1328 " + (hist.getConMes07() == null ? "" : hist.getConMes07()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1328 " + (hist.getConKwh07() == 0 ? "" : hist.getConKwh07()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1328 " + (hist.getConMes07() == null ? "" : hist.getConKwh07()) + "\r\n" +
                 "T CONSO1.CPF 0 435 1343 " + (hist.getConMes08() == null ? "" : hist.getConMes08()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1343 " + (hist.getConKwh08() == 0 ? "" : hist.getConKwh08()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1343 " + (hist.getConMes08() == null ? "" : hist.getConKwh08()) + "\r\n" +
                 "T CONSO1.CPF 0 435 1358 " + (hist.getConMes09() == null ? "" : hist.getConMes09()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1358 " + (hist.getConKwh09() == 0 ? "" : hist.getConKwh09()) + "\r\n" +
+                "T CONSO1.CPF 0 560 1358 " + (hist.getConMes09() == null ? "" : hist.getConKwh09()) + "\r\n" +
                 "T CONSO1.CPF 0 635 1328 " + (hist.getConMes10() == null ? "" : hist.getConMes10()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1328 " + (hist.getConKwh10() == 0 ? "" : hist.getConKwh10()) + "\r\n" +
+                "T CONSO1.CPF 0 755 1328 " + (hist.getConMes10() == null ? "" : hist.getConKwh10()) + "\r\n" +
                 "T CONSO1.CPF 0 635 1343 " + (hist.getConMes11() == null ? "" : hist.getConMes11()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1343 " + (hist.getConKwh11() == 0 ? "" : hist.getConKwh11()) + "\r\n" +
+                "T CONSO1.CPF 0 755 1343 " + (hist.getConMes11() == null ? "" : hist.getConKwh11()) + "\r\n" +
                 "T CONSO1.CPF 0 635 1358 " + (hist.getConMes12() == null ? "" : hist.getConMes12()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1358 " + (hist.getConKwh12() == 0 ? "" : hist.getConKwh12()) + "\r\n";
+                "T CONSO1.CPF 0 755 1358 " + (hist.getConMes12() == null ? "" : hist.getConKwh12()) + "\r\n";
         return res;
     }
 

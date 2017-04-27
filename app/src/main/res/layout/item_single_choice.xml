@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/item_code"
-        android:layout_width="56dp"
+        android:layout_width="68dp"
         android:layout_height="wrap_content"
         android:padding="@dimen/activity_horizontal_margin"
         android:textSize="16sp" />
@@ -15,6 +15,7 @@
         android:id="@+id/item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
         android:textSize="16sp" />
 </LinearLayout>

@@ -35,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "endeapp.db";
     // este es el numero de version de la base de datos,
     // cuando se hace un cambio en la base de datos se debe incrementar el numero
-    private static final int DATABASE_VERSION = 30;
+    private static final int DATABASE_VERSION = 31;
 
     // nombres de las tablas de la base de datos
 
@@ -224,32 +224,32 @@ public class DBHelper extends SQLiteOpenHelper {
                 "TlxKwhDev2 integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + HISTORICO_TABLE + " (" +
-                Historico.Columns.id.name()+" integer," +
-                Historico.Columns.general_id.name()+" integer," +
-                Historico.Columns.ConMes01.name()+" text," +
-                Historico.Columns.ConKwh01.name()+" integer," +
-                Historico.Columns.ConMes02.name()+" text," +
-                Historico.Columns.ConKwh02.name()+" integer," +
-                Historico.Columns.ConMes03.name()+" text," +
-                Historico.Columns.ConKwh03.name()+" integer," +
-                Historico.Columns.ConMes04.name()+" text," +
-                Historico.Columns.ConKwh04.name()+" integer," +
-                Historico.Columns.ConMes05.name()+" text," +
-                Historico.Columns.ConKwh05.name()+" integer," +
-                Historico.Columns.ConMes06.name()+" text," +
-                Historico.Columns.ConKwh06.name()+" integer," +
-                Historico.Columns.ConMes07.name()+" text," +
-                Historico.Columns.ConKwh07.name()+" integer," +
-                Historico.Columns.ConMes08.name()+" text," +
-                Historico.Columns.ConKwh08.name()+" integer," +
-                Historico.Columns.ConMes09.name()+" text," +
-                Historico.Columns.ConKwh09.name()+" integer," +
-                Historico.Columns.ConMes10.name()+" text," +
-                Historico.Columns.ConKwh10.name()+" integer," +
-                Historico.Columns.ConMes11.name()+" text," +
-                Historico.Columns.ConKwh11.name()+" integer," +
-                Historico.Columns.ConMes12.name()+" text," +
-                Historico.Columns.ConKwh12.name()+" integer)");
+                Historico.Columns.id.name() + " integer," +
+                Historico.Columns.general_id.name() + " integer," +
+                Historico.Columns.ConMes01.name() + " text," +
+                Historico.Columns.ConKwh01.name() + " integer," +
+                Historico.Columns.ConMes02.name() + " text," +
+                Historico.Columns.ConKwh02.name() + " integer," +
+                Historico.Columns.ConMes03.name() + " text," +
+                Historico.Columns.ConKwh03.name() + " integer," +
+                Historico.Columns.ConMes04.name() + " text," +
+                Historico.Columns.ConKwh04.name() + " integer," +
+                Historico.Columns.ConMes05.name() + " text," +
+                Historico.Columns.ConKwh05.name() + " integer," +
+                Historico.Columns.ConMes06.name() + " text," +
+                Historico.Columns.ConKwh06.name() + " integer," +
+                Historico.Columns.ConMes07.name() + " text," +
+                Historico.Columns.ConKwh07.name() + " integer," +
+                Historico.Columns.ConMes08.name() + " text," +
+                Historico.Columns.ConKwh08.name() + " integer," +
+                Historico.Columns.ConMes09.name() + " text," +
+                Historico.Columns.ConKwh09.name() + " integer," +
+                Historico.Columns.ConMes10.name() + " text," +
+                Historico.Columns.ConKwh10.name() + " integer," +
+                Historico.Columns.ConMes11.name() + " text," +
+                Historico.Columns.ConKwh11.name() + " integer," +
+                Historico.Columns.ConMes12.name() + " text," +
+                Historico.Columns.ConKwh12.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DATA_OBS_TABLE + " (" +
                 DataObs.Columns.id.name() + " integer," +
@@ -277,7 +277,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + PRINT_OBS_TABLE + " (" +
                 PrintObs.Columns.id.name() + " integer," +
-                PrintObs.Columns.ObiDes.name() + " text)");
+                PrintObs.Columns.ObiDes.name() + " text," +
+                PrintObs.Columns.ObiAut.name() + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + MED_ENTRE_LINEAS_TABLE + " (" +
                 "id integer," +

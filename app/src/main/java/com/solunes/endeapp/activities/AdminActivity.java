@@ -310,6 +310,7 @@ public class AdminActivity extends AppCompatActivity {
             ContentValues values = new ContentValues();
             values.put(PrintObs.Columns.id.name(), object.getInt(PrintObs.Columns.id.name()));
             values.put(PrintObs.Columns.ObiDes.name(), object.getString(PrintObs.Columns.ObiDes.name()).trim());
+            values.put(PrintObs.Columns.ObiAut.name(), object.getInt(PrintObs.Columns.ObiAut.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.PRINT_OBS_TABLE, values);
         }
