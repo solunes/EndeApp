@@ -547,6 +547,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                         Snackbar.make(view, "No hay esa observación", Snackbar.LENGTH_SHORT).show();
                     }
                     cursor.close();
+                    inputObsCode.setText("");
                 }
             }
         });

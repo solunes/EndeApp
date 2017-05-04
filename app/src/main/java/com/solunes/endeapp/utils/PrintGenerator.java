@@ -68,9 +68,9 @@ public class PrintGenerator {
                 "|" + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) +
                 "|" + dataModel.getTlxCodCon() +
                 "|" + dataModel.getTlxCliNit() +
-                "|" + StringUtils.roundTwoDigits(tasas) +
+                "|" + StringUtils.roundTwoDigits(GenLecturas.round(tasas)) +
                 "|0" +
-                "|" + StringUtils.roundTwoDigits(tasas + carDep) +
+                "|" + StringUtils.roundTwoDigits(GenLecturas.round(tasas + carDep)) +
                 "|0";
 
         String carta;
@@ -390,6 +390,11 @@ public class PrintGenerator {
         res += "RIGHT 782\r\n";
         res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
 
+        yValue += 90;
+        res += "LEFT\r\n";
+        res += "T CONSO3.CPF 0 40 " + yValue + " Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(impTotFac)) + "\r\n";
+
+        yValue += 20;
         for (int i = 0; i < bottomTitles.size(); i++) {
             yValue += 20;
             res += "LEFT\r\n";
@@ -398,12 +403,6 @@ public class PrintGenerator {
             res += "RIGHT 782\r\n";
             res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(bottomValues.get(i)) + "\r\n";
         }
-
-        yValue += 55;
-        res += "LEFT\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(importeMes)) + "\r\n";
-
-        Log.e(TAG, "detalleFacturacion: " + res);
         return res;
     }
 

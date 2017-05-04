@@ -113,7 +113,7 @@ public class GenLecturas {
         int limite = (int) dbAdapter.getParametroValor(Parametro.Values.dignidad_limite.name());
         double descuento = dbAdapter.getParametroValor(Parametro.Values.dignidad_descuento.name()) / 100;
         if (kWhConsumo <= limite) {
-            return round(importeConsumo * -descuento);
+            return importeConsumo * -descuento;
         } else {
             return 0;
         }
@@ -132,9 +132,9 @@ public class GenLecturas {
         int limite = (int) dbAdapter.getParametroValor(Parametro.Values.limite_1886.name());
         double descuento = (dbAdapter.getParametroValor(Parametro.Values.descuento_1886.name()) / 100);
         if (kWhConsumo <= limite) {
-            return round(-descuento * (dbAdapter.getCargoFijo(categoria) + subTotal(context, kWhConsumo, categoria, 0)));
+            return -descuento * (dbAdapter.getCargoFijo(categoria) + subTotal(context, kWhConsumo, categoria, 0));
         } else {
-            return round(-descuento * (dbAdapter.getCargoFijo(categoria) + subTotal(context, 100, categoria, 0)));
+            return -descuento * (dbAdapter.getCargoFijo(categoria) + subTotal(context, 100, categoria, 0));
         }
     }
 
