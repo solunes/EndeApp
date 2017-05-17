@@ -379,7 +379,7 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
         searchView.setOnQueryTextListener(this);
         searchView.setIconifiedByDefault(false);
         searchView.setSubmitButtonEnabled(false);
-        searchView.setQueryHint("Cliente o Medidor");
+        searchView.setQueryHint("Consumidor o Medidor");
 
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
             @Override

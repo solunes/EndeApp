@@ -15,4 +15,6 @@
     <string name="postergar_lectura">postergar lec</string>
     <string name="confirmar">Confirmar</string>
     <string name="postergar_impresion">No entrega factura</string>
+    <string name="search_consumidor">Consumidor</string>
+    <string name="search_medidor">Medidor</string>
 </resources>

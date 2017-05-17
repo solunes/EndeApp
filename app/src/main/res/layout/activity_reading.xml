@@ -40,7 +40,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginRight="32dp"
                 android:layout_weight="1"
-                android:text="cliente"
+                android:text="@string/search_consumidor"
                 android:textColor="@android:color/white"
                 android:theme="@style/MyRadioButton" />
 
@@ -51,7 +51,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginRight="32dp"
                 android:layout_weight="1"
-                android:text="medidor"
+                android:text="@string/search_medidor"
                 android:textColor="@android:color/white"
                 android:theme="@style/MyRadioButton" />
         </RadioGroup>

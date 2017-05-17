@@ -537,6 +537,9 @@ public class DBAdapter {
                 items.add(new StatisticsItem(DataModel.getTipoLectura(cursor.getInt(0)), cursor.getInt(1)));
             }
             cursor.close();
+            cursor = db.query(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null, null, null, null, null);
+            items.add(new StatisticsItem("Nuevos medidores", cursor.getCount()));
+            cursor.close();
         }
         if (param == 2) {
             Cursor cursor = db.rawQuery("select ot.ObsDes, count(ot.id)as cantidad from data_obs_table as dot join obs_table as ot " +

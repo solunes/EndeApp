@@ -36,15 +36,12 @@ public class AnalyticsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Log.e(TAG, "onCreate: 1");
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
-        Log.e(TAG, "onCreate: 2");
         adapter = new MyPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        Log.e(TAG, "onCreate: 3");
     }
 
     @Override
