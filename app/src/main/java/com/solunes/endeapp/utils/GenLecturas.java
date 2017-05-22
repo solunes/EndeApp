@@ -56,9 +56,8 @@ public class GenLecturas {
         if (kWhConsumo <= descuento) {
             return 0;
         }
-        Log.e(TAG, "subTotal: " + descuento);
+        int hasta = descuento;
         kWhConsumo = kWhConsumo - descuento;
-        Log.e(TAG, "subTotal: " + kWhConsumo);
         double res = 0;
         double resTotal = 0;
         boolean finish = false;
@@ -67,35 +66,26 @@ public class GenLecturas {
         dbAdapter.close();
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
-            Log.e(TAG, "subTotal: " + tarifa.getImporte());
             // se define si el consumo restante es mayor a todo el rango o no
-            if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
-                int diferencia = tarifa.getKwh_hasta() - tarifa.getKwh_desde() + 1;
-                Log.e(TAG, "subTotal: diff " + diferencia);
+            if (kWhConsumo > (hasta - descuento)) {
+                int diferencia = hasta - tarifa.getKwh_desde() + 1;
                 res = tarifa.getImporte() * diferencia;
-                Log.e(TAG, "subTotal: res " + res);
                 kWhConsumo -= diferencia;
-                Log.e(TAG, "subTotal: kwh " + kWhConsumo);
                 descuento += diferencia;
-                Log.e(TAG, "subTotal: des " + descuento);
             } else {
                 res = tarifa.getImporte() * kWhConsumo;
-                Log.e(TAG, "subTotal: " + res);
-                Log.e(TAG, "subTotal: " + roundDecimal(res, 4));
-                Log.e(TAG, "subTotal: " + roundDecimal(res, 5));
                 finish = true;
             }
             // se registra el detalle de factura para el rango
             if (idData > 0) {
                 res = DetalleFactura.crearDetalle(context, idData, tarifa.getItem_facturacion_id(), res);
-                Log.e(TAG, "subTotal: detalle " + res);
             }
             resTotal += res;
             // se finaliza el loop ya que no quedan rangos a descontar
             if (finish) {
-                Log.e(TAG, "subTotal: restotal " + round(resTotal));
                 return round(resTotal);
             }
+            hasta = tarifa.getKwh_hasta();
         }
         return 0;
     }

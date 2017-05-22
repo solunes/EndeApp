@@ -31,7 +31,7 @@ public class MedEntreLineas {
             jsonObject.put(Columns.MelRem.name(), getMelRem());
             jsonObject.put(Columns.MelMed.name(), getMelMed());
             jsonObject.put(Columns.MelLec.name(), getMelLec());
-            jsonObject.put(Columns.MelPot.name(), getMelLec());
+            jsonObject.put(Columns.MelPot.name(), getMelPot());
         } catch (JSONException e) {
             e.printStackTrace();
         }
