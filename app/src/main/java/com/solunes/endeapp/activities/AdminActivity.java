@@ -34,6 +34,7 @@ import com.solunes.endeapp.models.LimitesMaximos;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
+import com.solunes.endeapp.models.RangoValidez;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 import com.solunes.endeapp.models.TarifaTap;
@@ -74,6 +75,7 @@ public class AdminActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
@@ -171,7 +173,7 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         Button buttonTest = (Button) findViewById(R.id.btn_test);
-        if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             buttonTest.setVisibility(View.VISIBLE);
         }
         buttonTest.setOnClickListener(new View.OnClickListener() {
@@ -359,8 +361,8 @@ public class AdminActivity extends AppCompatActivity {
             values.put(TarifaAseo.Columns.categoria_tarifa_id.name(), object.getInt(TarifaAseo.Columns.categoria_tarifa_id.name()));
             values.put(TarifaAseo.Columns.anio.name(), object.getInt(TarifaAseo.Columns.anio.name()));
             values.put(TarifaAseo.Columns.mes.name(), object.getInt(TarifaAseo.Columns.mes.name()));
-            values.put(TarifaAseo.Columns.kwh_desde.name(), object.getInt(TarifaAseo.Columns.kwh_desde.name()));
-            values.put(TarifaAseo.Columns.kwh_hasta.name(), object.getInt(TarifaAseo.Columns.kwh_hasta.name()));
+            values.put(TarifaAseo.Columns.kwh_desde.name(), object.getDouble(TarifaAseo.Columns.kwh_desde.name()));
+            values.put(TarifaAseo.Columns.kwh_hasta.name(), object.getDouble(TarifaAseo.Columns.kwh_hasta.name()));
             values.put(TarifaAseo.Columns.importe.name(), object.getDouble(TarifaAseo.Columns.importe.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.TARIFA_ASEO_TABLE, values);
@@ -377,6 +379,21 @@ public class AdminActivity extends AppCompatActivity {
             values.put(LimitesMaximos.Columns.max_bs.name(), object.getInt(LimitesMaximos.Columns.max_bs.name()));
             // guardar values
             dbAdapter.saveObject(DBHelper.LIMITES_MAXIMOS_TABLE, values);
+        }
+
+        // guarda los rango validez
+        JSONArray rangoValidez = jsonObject.getJSONArray("rango_validez");
+        for (int i = 0; i < rangoValidez.length(); i++) {
+            JSONObject object = rangoValidez.getJSONObject(i);
+            ContentValues values = new ContentValues();
+            values.put(RangoValidez.Columns.id.name(), object.getInt(RangoValidez.Columns.id.name()));
+            values.put(RangoValidez.Columns.categoria_tarifa_id.name(), object.getInt(RangoValidez.Columns.categoria_tarifa_id.name()));
+            values.put(RangoValidez.Columns.val_kw_desde.name(), object.getInt(RangoValidez.Columns.val_kw_desde.name()));
+            values.put(RangoValidez.Columns.val_kw_hasta.name(), object.getInt(RangoValidez.Columns.val_kw_hasta.name()));
+            values.put(RangoValidez.Columns.val_porcentaje.name(), object.getDouble(RangoValidez.Columns.val_porcentaje.name()));
+            values.put(RangoValidez.Columns.val_valor.name(), object.getInt(RangoValidez.Columns.val_valor.name()));
+            // guardar values
+            dbAdapter.saveObject(DBHelper.RANGO_VALIDEZ_TABLE, values);
         }
     }
 

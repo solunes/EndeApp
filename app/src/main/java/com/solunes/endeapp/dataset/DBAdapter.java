@@ -21,6 +21,7 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
+import com.solunes.endeapp.models.RangoValidez;
 import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
@@ -102,6 +103,8 @@ public class DBAdapter {
         db.delete(DBHelper.OBS_TABLE, null, null);
         db.delete(DBHelper.USER_TABLE, null, null);
         db.delete(DBHelper.TARIFA_TABLE, null, null);
+        db.delete(DBHelper.TARIFA_ASEO_TABLE, null, null);
+        db.delete(DBHelper.TARIFA_TAP_TABLE, null, null);
         db.delete(DBHelper.ITEM_FACTURACION_TABLE, null, null);
         db.delete(DBHelper.PARAMETRO_TABLE, null, null);
         db.delete(DBHelper.PRINT_OBS_TABLE, null, null);
@@ -200,17 +203,34 @@ public class DBAdapter {
      * @param state Es el tipo de lectura que va venir como parametro para la consulta
      * @return retorna una lista de DataModel
      */
-    public ArrayList<DataModel> getState(int state) {
+    public ArrayList<DataModel> getState(String... state) {
         open();
         ArrayList<DataModel> dataModels = new ArrayList<>();
-        Cursor query = db.query(DBHelper.DATA_TABLE, null,
-                DataModel.Columns.estado_lectura.name() + " = " + state,
-                null, null, null, DataModel.Columns.TlxImpAvi.name() + " ASC");
+        String rawQuery = "SELECT * FROM " + DBHelper.DATA_TABLE +
+                " WHERE " + DataModel.Columns.estado_lectura.name() + makeInQueryString(state.length, state) + " ORDER BY " + DataModel.Columns.TlxImpAvi.name() + " ASC";
+        Cursor query = db.rawQuery(rawQuery, null);
         while (query.moveToNext()) {
             dataModels.add(DataModel.fromCursor(query));
         }
         query.close();
         return dataModels;
+    }
+
+    public static String makeInQueryString(int size, String... ids) {
+        StringBuilder sb = new StringBuilder();
+        if (size > 0) {
+            sb.append(" IN ( ");
+            String placeHolder = "";
+            for (int i = 0; i < size; i++) {
+                sb.append(placeHolder);
+                sb.append("'");
+                sb.append(ids[i]);
+                sb.append("'");
+                placeHolder = ",";
+            }
+            sb.append(" )");
+        }
+        return sb.toString();
     }
 
     /**
@@ -540,6 +560,14 @@ public class DBAdapter {
             cursor = db.query(DBHelper.MED_ENTRE_LINEAS_TABLE, null, null, null, null, null, null);
             items.add(new StatisticsItem("Nuevos medidores", cursor.getCount()));
             cursor.close();
+            cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null,
+                    PrintObsData.Columns.observacion_imp_id.name() + " = 6", null, null, null, null);
+            items.add(new StatisticsItem("Facturas no entregadas", cursor.getCount()));
+            cursor.close();
+            cursor = db.query(DBHelper.PRINT_OBS_DATA_TABLE, null,
+                    "not " + PrintObsData.Columns.observacion_imp_id.name() + " = 6", null, null, null, null);
+            items.add(new StatisticsItem("Facturas reimpresas", cursor.getCount()));
+            cursor.close();
         }
         if (param == 2) {
             Cursor cursor = db.rawQuery("select ot.ObsDes, count(ot.id)as cantidad from data_obs_table as dot join obs_table as ot " +
@@ -734,7 +762,7 @@ public class DBAdapter {
         return -1;
     }
 
-    public double getImporteAseo(int categoriaTarifa, int mes, int anio, int kwhConsumo) {
+    public double getImporteAseo(int categoriaTarifa, int mes, int anio, double kwhConsumo) {
         open();
         Cursor cursor = db.query(DBHelper.TARIFA_ASEO_TABLE, null, TarifaAseo.Columns.categoria_tarifa_id.name() + " = " + categoriaTarifa +
                 " AND " + TarifaAseo.Columns.mes.name() + " = " + mes +
@@ -818,5 +846,22 @@ public class DBAdapter {
         }
         cursor.close();
         return -1;
+    }
+
+    public double getPorcentaje(int categoriaId, int conPro) {
+        open();
+        Cursor cursor = db.query(DBHelper.RANGO_VALIDEZ_TABLE, null,
+                RangoValidez.Columns.categoria_tarifa_id.name() + " = " + categoriaId + " AND " +
+                        RangoValidez.Columns.val_kw_desde.name() + " < " + conPro + " AND " +
+                        RangoValidez.Columns.val_kw_hasta.name() + " >= " + conPro, null, null, null, null);
+        RangoValidez rangoValidez;
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            rangoValidez = RangoValidez.fromCursor(cursor);
+            cursor.close();
+            return rangoValidez.getValPorcentaje();
+        }
+        cursor.close();
+        return 0;
     }
 }

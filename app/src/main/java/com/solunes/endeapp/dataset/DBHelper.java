@@ -17,6 +17,7 @@ import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
 import com.solunes.endeapp.models.PrintObsData;
+import com.solunes.endeapp.models.RangoValidez;
 import com.solunes.endeapp.models.Resultados;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
@@ -35,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "endeapp.db";
     // este es el numero de version de la base de datos,
     // cuando se hace un cambio en la base de datos se debe incrementar el numero
-    private static final int DATABASE_VERSION = 31;
+    private static final int DATABASE_VERSION = 34;
 
     // nombres de las tablas de la base de datos
 
@@ -56,6 +57,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DETALLE_FACTURA_TABLE = "detalle_factura_table";
     public static final String LIMITES_MAXIMOS_TABLE = "limites_maximos_table";
     public static final String RESULTADOS_TABLE = "resultados_table";
+    public static final String RANGO_VALIDEZ_TABLE = "rango_validez_table";
 
     private Context context;
 
@@ -284,7 +286,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 "id integer," +
                 MedEntreLineas.Columns.MelRem + " integer," +
                 MedEntreLineas.Columns.MelMed + " integer," +
-                MedEntreLineas.Columns.MelLec + " integer)");
+                MedEntreLineas.Columns.MelLec + " integer," +
+                MedEntreLineas.Columns.MelPot + " integer)");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + FACTURA_DOSIFICACION_TABLE + " (" +
                 FacturaDosificacion.Columns.id.name() + " integer," +
@@ -312,8 +315,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 TarifaAseo.Columns.categoria_tarifa_id.name() + " integer," +
                 TarifaAseo.Columns.anio.name() + " integer," +
                 TarifaAseo.Columns.mes.name() + " integer," +
-                TarifaAseo.Columns.kwh_desde.name() + " integer," +
-                TarifaAseo.Columns.kwh_hasta.name() + " integer," +
+                TarifaAseo.Columns.kwh_desde.name() + " decimal(15,4)," +
+                TarifaAseo.Columns.kwh_hasta.name() + " decimal(15,4)," +
                 TarifaAseo.Columns.importe.name() + " decimal(15, 2))");
 
         sqLiteDatabase.execSQL("CREATE TABLE " + DETALLE_FACTURA_TABLE + " (" +
@@ -335,6 +338,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 Resultados.Columns.lectura.name() + " integer," +
                 Resultados.Columns.lectura_potencia.name() + " integer," +
                 Resultados.Columns.observacion.name() + " integer)");
+
+        sqLiteDatabase.execSQL("CREATE TABLE " + RANGO_VALIDEZ_TABLE+ " (" +
+                RangoValidez.Columns.id.name() + " integer," +
+                RangoValidez.Columns.categoria_tarifa_id.name() + " integer," +
+                RangoValidez.Columns.val_kw_desde.name() + " integer," +
+                RangoValidez.Columns.val_kw_hasta.name() + " integer," +
+                RangoValidez.Columns.val_valor.name() + " decimal," +
+                RangoValidez.Columns.val_porcentaje.name() + " integer)");
+
 
         // inserts
         // TODO: 25-11-16 encriptacion
@@ -374,6 +386,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DETALLE_FACTURA_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LIMITES_MAXIMOS_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RESULTADOS_TABLE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RANGO_VALIDEZ_TABLE);
 
         onCreate(sqLiteDatabase);
     }

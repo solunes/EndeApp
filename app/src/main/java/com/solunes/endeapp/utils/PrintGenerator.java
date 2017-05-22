@@ -403,6 +403,7 @@ public class PrintGenerator {
             res += "RIGHT 782\r\n";
             res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(bottomValues.get(i)) + "\r\n";
         }
+        Log.e(TAG, "detalleFacturacion: " + res);
         return res;
     }
 

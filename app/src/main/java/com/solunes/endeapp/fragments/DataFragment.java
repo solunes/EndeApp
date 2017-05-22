@@ -75,7 +75,6 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private Button buttonObsImped;
     private ImageButton buttonObsAdd;
     private TextView estadoMedidor;
-    private TextView estadoCliente;
     private EditText inputRemenber;
     private EditText kwInst;
     private EditText reactiva;
@@ -205,7 +204,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         buttonObsImped = (Button) view.findViewById(R.id.button_obs_imped);
         buttonObsAdd = (ImageButton) view.findViewById(R.id.button_obs_add);
         inputObsCode = (EditText) view.findViewById(R.id.obs_code);
-        estadoCliente = (TextView) view.findViewById(R.id.estado_client);
+        TextView estadoCliente = (TextView) view.findViewById(R.id.estado_client);
         if (data.getTlxEstCli() == 1) {
             estadoCliente.setText(estados_cliente.Conectado.name());
             estadoCliente.setTextColor(getResources().getColor(R.color.colorConectado));
@@ -235,7 +234,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         });
 
         inputPotenciaReading = (EditText) view.findViewById(R.id.input_potencia_reading);
-        if (dataModel.getTlxTipDem() == 2) {
+        if (dataModel.getTlxLeePot() == 1) {
             inputPotenciaReading.setVisibility(View.VISIBLE);
             if (dataModel.getTlxPotLei() > 0) {
                 inputPotenciaReading.setText(String.valueOf(dataModel.getTlxPotLei()));
@@ -567,7 +566,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         DBAdapter dbAdapter = new DBAdapter(getContext());
 
         // si es mediana demanda se verifica que tiene potencia
-        if (dataModel.getTlxTipDem() == 2 && tipoLectura != 3 && tipoLectura != 9) {
+        if (dataModel.getTlxLeePot() == 1 && tipoLectura != 3 && tipoLectura != 9) {
             if (inputPotenciaReading.getText().toString().isEmpty()) {
                 Snackbar.make(view, "Ingresar indice de potencia", Snackbar.LENGTH_SHORT).show();
                 return;
@@ -656,7 +655,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.Theme_Dialog);
         builder.setTitle("Alerta!");
         if (dataModel.getTlxCliNew() == 0) {
-            if (lecturaKwh > (conPro + conPro * (dbAdapter.getParametroValor(Parametro.Values.consumo_elevado.name()) / 100))) {
+
+            if (isConsumoElevado(lecturaKwh, dataModel.getTlxCtg(), dataModel.getTlxConPro())) {
                 message += "\n- Consumo elevado";
                 isAlert = true;
                 autoObs.add(80);
@@ -858,7 +858,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         if (tipoLectura == 5) {
             dataModel.setTlxNvaLec(nuevaLectura);
-            if (dataModel.getTlxTipDem() == 2) {
+            if (dataModel.getTlxLeePot() == 1) {
                 potenciaLeida = correccionPotencia(potenciaLeida, dataModel.getTlxDecPot());
                 dataModel.setTlxPotLei(potenciaLeida);
             }
@@ -913,7 +913,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
         // calculo de potencia para mediana demanda
         double importePotencia = 0;
-        if (dataModel.getTlxTipDem() == 2) {
+        if (dataModel.getTlxLeePot() == 1) {
             // correccion de digitos para la potencia leida
             potenciaLeida = correccionPotencia(potenciaLeida, dataModel.getTlxDecPot());
             dataModel.setTlxPotLei(potenciaLeida);
@@ -971,7 +971,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
         totalSuministroTap = DetalleFactura.crearDetalle(context, dataModel.getId(), 153, totalSuministroTap);
 
-        int consumoAseo = (dataModel.getTlxPromAseo() + dataModel.getTlxConsFacturado()) / (dataModel.getTlxDivAseo() + 1);
+        double consumoAseo = (double) (dataModel.getTlxPromAseo() + dataModel.getTlxConsFacturado()) / (dataModel.getTlxDivAseo() + 1);
         double totalSuministroAseo = GenLecturas.totalSuministroAseo(dataModel, context, consumoAseo);
         if (totalSuministroAseo == -1) {
             Toast.makeText(context, "No hay tarifa para el aseo", Toast.LENGTH_LONG).show();
@@ -1021,7 +1021,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         printValues.add(GenLecturas.round(dataModel.getTlxImpEnergia() + dataModel.getTlxCarFij()));
 
         // calculo de potencia para mediana demanda
-        if (dataModel.getTlxTipDem() == 2) {
+        if (dataModel.getTlxLeePot() == 1) {
             // agregar el importe por potencia al array de impresion
             printTitles.add(dbAdapter.getItemDescription(41));
             printValues.add(GenLecturas.round(dataModel.getTlxImpPot()));
@@ -1424,7 +1424,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             estadoMedidor.setText(estados_lectura.Pendiente.name());
             estadoMedidor.setTextColor(getResources().getColor(R.color.colorPendiente));
         }
-        if (dataModel.getTlxTipDem() == 2 && dataModel.getTlxPotLei() > 0) {
+        if (dataModel.getTlxLeePot() == 1 && dataModel.getTlxPotLei() > 0) {
             inputPotenciaReading.setText(String.valueOf(dataModel.getTlxPotLei()));
         }
         if (dataModel.getEstadoLectura() != 0 && dataModel.getEstadoLectura() != 3) {
@@ -1748,5 +1748,14 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             }
         }
         dbAdapter.close();
+    }
+
+    private boolean isConsumoElevado(int lecturaKwh, int categoriaId, int consumoPro) {
+        DBAdapter dbAdapter = new DBAdapter(getContext());
+        double porcentaje = dbAdapter.getPorcentaje(categoriaId, consumoPro);
+        if (porcentaje == 0){
+            return false;
+        }
+        return lecturaKwh > (consumoPro + consumoPro * (porcentaje / 100));
     }
 }

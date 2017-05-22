@@ -10,6 +10,7 @@ import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.Tarifa;
 import com.solunes.endeapp.models.TarifaAseo;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -55,7 +56,9 @@ public class GenLecturas {
         if (kWhConsumo <= descuento) {
             return 0;
         }
+        Log.e(TAG, "subTotal: " + descuento);
         kWhConsumo = kWhConsumo - descuento;
+        Log.e(TAG, "subTotal: " + kWhConsumo);
         double res = 0;
         double resTotal = 0;
         boolean finish = false;
@@ -64,23 +67,33 @@ public class GenLecturas {
         dbAdapter.close();
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
+            Log.e(TAG, "subTotal: " + tarifa.getImporte());
             // se define si el consumo restante es mayor a todo el rango o no
             if (kWhConsumo > (tarifa.getKwh_hasta() - descuento)) {
                 int diferencia = tarifa.getKwh_hasta() - tarifa.getKwh_desde() + 1;
+                Log.e(TAG, "subTotal: diff " + diferencia);
                 res = tarifa.getImporte() * diferencia;
+                Log.e(TAG, "subTotal: res " + res);
                 kWhConsumo -= diferencia;
+                Log.e(TAG, "subTotal: kwh " + kWhConsumo);
                 descuento += diferencia;
+                Log.e(TAG, "subTotal: des " + descuento);
             } else {
                 res = tarifa.getImporte() * kWhConsumo;
+                Log.e(TAG, "subTotal: " + res);
+                Log.e(TAG, "subTotal: " + roundDecimal(res, 4));
+                Log.e(TAG, "subTotal: " + roundDecimal(res, 5));
                 finish = true;
             }
             // se registra el detalle de factura para el rango
             if (idData > 0) {
                 res = DetalleFactura.crearDetalle(context, idData, tarifa.getItem_facturacion_id(), res);
+                Log.e(TAG, "subTotal: detalle " + res);
             }
             resTotal += res;
             // se finaliza el loop ya que no quedan rangos a descontar
             if (finish) {
+                Log.e(TAG, "subTotal: restotal " + round(resTotal));
                 return round(resTotal);
             }
         }
@@ -165,7 +178,12 @@ public class GenLecturas {
             valorTAP = dbAdapter.getValorTAP(dataModel.getTlxCtgTap(), dataModel.getTlxMes(), dataModel.getTlxAno());
         }
         dbAdapter.close();
-        return round(importeEnergia * valorTAP);
+        double importeTap = importeEnergia * valorTAP;
+        Log.e(TAG, "totalSuministroTap: " + importeTap);
+        importeTap = roundDecimal(importeTap, 3);
+        Log.e(TAG, "totalSuministroTap: " + importeTap);
+        Log.e(TAG, "totalSuministroTap: " + roundDecimal(importeTap, 2));
+        return roundDecimal(importeTap, 2);
     }
 
     /**
@@ -176,7 +194,7 @@ public class GenLecturas {
      * @param kWhConsumo los Kwh de consumo
      * @return si hay aseo, se obtiene la tarifa de aseo de la tabla tarifa_aseo, si no hay se devuelve 0
      */
-    public static double totalSuministroAseo(DataModel dataModel, Context context, int kWhConsumo) {
+    public static double totalSuministroAseo(DataModel dataModel, Context context, double kWhConsumo) {
         DBAdapter dbAdapter = new DBAdapter(context);
         double importeAseo = 0;
         if (dataModel.getTlxCotaseo() != 0) {
@@ -237,7 +255,7 @@ public class GenLecturas {
         }
         long factor = (long) Math.pow(10, decimal);
         value = value * factor;
-        long tmp = Math.round(value);
+        long tmp = Math.round(value + 0.000000001);
         double res = (double) tmp / factor;
         if (isNegative) {
             res = -res;

@@ -12,8 +12,8 @@ public class TarifaAseo {
     private int categoria_tarifa_id;
     private int anio;
     private int mes;
-    private int kwh_desde;
-    private int kwh_hasta;
+    private double kwh_desde;
+    private double kwh_hasta;
     private double importe;
 
     public enum Columns{
@@ -32,8 +32,8 @@ public class TarifaAseo {
         tarifaAseo.setCategoria_tarifa_id(cursor.getInt(Columns.categoria_tarifa_id.ordinal()));
         tarifaAseo.setAnio(cursor.getInt(Columns.anio.ordinal()));
         tarifaAseo.setMes(cursor.getInt(Columns.mes.ordinal()));
-        tarifaAseo.setKwh_desde(cursor.getInt(Columns.kwh_desde.ordinal()));
-        tarifaAseo.setKwh_hasta(cursor.getInt(Columns.kwh_hasta.ordinal()));
+        tarifaAseo.setKwh_desde(cursor.getDouble(Columns.kwh_desde.ordinal()));
+        tarifaAseo.setKwh_hasta(cursor.getDouble(Columns.kwh_hasta.ordinal()));
         tarifaAseo.setImporte(cursor.getDouble(Columns.importe.ordinal()));
         return tarifaAseo;
     }
@@ -70,19 +70,19 @@ public class TarifaAseo {
         this.mes = mes;
     }
 
-    public int getKwh_desde() {
+    public double getKwh_desde() {
         return kwh_desde;
     }
 
-    public void setKwh_desde(int kwh_desde) {
+    public void setKwh_desde(double kwh_desde) {
         this.kwh_desde = kwh_desde;
     }
 
-    public int getKwh_hasta() {
+    public double getKwh_hasta() {
         return kwh_hasta;
     }
 
-    public void setKwh_hasta(int kwh_hasta) {
+    public void setKwh_hasta(double kwh_hasta) {
         this.kwh_hasta = kwh_hasta;
     }
 

@@ -67,6 +67,7 @@ public class DetalleFactura {
      */
     public static double crearDetalle(Context context, int idData, int idItem, double importe) {
         //double importeRedondeado = GenLecturas.roundDecimal(importe, 1);
+        importe = GenLecturas.roundDecimal(importe, 5);
         double importeRedondeado = GenLecturas.roundDecimal(importe, 2);
         //double diferencia = importe - importeRedondeado;
         double diferencia = 0;
@@ -87,7 +88,6 @@ public class DetalleFactura {
         dbAdapter.close();
         return importeRedondeado;
     }
-
 
 
     public int getId() {

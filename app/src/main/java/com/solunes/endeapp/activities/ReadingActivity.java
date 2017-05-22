@@ -109,13 +109,13 @@ public class ReadingActivity extends AppCompatActivity implements DataFragment.O
                     datas = dbAdapter.getReady();
                     break;
                 case MainActivity.KEY_MISSING:
-                    datas = dbAdapter.getState(0);
+                    datas = dbAdapter.getState("0","3");
                     break;
                 case MainActivity.KEY_PRINT:
-                    datas = dbAdapter.getState(1);
+                    datas = dbAdapter.getState("1");
                     break;
                 case MainActivity.KEY_POSTPONED:
-                    datas = dbAdapter.getState(2);
+                    datas = dbAdapter.getState("2");
                     break;
             }
         } else {
