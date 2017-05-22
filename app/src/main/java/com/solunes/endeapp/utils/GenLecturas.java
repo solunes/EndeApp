@@ -68,7 +68,7 @@ public class GenLecturas {
             Tarifa tarifa = cargoEnergia.get(i);
             // se define si el consumo restante es mayor a todo el rango o no
             if (kWhConsumo > (hasta - descuento)) {
-                int diferencia = hasta - tarifa.getKwh_desde() + 1;
+                int diferencia = hasta - tarifa.getKwh_desde();
                 res = tarifa.getImporte() * diferencia;
                 kWhConsumo -= diferencia;
                 descuento += diferencia;
