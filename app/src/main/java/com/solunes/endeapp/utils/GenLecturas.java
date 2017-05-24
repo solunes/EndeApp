@@ -56,7 +56,6 @@ public class GenLecturas {
         if (kWhConsumo <= descuento) {
             return 0;
         }
-        int hasta = descuento;
         kWhConsumo = kWhConsumo - descuento;
         double res = 0;
         double resTotal = 0;
@@ -66,12 +65,11 @@ public class GenLecturas {
         dbAdapter.close();
         for (int i = 0; i < cargoEnergia.size(); i++) {
             Tarifa tarifa = cargoEnergia.get(i);
-            // se define si el consumo restante es mayor a todo el rango o no
-            if (kWhConsumo > (hasta - descuento)) {
-                int diferencia = hasta - tarifa.getKwh_desde();
+            // se define s i el consumo restante es mayor a todo el rango o no
+            int diferencia = tarifa.getKwh_hasta() - descuento;
+            if (kWhConsumo > diferencia) {
                 res = tarifa.getImporte() * diferencia;
                 kWhConsumo -= diferencia;
-                descuento += diferencia;
             } else {
                 res = tarifa.getImporte() * kWhConsumo;
                 finish = true;
@@ -85,7 +83,7 @@ public class GenLecturas {
             if (finish) {
                 return round(resTotal);
             }
-            hasta = tarifa.getKwh_hasta();
+            descuento = tarifa.getKwh_hasta();
         }
         return 0;
     }

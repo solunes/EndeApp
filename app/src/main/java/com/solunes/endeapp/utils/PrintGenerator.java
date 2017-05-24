@@ -102,39 +102,42 @@ public class PrintGenerator {
                 "T CONSO2.CPF 0 280 173 N° CONSUMIDOR:\r\n" +
                 "T CONSO2.CPF 0 575 173 N° MEDIDOR:\r\n" +
                 "RIGHT 100\r\n" +
-                "T CONSO2.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
-                "T CONSO2.CPF 0 450 173 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
-                "T CONSO2.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
+                "T CONSO3.CPF 0 150 173 " + dataModel.getTlxCliNit() + "\r\n" +
+                "T CONSO3.CPF 0 450 173 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
+                "T CONSO3.CPF 0 720 173 " + dataModel.getTlxNroMed() + "\r\n" +
 
                 "LEFT\r\n" +
-                "T CONSO2.CPF 0 40 192 DIRECCIÓN: " + dataModel.getTlxDir() + "\r\n" +
+                "T TREB6.CPF 0 40 192 DIRECCIÓN: " + dataModel.getTlxDir() + "\r\n" +
 
-                "T CONSO2.CPF 0 40 211 CIUDAD/LOCALIDAD: " + dataModel.getTlxCiudad().toUpperCase() + "\r\n" +
-                "T CONSO2.CPF 0 450 211 ACTIVIDAD: " + dataModel.getTlxActivi() + "\r\n" +
+                "T CONSO2.CPF 0 40 211 CIUDAD/LOCALIDAD: \r\n" +
+                "T CONSO3.CPF 0 250 211 " + dataModel.getTlxCiudad().toUpperCase() + "\r\n" +
+                "T CONSO2.CPF 0 450 211 ACTIVIDAD: \r\n" +
+                "T CONSO3.CPF 0 650 211 " + dataModel.getTlxActivi() + "\r\n" +
 
                 "T CONSO2.CPF 0 40 230 REMESA/RUTA: " + dataModel.getTlxRem() + "/" + dataModel.getTlxRutO() + "\r\n" +
                 "T CONSO2.CPF 0 450 230 CARTA FACTURA:  " + carta + "\r\n" +
 
                 // BLOQUE 2: DATOS DE MEDICION
                 "T CONSO2.CPF 0 45 260 MES DE LA FACTURA: " + mesString(dataModel.getTlxMes()).toUpperCase() + "-" + dataModel.getTlxAno() + "\r\n" +
-                "T CONSO2.CPF 0 430 260 CATEGORÍA: " + dataModel.getTlxSgl() + "\r\n" +
+                "T CONSO2.CPF 0 430 260 CATEGORÍA: \r\n" +
+                "T CONSO3.CPF 0 560 260 " + dataModel.getTlxSgl() + "\r\n" +
 
                 "T CONSO2.CPF 0 45 280 FECHA DE LECTURA:\r\n" +
                 "T CONSO2.CPF 0 250 280 ANTERIOR:\r\n" +
                 "T CONSO2.CPF 0 530 280 ACTUAL:\r\n" +
                 "RIGHT 100\r\n" +
-                "T CONSO2.CPF 0 375 280 " + formatedDate(dataModel.getTlxFecAnt()) + "\r\n" +
+                "T CONSO3.CPF 0 375 280 " + formatedDate(dataModel.getTlxFecAnt()) + "\r\n" +
                 "RIGHT 782\r\n" +
-                "T CONSO2.CPF 0 720 280 " + formatedDate(dataModel.getTlxFecLec()) + "\r\n" +
+                "T CONSO3.CPF 0 720 280 " + formatedDate(dataModel.getTlxFecLec()) + "\r\n" +
 
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 300 LECTURA MEDIDOR:\r\n" +
                 "T CONSO2.CPF 0 250 300 ANTERIOR:\r\n" +
                 "T CONSO2.CPF 0 530 300 ACTUAL:\r\n" +
                 "RIGHT 100\r\n" +
-                "T CONSO2.CPF 0 375 300 " + dataModel.getTlxUltInd() + "\r\n" +
+                "T CONSO3.CPF 0 375 300 " + dataModel.getTlxUltInd() + "\r\n" +
                 "RIGHT 782\r\n" +
-                "T CONSO2.CPF 0 720 300 " + dataModel.getTlxNvaLec() + "\r\n" +
+                "T CONSO3.CPF 0 720 300 " + dataModel.getTlxNvaLec() + "\r\n" +
 
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 320 TIPO LECTURA:  " + tipoLectura + "\r\n" +
@@ -142,22 +145,22 @@ public class PrintGenerator {
                 "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 340 Energía consumida en (" + calcDays(dataModel.getTlxFecAnt(), dataModel.getTlxFecLec()) + ") dias\r\n" +
                 "RIGHT 782\r\n" +
-                "T CONSO2.CPF 0 720 340 " + dataModel.getTlxConsumo() + " kWh\r\n" +
+                "T CONSO3.CPF 0 720 340 " + dataModel.getTlxConsumo() + " kWh\r\n" +
 
                 detalleConsumo(dataModel) +
 
                 "LEFT\r\n" +
-                "T CONSO3.CPF 0 40 1004 Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(dataModel.getTlxImpTot())) + "\r\n" +
+                "T HACK7.CPF 0 40 1004 Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(dataModel.getTlxImpTot())) + "\r\n" +
 
 
-                "T CONSO3.CPF 0 40 881 Importe del mes a cancelar:Bs\r\n" +
-                "T CONSO3.CPF 0 40 968 Importe total a cancelar: Bs\r\n" +
-                "T CONSO3.CPF 0 40 1035 Importe base para crédito fiscal: Bs\r\n" +
+                "T HACK7.CPF 0 40 881 Importe del mes a cancelar:Bs\r\n" +
+                "T HACK7.CPF 0 40 968 Importe total a cancelar: Bs\r\n" +
+                "T HACK7.CPF 0 40 1035 Importe base para crédito fiscal: Bs\r\n" +
 
                 "RIGHT 782\r\n" +
-                "T CONSO3.CPF 0 45 881 " + StringUtils.roundTwoDigits(dataModel.getTlxImpMes()) + "\r\n" +
-                "T CONSO3.CPF 0 45 968 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n" +
-                "T CONSO3.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) + "\r\n" +
+                "T HACK7.CPF 0 45 881 " + StringUtils.roundTwoDigits(dataModel.getTlxImpMes()) + "\r\n" +
+                "T HACK7.CPF 0 45 968 " + StringUtils.roundTwoDigits(dataModel.getTlxImpTot()) + "\r\n" +
+                "T HACK7.CPF 0 45 1035 " + StringUtils.roundTwoDigits(dataModel.getTlxImpSum()) + "\r\n" +
 
                 deudasEnergia +
                 deudasAseo +
@@ -171,8 +174,8 @@ public class PrintGenerator {
                 "T CONSO1.CPF 0 40 1100 CÓDIGO DE CONTROL:\r\n" +
                 "T CONSO1.CPF 0 40 1130 FECHA LÍMITE DE EMISIÓN: \r\n" +
 
-                "T CONSO2.CPF 0 270 1100 " + dataModel.getTlxCodCon() + "\r\n" +
-                "T CONSO2.CPF 0 270 1130 " + formatedDatePrint(fechaLimiteEmision) + "\r\n" +
+                "T CONSO3.CPF 0 270 1095 " + dataModel.getTlxCodCon() + "\r\n" +
+                "T CONSO3.CPF 0 270 1125 " + formatedDatePrint(fechaLimiteEmision) + "\r\n" +
 
                 "CENTER\r\n" +
                 "T CONSO4.CPF 0 0 1230 " + leyenda[0] + "\n\r\n" +
@@ -195,11 +198,11 @@ public class PrintGenerator {
                 createHistorico(historico) +
 
                 "T CONSO0.CPF 0 55 1378 Fecha Vencimiento: \r\n" +
-                "T CONSO0.CPF 0 210 1378 " + formatedDatePrint(dataModel.getTlxFecVto()) + "\r\n" +
+                "T CONSO2.CPF 0 210 1378 " + formatedDatePrint(dataModel.getTlxFecVto()) + "\r\n" +
                 "T CONSO0.CPF 0 300 1378 Fecha Est.Prox.Med: \r\n" +
-                "T CONSO0.CPF 0 460 1378 " + formatedDatePrint(dataModel.getTlxFecproMed()) + "\r\n" +
+                "T CONSO2.CPF 0 460 1378 " + formatedDatePrint(dataModel.getTlxFecproMed()) + "\r\n" +
                 "T CONSO0.CPF 0 560 1378 Fecha Est.Prox.Emi: \r\n" +
-                "T CONSO0.CPF 0 710 1378 " + formatedDatePrint(dataModel.getTlxFecproEmi()) + "\r\n" +
+                "T CONSO2.CPF 0 710 1378 " + formatedDatePrint(dataModel.getTlxFecproEmi()) + "\r\n" +
 
                 "T CONSO1.CPF 0 135 1430 " + formatedDateSinDia(dataModel.getTlxFecLec()) + "\r\n" +
                 "T CONSO1.CPF 0 300 1430 " + dataModel.getTlxCli() + "-" + dataModel.getTlxDav() + "\r\n" +
@@ -359,49 +362,49 @@ public class PrintGenerator {
 //        String[] values = new String[]{"123.2", "123.4", "123.1", "123.3", "123.5"};
         for (int i = 0; i < titles.size(); i++) {
             res += "LEFT\r\n";
-            res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-            res += "T CONSO3.CPF 0 40 " + yValue + " " + titles.get(i) + "\r\n";
+            res += "T HACK7.CPF 0 575 " + yValue + " Bs\r\n";
+            res += "T HACK7.CPF 0 40 " + yValue + " " + titles.get(i) + "\r\n";
             res += "RIGHT 782\r\n";
-            res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(values.get(i)) + "\r\n";
+            res += "T HACK7.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(values.get(i)) + "\r\n";
             yValue += 20;
         }
 
         yValue += 20;
         res += "LEFT\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " Tasas para el Gobierno Municipal\r\n";
+        res += "T HACK7.CPF 0 40 " + yValue + " Tasas para el Gobierno Municipal\r\n";
 
         yValue += 20;
-        res += "T CONSO3.CPF 0 40 " + yValue + " " + tapTitle + "\r\n";
-        res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
+        res += "T HACK7.CPF 0 40 " + yValue + " " + tapTitle + "\r\n";
+        res += "T HACK7.CPF 0 575 " + yValue + " Bs\r\n";
         res += "RIGHT 782\r\n";
-        res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(tap) + "\r\n";
+        res += "T HACK7.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(tap) + "\r\n";
 
         yValue += 20;
         res += "LEFT\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " " + aseoTitle + "\r\n";
-        res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
+        res += "T HACK7.CPF 0 40 " + yValue + " " + aseoTitle + "\r\n";
+        res += "T HACK7.CPF 0 575 " + yValue + " Bs\r\n";
         res += "RIGHT 782\r\n";
-        res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impAse) + "\r\n";
+        res += "T HACK7.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impAse) + "\r\n";
 
         yValue += 40;
         res += "LEFT\r\n";
-        res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " Importe total factura\r\n";
+        res += "T HACK7.CPF 0 575 " + yValue + " Bs\r\n";
+        res += "T HACK7.CPF 0 40 " + yValue + " Importe total factura\r\n";
         res += "RIGHT 782\r\n";
-        res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
+        res += "T HACK7.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(impTotFac) + "\r\n";
 
         yValue += 90;
         res += "LEFT\r\n";
-        res += "T CONSO3.CPF 0 40 " + yValue + " Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(impTotFac)) + "\r\n";
+        res += "T HACK7.CPF 0 40 " + yValue + " Son: " + NumberToLetterConverter.convertNumberToLetter(StringUtils.roundTwoDigits(impTotFac)) + "\r\n";
 
         yValue += 20;
         for (int i = 0; i < bottomTitles.size(); i++) {
             yValue += 20;
             res += "LEFT\r\n";
-            res += "T CONSO3.CPF 0 575 " + yValue + " Bs\r\n";
-            res += "T CONSO3.CPF 0 40 " + yValue + " " + bottomTitles.get(i) + "\r\n";
+            res += "T HACK7.CPF 0 575 " + yValue + " Bs\r\n";
+            res += "T HACK7.CPF 0 40 " + yValue + " " + bottomTitles.get(i) + "\r\n";
             res += "RIGHT 782\r\n";
-            res += "T CONSO3.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(bottomValues.get(i)) + "\r\n";
+            res += "T HACK7.CPF 0 720 " + yValue + " " + StringUtils.roundTwoDigits(bottomValues.get(i)) + "\r\n";
         }
         Log.e(TAG, "detalleFacturacion: " + res);
         return res;
@@ -415,30 +418,30 @@ public class PrintGenerator {
      */
     private static String createHistorico(Historico hist) {
         String res = "" +
-                "T CONSO1.CPF 0 40 1328 " + (hist.getConMes01() == null ? "" : hist.getConMes01()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1328 " + (hist.getConMes01() == null ? "" : hist.getConKwh01()) + "\r\n" +
-                "T CONSO1.CPF 0 40 1343 " + (hist.getConMes02() == null ? "" : hist.getConMes02()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1343 " + (hist.getConMes02() == null ? "" : hist.getConKwh02()) + "\r\n" +
-                "T CONSO1.CPF 0 40 1358 " + (hist.getConMes03() == null ? "" : hist.getConMes03()) + "\r\n" +
-                "T CONSO1.CPF 0 160 1358 " + (hist.getConMes03() == null ? "" : hist.getConKwh03()) + "\r\n" +
-                "T CONSO1.CPF 0 235 1328 " + (hist.getConMes04() == null ? "" : hist.getConMes04()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1328 " + (hist.getConMes04() == null ? "" : hist.getConKwh04()) + "\r\n" +
-                "T CONSO1.CPF 0 235 1343 " + (hist.getConMes05() == null ? "" : hist.getConMes05()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1343 " + (hist.getConMes05() == null ? "" : hist.getConKwh05()) + "\r\n" +
-                "T CONSO1.CPF 0 235 1358 " + (hist.getConMes06() == null ? "" : hist.getConMes06()) + "\r\n" +
-                "T CONSO1.CPF 0 360 1358 " + (hist.getConMes06() == null ? "" : hist.getConKwh06()) + "\r\n" +
-                "T CONSO1.CPF 0 435 1328 " + (hist.getConMes07() == null ? "" : hist.getConMes07()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1328 " + (hist.getConMes07() == null ? "" : hist.getConKwh07()) + "\r\n" +
-                "T CONSO1.CPF 0 435 1343 " + (hist.getConMes08() == null ? "" : hist.getConMes08()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1343 " + (hist.getConMes08() == null ? "" : hist.getConKwh08()) + "\r\n" +
-                "T CONSO1.CPF 0 435 1358 " + (hist.getConMes09() == null ? "" : hist.getConMes09()) + "\r\n" +
-                "T CONSO1.CPF 0 560 1358 " + (hist.getConMes09() == null ? "" : hist.getConKwh09()) + "\r\n" +
-                "T CONSO1.CPF 0 635 1328 " + (hist.getConMes10() == null ? "" : hist.getConMes10()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1328 " + (hist.getConMes10() == null ? "" : hist.getConKwh10()) + "\r\n" +
-                "T CONSO1.CPF 0 635 1343 " + (hist.getConMes11() == null ? "" : hist.getConMes11()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1343 " + (hist.getConMes11() == null ? "" : hist.getConKwh11()) + "\r\n" +
-                "T CONSO1.CPF 0 635 1358 " + (hist.getConMes12() == null ? "" : hist.getConMes12()) + "\r\n" +
-                "T CONSO1.CPF 0 755 1358 " + (hist.getConMes12() == null ? "" : hist.getConKwh12()) + "\r\n";
+                "T TREB5B.CPF 0 40 1328 " + (hist.getConMes01() == null ? "" : hist.getConMes01()) + "\r\n" +
+                "T TREB5B.CPF 0 160 1328 " + (hist.getConMes01() == null ? "" : hist.getConKwh01()) + "\r\n" +
+                "T TREB5B.CPF 0 40 1343 " + (hist.getConMes02() == null ? "" : hist.getConMes02()) + "\r\n" +
+                "T TREB5B.CPF 0 160 1343 " + (hist.getConMes02() == null ? "" : hist.getConKwh02()) + "\r\n" +
+                "T TREB5B.CPF 0 40 1358 " + (hist.getConMes03() == null ? "" : hist.getConMes03()) + "\r\n" +
+                "T TREB5B.CPF 0 160 1358 " + (hist.getConMes03() == null ? "" : hist.getConKwh03()) + "\r\n" +
+                "T TREB5B.CPF 0 235 1328 " + (hist.getConMes04() == null ? "" : hist.getConMes04()) + "\r\n" +
+                "T TREB5B.CPF 0 360 1328 " + (hist.getConMes04() == null ? "" : hist.getConKwh04()) + "\r\n" +
+                "T TREB5B.CPF 0 235 1343 " + (hist.getConMes05() == null ? "" : hist.getConMes05()) + "\r\n" +
+                "T TREB5B.CPF 0 360 1343 " + (hist.getConMes05() == null ? "" : hist.getConKwh05()) + "\r\n" +
+                "T TREB5B.CPF 0 235 1358 " + (hist.getConMes06() == null ? "" : hist.getConMes06()) + "\r\n" +
+                "T TREB5B.CPF 0 360 1358 " + (hist.getConMes06() == null ? "" : hist.getConKwh06()) + "\r\n" +
+                "T TREB5B.CPF 0 435 1328 " + (hist.getConMes07() == null ? "" : hist.getConMes07()) + "\r\n" +
+                "T TREB5B.CPF 0 560 1328 " + (hist.getConMes07() == null ? "" : hist.getConKwh07()) + "\r\n" +
+                "T TREB5B.CPF 0 435 1343 " + (hist.getConMes08() == null ? "" : hist.getConMes08()) + "\r\n" +
+                "T TREB5B.CPF 0 560 1343 " + (hist.getConMes08() == null ? "" : hist.getConKwh08()) + "\r\n" +
+                "T TREB5B.CPF 0 435 1358 " + (hist.getConMes09() == null ? "" : hist.getConMes09()) + "\r\n" +
+                "T TREB5B.CPF 0 560 1358 " + (hist.getConMes09() == null ? "" : hist.getConKwh09()) + "\r\n" +
+                "T TREB5B.CPF 0 635 1328 " + (hist.getConMes10() == null ? "" : hist.getConMes10()) + "\r\n" +
+                "T TREB5B.CPF 0 755 1328 " + (hist.getConMes10() == null ? "" : hist.getConKwh10()) + "\r\n" +
+                "T TREB5B.CPF 0 635 1343 " + (hist.getConMes11() == null ? "" : hist.getConMes11()) + "\r\n" +
+                "T TREB5B.CPF 0 755 1343 " + (hist.getConMes11() == null ? "" : hist.getConKwh11()) + "\r\n" +
+                "T TREB5B.CPF 0 635 1358 " + (hist.getConMes12() == null ? "" : hist.getConMes12()) + "\r\n" +
+                "T TREB5B.CPF 0 755 1358 " + (hist.getConMes12() == null ? "" : hist.getConKwh12()) + "\r\n";
         return res;
     }
 
@@ -463,35 +466,35 @@ public class PrintGenerator {
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a devolver\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " -" + dataModel.getTlxKwhDev2() + " kWh\r\n";
+                    "T CONSO3.CPF 0 720 " + offsetX + " -" + dataModel.getTlxKwhDev2() + " kWh\r\n";
         }
         if (dataModel.getTlxKwhAdi2() > 0) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " kWh a adicionar\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi2() + " kWh\r\n";
+                    "T CONSO3.CPF 0 720 " + offsetX + " " + dataModel.getTlxKwhAdi2() + " kWh\r\n";
         }
 
         offsetX += 20;
         res += "LEFT\r\n" +
                 "T CONSO2.CPF 0 45 " + offsetX + " Total energía a facturar\r\n" +
                 "RIGHT 782\r\n" +
-                "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxConsFacturado() + " kWh\r\n";
+                "T CONSO3.CPF 0 720 " + offsetX + " " + dataModel.getTlxConsFacturado() + " kWh\r\n";
 
         if (dataModel.getTlxTipDem() == 2) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " Potencia Leida\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotLei() + " kWh\r\n";
+                    "T CONSO3.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotLei() + " kWh\r\n";
         }
         if (dataModel.getTlxPotFac() == 2) {
             offsetX += 20;
             res += "LEFT\r\n" +
                     "T CONSO2.CPF 0 45 " + offsetX + " Potencia Facturada\r\n" +
                     "RIGHT 782\r\n" +
-                    "T CONSO2.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotFac() + " kWh\r\n";
+                    "T CONSO3.CPF 0 720 " + offsetX + " " + dataModel.getTlxPotFac() + " kWh\r\n";
         }
         return res;
     }

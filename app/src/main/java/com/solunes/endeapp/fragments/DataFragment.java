@@ -983,6 +983,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         double importeTotalFactura = GenLecturas.totalFacturar(dataModel.getTlxImpSum(), dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
         double importeTotalFactura2 = GenLecturas.roundDecimal(importeTotalFactura, 1);
         double diff = importeTotalFactura - importeTotalFactura2;
+        DetalleFactura.crearDetalle(context, dataModel.getId(), 999, diff);
         if (dataModel.getTlxImpEnergia() > 0) {
             dataModel.setTlxImpEnergia(GenLecturas.roundDecimal(dataModel.getTlxImpEnergia() - diff, 2));
         } else {
