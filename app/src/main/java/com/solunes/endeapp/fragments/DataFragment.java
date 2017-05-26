@@ -29,6 +29,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.solunes.endeapp.R;
+import com.solunes.endeapp.activities.MainActivity;
 import com.solunes.endeapp.adapters.SingleChoiceAdapter;
 import com.solunes.endeapp.control_code.ControlCode;
 import com.solunes.endeapp.dataset.DBAdapter;
@@ -38,6 +39,7 @@ import com.solunes.endeapp.models.DataObs;
 import com.solunes.endeapp.models.DetalleFactura;
 import com.solunes.endeapp.models.FacturaDosificacion;
 import com.solunes.endeapp.models.Historico;
+import com.solunes.endeapp.models.MedEntreLineas;
 import com.solunes.endeapp.models.Obs;
 import com.solunes.endeapp.models.Parametro;
 import com.solunes.endeapp.models.PrintObs;
@@ -819,7 +821,44 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             hidingViews();
             onFragmentListener.onAjusteOrden(dataModel.getId());
             saveLectura();
+            nuevoMedidor(view);
             printFactura(view);
+        }
+    }
+
+    private void nuevoMedidor(final View view) {
+        if (obsArray.contains(58)) {
+            AlertDialog.Builder newMedidor = new AlertDialog.Builder(getContext());
+            newMedidor.setTitle("Cambio de tarifa");
+            View viewInside = LayoutInflater.from(getContext()).inflate(R.layout.layout_new_medidor, null);
+            final EditText nroMed = (EditText) viewInside.findViewById(R.id.new_med_number);
+            nroMed.setVisibility(View.GONE);
+            final EditText lecMed = (EditText) viewInside.findViewById(R.id.new_med_lectura);
+            lecMed.setVisibility(View.GONE);
+            final EditText potMed = (EditText) viewInside.findViewById(R.id.new_med_pot);
+            newMedidor.setView(viewInside);
+            newMedidor.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (potMed.getText().toString().isEmpty()) {
+                        Toast.makeText(getContext(), "Campo obligatorio", Toast.LENGTH_SHORT).show();
+                    } else {
+                        DBAdapter dbAdapter = new DBAdapter(getContext());
+                        ContentValues cv = new ContentValues();
+                        cv.put(MedEntreLineas.Columns.MelRem.name(), dataModel.getTlxRem());
+                        cv.put(MedEntreLineas.Columns.MelMed.name(), dataModel.getTlxNroMed());
+                        cv.put(MedEntreLineas.Columns.MelLec.name(), dataModel.getTlxNvaLec());
+                        cv.put(MedEntreLineas.Columns.MelPot.name(), Integer.parseInt(potMed.getText().toString()));
+                        dbAdapter.saveObject(DBHelper.MED_ENTRE_LINEAS_TABLE, cv);
+                        dbAdapter.close();
+                        Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
+                        onFragmentListener.onNextPage();
+                    }
+                }
+            });
+            newMedidor.setCancelable(false);
+            newMedidor.show();
+        } else {
             onFragmentListener.onNextPage();
         }
     }
@@ -983,7 +1022,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         double importeTotalFactura = GenLecturas.totalFacturar(dataModel.getTlxImpSum(), dataModel.getTlxImpTap(), dataModel.getTlxImpAse());
         double importeTotalFactura2 = GenLecturas.roundDecimal(importeTotalFactura, 1);
         double diff = importeTotalFactura - importeTotalFactura2;
-        DetalleFactura.crearDetalle(context, dataModel.getId(), 999, diff);
+        DetalleFactura.crearDetalle(context, dataModel.getId(), 999, -diff);
         if (dataModel.getTlxImpEnergia() > 0) {
             dataModel.setTlxImpEnergia(GenLecturas.roundDecimal(dataModel.getTlxImpEnergia() - diff, 2));
         } else {
@@ -1754,7 +1793,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
     private boolean isConsumoElevado(int lecturaKwh, int categoriaId, int consumoPro) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
         double porcentaje = dbAdapter.getPorcentaje(categoriaId, consumoPro);
-        if (porcentaje == 0){
+        if (porcentaje == 0) {
             return false;
         }
         return lecturaKwh > (consumoPro + consumoPro * (porcentaje / 100));
