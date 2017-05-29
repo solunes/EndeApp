@@ -845,6 +845,8 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     } else {
                         DBAdapter dbAdapter = new DBAdapter(getContext());
                         ContentValues cv = new ContentValues();
+                        Log.e(TAG, "onClick: rem " + dataModel.getTlxRem());
+                        Log.e(TAG, "onClick: med " + dataModel.getTlxNroMed());
                         cv.put(MedEntreLineas.Columns.MelRem.name(), dataModel.getTlxRem());
                         cv.put(MedEntreLineas.Columns.MelMed.name(), dataModel.getTlxNroMed());
                         cv.put(MedEntreLineas.Columns.MelLec.name(), dataModel.getTlxNvaLec());

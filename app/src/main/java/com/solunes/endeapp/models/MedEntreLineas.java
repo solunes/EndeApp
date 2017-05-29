@@ -21,7 +21,7 @@ public class MedEntreLineas {
         entreLineas.setMelRem(cursor.getInt(Columns.MelRem.ordinal()));
         entreLineas.setMelMed(cursor.getInt(Columns.MelMed.ordinal()));
         entreLineas.setMelLec(cursor.getInt(Columns.MelLec.ordinal()));
-        entreLineas.setMelLec(cursor.getInt(Columns.MelPot.ordinal()));
+        entreLineas.setMelPot(cursor.getInt(Columns.MelPot.ordinal()));
         return entreLineas;
     }
 
@@ -39,6 +39,7 @@ public class MedEntreLineas {
     }
 
     public enum Columns {
+        id,
         MelRem,
         MelMed,
         MelLec,

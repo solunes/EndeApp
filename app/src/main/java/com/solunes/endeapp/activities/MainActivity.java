@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 boolean response = false;
                                 try {
-                                    response = processResponse(getApplicationContext(),result);
+                                    response = processResponse(getApplicationContext(), result);
                                 } catch (JSONException e) {
                                     Log.e(TAG, "onSuccess: ", e);
                                 }
@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
      * @return retorna true si se hay datos para guardar
      * @throws JSONException lanza una excepcion si el formato del string result no es json
      */
-    public static boolean processResponse(Context context,String result) throws JSONException {
+    public static boolean processResponse(Context context, String result) throws JSONException {
         JSONArray results = new JSONArray(result);
         DBAdapter dbAdapter = new DBAdapter(context);
         dbAdapter.beforeDownloadData();
@@ -527,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
                 valuesRes.put(Resultados.Columns.lectura_potencia.name(), resultado.getDouble(Resultados.Columns.lectura_potencia.name()));
                 valuesRes.put(Resultados.Columns.observacion.name(), resultado.getDouble(Resultados.Columns.observacion.name()));
                 dbAdapter.saveObject(DBHelper.RESULTADOS_TABLE, valuesRes);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 Log.e(TAG, "no hay rasultados");
             }
 
@@ -576,9 +576,13 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < entreLineasList.size(); i++) {
                 MedEntreLineas entreLineas = entreLineasList.get(i);
+                Log.e(TAG, "prepareDataToPost: " + entreLineas.getMelMed());
+                Log.e(TAG, "prepareDataToPost: " + entreLineas.getMelPot());
+                Log.e(TAG, "prepareDataToPost: toJson " + entreLineas.toJson());
                 jsonArray.put(i, entreLineas.toJson());
             }
             params.put("med_entre_lineas", jsonArray.toString());
+            Log.e(TAG, "prepareDataToPost: entre lineas " + jsonArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
