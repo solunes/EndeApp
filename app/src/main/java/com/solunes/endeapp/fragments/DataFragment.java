@@ -658,7 +658,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         builder.setTitle("Alerta!");
         if (dataModel.getTlxCliNew() == 0) {
 
-            if (isConsumoElevado(lecturaKwh, dataModel.getTlxCtg(), dataModel.getTlxConPro())) {
+            if (isConsumoElevado(lecturaKwh, dataModel.getTlxCtg(), dataModel.getTlxConsumo())) {
                 message += "\n- Consumo elevado";
                 isAlert = true;
                 autoObs.add(80);
@@ -840,22 +840,17 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             newMedidor.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    if (potMed.getText().toString().isEmpty()) {
-                        Toast.makeText(getContext(), "Campo obligatorio", Toast.LENGTH_SHORT).show();
-                    } else {
-                        DBAdapter dbAdapter = new DBAdapter(getContext());
-                        ContentValues cv = new ContentValues();
-                        Log.e(TAG, "onClick: rem " + dataModel.getTlxRem());
-                        Log.e(TAG, "onClick: med " + dataModel.getTlxNroMed());
-                        cv.put(MedEntreLineas.Columns.MelRem.name(), dataModel.getTlxRem());
-                        cv.put(MedEntreLineas.Columns.MelMed.name(), dataModel.getTlxNroMed());
-                        cv.put(MedEntreLineas.Columns.MelLec.name(), dataModel.getTlxNvaLec());
-                        cv.put(MedEntreLineas.Columns.MelPot.name(), Integer.parseInt(potMed.getText().toString()));
-                        dbAdapter.saveObject(DBHelper.MED_ENTRE_LINEAS_TABLE, cv);
-                        dbAdapter.close();
-                        Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
-                        onFragmentListener.onNextPage();
-                    }
+                    DBAdapter dbAdapter = new DBAdapter(getContext());
+                    ContentValues cv = new ContentValues();
+                    cv.put(MedEntreLineas.Columns.MelRem.name(), dataModel.getTlxRem());
+                    cv.put(MedEntreLineas.Columns.MelMed.name(), dataModel.getTlxNroMed());
+                    cv.put(MedEntreLineas.Columns.MelLec.name(), dataModel.getTlxNvaLec());
+                    int pot = potMed.getText().toString().isEmpty() ? 0 : Integer.parseInt(potMed.getText().toString());
+                    cv.put(MedEntreLineas.Columns.MelPot.name(), pot) ;
+                    dbAdapter.saveObject(DBHelper.MED_ENTRE_LINEAS_TABLE, cv);
+                    dbAdapter.close();
+                    Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
+                    onFragmentListener.onNextPage();
                 }
             });
             newMedidor.setCancelable(false);
