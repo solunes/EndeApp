@@ -658,7 +658,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
         builder.setTitle("Alerta!");
         if (dataModel.getTlxCliNew() == 0) {
 
-            if (isConsumoElevado(lecturaKwh, dataModel.getTlxCtg(), dataModel.getTlxConsumo())) {
+            if (isConsumoElevado(lecturaKwh, dataModel.getTlxCtg(), dataModel.getTlxConPro())) {
                 message += "\n- Consumo elevado";
                 isAlert = true;
                 autoObs.add(80);
@@ -846,7 +846,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
                     cv.put(MedEntreLineas.Columns.MelMed.name(), dataModel.getTlxNroMed());
                     cv.put(MedEntreLineas.Columns.MelLec.name(), dataModel.getTlxNvaLec());
                     int pot = potMed.getText().toString().isEmpty() ? 0 : Integer.parseInt(potMed.getText().toString());
-                    cv.put(MedEntreLineas.Columns.MelPot.name(), pot) ;
+                    cv.put(MedEntreLineas.Columns.MelPot.name(), pot);
                     dbAdapter.saveObject(DBHelper.MED_ENTRE_LINEAS_TABLE, cv);
                     dbAdapter.close();
                     Snackbar.make(view, "Nuevo medidor para la ruta", Snackbar.LENGTH_SHORT).show();
@@ -916,16 +916,15 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
             dataModel.setTlxConsumo(0);
         }
 
-        Log.e(TAG, "calculo: KwhDev2 " + dataModel.getTlxKwhDev2());
         // correccion de kwh a devolver sino es consumo promedio o lectura estinada
         if (dataModel.getTlxKwhDev() > 0 && tipoLectura != 3 && tipoLectura != 9) {
             int lectura2 = lectura - dataModel.getTlxKwhDev();
             if (lectura2 > 0) {
                 dataModel.setTlxKwhDev(0);
+                lectura = lectura2;
             } else {
                 dataModel.setTlxKwhDev(Math.abs(lectura2));
                 dataModel.setTlxKwhDev2(lectura);
-                Log.e(TAG, "calculo: KwhDev2 " + dataModel.getTlxKwhDev2());
                 lectura = 0;
             }
         }
@@ -1789,7 +1788,7 @@ public class DataFragment extends Fragment implements DatePickerDialog.OnDateSet
 
     private boolean isConsumoElevado(int lecturaKwh, int categoriaId, int consumoPro) {
         DBAdapter dbAdapter = new DBAdapter(getContext());
-        double porcentaje = dbAdapter.getPorcentaje(categoriaId, consumoPro);
+        double porcentaje = dbAdapter.getPorcentaje(categoriaId, lecturaKwh);
         if (porcentaje == 0) {
             return false;
         }
